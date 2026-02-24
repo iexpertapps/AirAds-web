@@ -297,47 +297,65 @@ Already configured at `airaad/frontend/vercel.json` with:
 
 ## GitHub Actions CI/CD Pipeline
 
-### Pipeline Overview
+### Workflow Files
+
+| File | Trigger | Purpose |
+|------|---------|--------|
+| `ci.yml` | Push to any branch + PRs | All CI checks (lint, test, security, build, E2E) |
+| `deploy-development.yml` | `ci.yml` passes on `develop` | Auto-deploy to dev + health check |
+| `deploy-staging.yml` | `ci.yml` passes on `staging` | Deploy to staging + smoke tests |
+| `deploy-production.yml` | `ci.yml` passes on `main` | Deploy to prod + rollback safety |
+
+### CI Pipeline Architecture (ci.yml)
 
 ```
-┌──────────────────── CI (all branches + PRs) ────────────────────┐
-│                                                                  │
-│  lint ─┐                                                        │
-│        ├── test ──── backend-build ──┐                          │
-│  migration-check                     │                          │
-│                                      ├── DEPLOY JOBS (push only)│
-│  frontend-lint ── frontend-build ────┘                          │
-│                                                                  │
-│  security-scan                                                   │
-│  semgrep (PRs only) ── ai-review                                │
-│  secret-scan (PRs only)                                         │
-│  backend-e2e                                                     │
-│  frontend-e2e                                                    │
-│  quality-gate (PRs only)                                        │
-└──────────────────────────────────────────────────────────────────┘
-
-┌──────────────────── Deploy (push only) ─────────────────────────┐
-│                                                                  │
-│  develop push:                                                   │
-│    deploy-backend-dev → deploy-celery-dev                       │
-│    deploy-frontend-dev                                           │
-│                                                                  │
-│  staging push:                                                   │
-│    deploy-backend-staging → deploy-celery-staging               │
-│    deploy-frontend-staging                                       │
-│                                                                  │
-│  main push:                                                      │
-│    deploy-backend-prod → deploy-celery-prod                     │
-│    deploy-frontend-prod                                          │
-└──────────────────────────────────────────────────────────────────┘
+┌─── LAYER 1: Parallel fast checks (no DB) ───────────────────────┐
+│  backend-lint    frontend-lint    backend-security               │
+│  frontend-security               secret-scan (ALL pushes)       │
+└──────────┬──────────┬────────────────────────────────────────────┘
+           │          │
+┌─── LAYER 2: DB-dependent checks (parallel) ─────────────────────┐
+│  migration-check   backend-test (≥80% cov)   rbac-test          │
+│                    frontend-build                                │
+└──────────┬──────────┬────────────────────────────────────────────┘
+           │          │
+┌─── LAYER 3: Integration & E2E ──────────────────────────────────┐
+│  backend-docker (Buildx cached)   backend-e2e   frontend-e2e    │
+└──────────┬──────────┬────────────────────────────────────────────┘
+           │          │
+┌─── LAYER 4: PR-only gates ──────────────────────────────────────┐
+│  semgrep → ai-review    quality-gate                            │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### Deploy Job Dependencies
+### Deploy Pipelines (triggered via `workflow_run`)
 
-All deploy jobs require these CI jobs to pass first:
-- `test` (backend tests with ≥80% coverage)
-- `backend-build` (Docker image builds successfully)
-- `frontend-build` (Vite build completes without errors)
+```
+┌─── Development (deploy-development.yml) ────────────────────────┐
+│  CI passes on develop →                                         │
+│    deploy-backend → deploy-celery (sequential)                  │
+│    deploy-frontend (parallel with backend)                      │
+│    health-check → notify                                        │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─── Staging (deploy-staging.yml) ────────────────────────────────┐
+│  CI passes on staging →                                         │
+│    deploy-backend → deploy-celery                               │
+│    deploy-frontend                                              │
+│    smoke-test (DEBUG off, auth enforced, security headers)      │
+│    notify                                                       │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─── Production (deploy-production.yml) ──────────────────────────┐
+│  CI passes on main →                                            │
+│    create git tag (rollback save point)                         │
+│    deploy-backend → deploy-celery                               │
+│    deploy-frontend                                              │
+│    verify (health + DEBUG + auth + HTTPS + security headers)    │
+│    auto-rollback (if verify fails)                              │
+│    notify (ALWAYS — success, failure, or rollback)              │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ### Migration Safety
 
@@ -389,6 +407,12 @@ Configure all secrets in **GitHub → Settings → Secrets and variables → Act
 | `VERCEL_DEV_URL` | Full URL of dev frontend |
 | `VERCEL_STAGING_URL` | Full URL of staging frontend |
 | `VERCEL_PROD_URL` | Full URL of prod frontend |
+
+### Notification Secrets
+
+| Secret Name | Description |
+|-------------|-------------|
+| `SLACK_WEBHOOK_URL` | Slack incoming webhook URL for deploy notifications (optional but recommended) |
 
 ### Other Secrets
 
