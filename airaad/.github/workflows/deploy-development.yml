@@ -1,0 +1,230 @@
+# =============================================================================
+# AirAd Deploy — Development Environment
+# =============================================================================
+# Triggers: when "AirAd CI" workflow completes successfully on develop branch.
+# Auto-deploys backend + celery to Railway, frontend to Vercel.
+# Post-deploy health check verifies the environment is live.
+# =============================================================================
+
+name: "Deploy → Development"
+
+on:
+  workflow_run:
+    workflows: ["AirAd CI"]
+    types: [completed]
+    branches: [develop]
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  # -------------------------------------------------------------------------
+  # Gate: only proceed if CI passed
+  # -------------------------------------------------------------------------
+  gate:
+    name: "CI Gate"
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: CI passed — proceeding with deployment
+        run: echo "✅ CI workflow ${{ github.event.workflow_run.id }} passed on develop"
+
+  # -------------------------------------------------------------------------
+  # Deploy backend to Railway (development)
+  # -------------------------------------------------------------------------
+  deploy-backend:
+    name: "Backend → Railway Dev"
+    runs-on: ubuntu-latest
+    needs: [gate]
+    environment:
+      name: development
+      url: ${{ secrets.RAILWAY_DEV_BACKEND_URL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
+
+      - name: Deploy backend
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_DEV_TOKEN }}
+        run: railway up --service ${{ secrets.RAILWAY_DEV_SERVICE_ID_BACKEND }} --detach
+        working-directory: airaad/backend
+
+      - name: Wait for Railway deployment to stabilize
+        run: sleep 30
+
+      - name: Run database migrations
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_DEV_TOKEN }}
+        run: railway run --service ${{ secrets.RAILWAY_DEV_SERVICE_ID_BACKEND }} python manage.py migrate --noinput
+        working-directory: airaad/backend
+
+  # -------------------------------------------------------------------------
+  # Deploy Celery worker to Railway (development)
+  # -------------------------------------------------------------------------
+  deploy-celery:
+    name: "Celery → Railway Dev"
+    runs-on: ubuntu-latest
+    needs: [deploy-backend]
+    environment:
+      name: development
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
+
+      - name: Deploy Celery worker
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_DEV_TOKEN }}
+        run: railway up --service ${{ secrets.RAILWAY_DEV_SERVICE_ID_CELERY }} --detach
+        working-directory: airaad/backend
+
+  # -------------------------------------------------------------------------
+  # Deploy frontend to Vercel (development)
+  # -------------------------------------------------------------------------
+  deploy-frontend:
+    name: "Frontend → Vercel Dev"
+    runs-on: ubuntu-latest
+    needs: [gate]
+    environment:
+      name: development
+      url: ${{ secrets.VERCEL_DEV_URL }}
+    defaults:
+      run:
+        working-directory: airaad/frontend
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: airaad/frontend/package-lock.json
+
+      - name: Install Vercel CLI
+        run: npm i -g vercel
+
+      - name: Pull Vercel project settings
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build for development
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VITE_API_BASE_URL: ${{ secrets.RAILWAY_DEV_BACKEND_URL }}
+          VITE_APP_ENV: development
+
+      - name: Deploy to Vercel
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+
+  # -------------------------------------------------------------------------
+  # Post-deploy health check
+  # -------------------------------------------------------------------------
+  health-check:
+    name: "Post-Deploy Health Check"
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, deploy-celery, deploy-frontend]
+    steps:
+      - name: Check backend health endpoint
+        run: |
+          BACKEND_URL="${{ secrets.RAILWAY_DEV_BACKEND_URL }}"
+          echo "Checking $BACKEND_URL/api/v1/health/ ..."
+          for i in 1 2 3 4 5; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BACKEND_URL/api/v1/health/" || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Backend health check passed (HTTP $STATUS)"
+              exit 0
+            fi
+            echo "  Attempt $i: HTTP $STATUS — retrying in 10s..."
+            sleep 10
+          done
+          echo "❌ Backend health check FAILED after 5 attempts"
+          exit 1
+
+      - name: Check frontend is accessible
+        run: |
+          FRONTEND_URL="${{ secrets.VERCEL_DEV_URL }}"
+          echo "Checking $FRONTEND_URL ..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$FRONTEND_URL" || echo "000")
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ Frontend accessible (HTTP $STATUS)"
+          else
+            echo "⚠️ Frontend returned HTTP $STATUS (may still be deploying)"
+          fi
+
+  # -------------------------------------------------------------------------
+  # Notify team
+  # -------------------------------------------------------------------------
+  notify:
+    name: "Notify Team"
+    runs-on: ubuntu-latest
+    needs: [health-check]
+    if: always()
+    steps:
+      - name: Determine deployment status
+        id: status
+        run: |
+          if [ "${{ needs.health-check.result }}" = "success" ]; then
+            echo "emoji=✅" >> $GITHUB_OUTPUT
+            echo "status=succeeded" >> $GITHUB_OUTPUT
+          else
+            echo "emoji=❌" >> $GITHUB_OUTPUT
+            echo "status=FAILED" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Post to Slack
+        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "${{ steps.status.outputs.emoji }} *Development Deploy ${{ steps.status.outputs.status }}*\nBranch: `develop`\nCommit: `${{ github.event.workflow_run.head_sha }}`\nBackend: ${{ secrets.RAILWAY_DEV_BACKEND_URL }}\nFrontend: ${{ secrets.VERCEL_DEV_URL }}\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Post summary to GitHub Actions
+        run: |
+          echo "## ${{ steps.status.outputs.emoji }} Development Deploy ${{ steps.status.outputs.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | \`develop\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`${{ github.event.workflow_run.head_sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend | ${{ secrets.RAILWAY_DEV_BACKEND_URL }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend | ${{ secrets.VERCEL_DEV_URL }} |" >> $GITHUB_STEP_SUMMARY
+
+  # -------------------------------------------------------------------------
+  # Notify on CI failure (deploy skipped)
+  # -------------------------------------------------------------------------
+  notify-ci-failed:
+    name: "Notify CI Failure"
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'failure'
+    steps:
+      - name: Post CI failure to Slack
+        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "❌ *Development CI FAILED — deploy skipped*\nBranch: `develop`\nCommit: `${{ github.event.workflow_run.head_sha }}`\nCI Run: ${{ github.event.workflow_run.html_url }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Post failure summary
+        run: |
+          echo "## ❌ Development CI Failed — Deploy Skipped" >> $GITHUB_STEP_SUMMARY
+          echo "CI Run: ${{ github.event.workflow_run.html_url }}" >> $GITHUB_STEP_SUMMARY

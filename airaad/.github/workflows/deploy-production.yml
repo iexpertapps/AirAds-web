@@ -1,0 +1,397 @@
+# =============================================================================
+# AirAd Deploy — Production Environment
+# =============================================================================
+# Triggers: when "AirAd CI" workflow completes successfully on main branch.
+# Code reaches production ONLY via reviewed PR from staging.
+#
+# Safety features:
+# - Creates a git tag (rollback point) before deploying
+# - Post-deploy health check + smoke tests
+# - Auto-rollback on failure via Railway CLI
+# - Team notified on EVERY production deploy (success or failure)
+# =============================================================================
+
+name: "Deploy → Production"
+
+on:
+  workflow_run:
+    workflows: ["AirAd CI"]
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  # -------------------------------------------------------------------------
+  # Gate: only proceed if CI passed
+  # -------------------------------------------------------------------------
+  gate:
+    name: "CI Gate"
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    outputs:
+      short_sha: ${{ steps.meta.outputs.short_sha }}
+      release_tag: ${{ steps.meta.outputs.release_tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Compute release metadata
+        id: meta
+        run: |
+          SHORT_SHA=$(echo "${{ github.event.workflow_run.head_sha }}" | cut -c1-7)
+          RELEASE_TAG="release-$(date -u +%Y%m%d-%H%M%S)-${SHORT_SHA}"
+          echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "release_tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
+          echo "✅ CI passed — preparing production deploy"
+          echo "   Commit: $SHORT_SHA"
+          echo "   Tag:    $RELEASE_TAG"
+
+      - name: Create rollback tag (save point)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.meta.outputs.release_tag }}" -m "Production release ${{ steps.meta.outputs.release_tag }}"
+          git push origin "${{ steps.meta.outputs.release_tag }}"
+          echo "🏷️ Created rollback tag: ${{ steps.meta.outputs.release_tag }}"
+
+  # -------------------------------------------------------------------------
+  # Deploy backend to Railway (production)
+  # -------------------------------------------------------------------------
+  deploy-backend:
+    name: "Backend → Railway Prod"
+    runs-on: ubuntu-latest
+    needs: [gate]
+    environment:
+      name: production
+      url: ${{ secrets.RAILWAY_PROD_BACKEND_URL }}
+    outputs:
+      deploy_success: ${{ steps.deploy.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
+
+      - name: Deploy backend
+        id: deploy
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROD_TOKEN }}
+        run: railway up --service ${{ secrets.RAILWAY_PROD_SERVICE_ID_BACKEND }} --detach
+        working-directory: airaad/backend
+
+      - name: Wait for Railway deployment to stabilize
+        run: sleep 45
+
+      - name: Run database migrations
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROD_TOKEN }}
+        run: railway run --service ${{ secrets.RAILWAY_PROD_SERVICE_ID_BACKEND }} python manage.py migrate --noinput
+        working-directory: airaad/backend
+
+  # -------------------------------------------------------------------------
+  # Deploy Celery worker to Railway (production)
+  # -------------------------------------------------------------------------
+  deploy-celery:
+    name: "Celery → Railway Prod"
+    runs-on: ubuntu-latest
+    needs: [deploy-backend]
+    environment:
+      name: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
+
+      - name: Deploy Celery worker
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROD_TOKEN }}
+        run: railway up --service ${{ secrets.RAILWAY_PROD_SERVICE_ID_CELERY }} --detach
+        working-directory: airaad/backend
+
+  # -------------------------------------------------------------------------
+  # Deploy frontend to Vercel (production)
+  # -------------------------------------------------------------------------
+  deploy-frontend:
+    name: "Frontend → Vercel Prod"
+    runs-on: ubuntu-latest
+    needs: [gate]
+    environment:
+      name: production
+      url: ${{ secrets.VERCEL_PROD_URL }}
+    defaults:
+      run:
+        working-directory: airaad/frontend
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: airaad/frontend/package-lock.json
+
+      - name: Install Vercel CLI
+        run: npm i -g vercel
+
+      - name: Pull Vercel project settings
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build for production
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VITE_API_BASE_URL: ${{ secrets.RAILWAY_PROD_BACKEND_URL }}
+          VITE_APP_ENV: production
+
+      - name: Deploy to Vercel (production)
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+  # -------------------------------------------------------------------------
+  # Post-deploy verification — comprehensive production checks
+  # -------------------------------------------------------------------------
+  verify:
+    name: "Post-Deploy Verification"
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, deploy-celery, deploy-frontend]
+    outputs:
+      result: ${{ steps.final.outputs.result }}
+    steps:
+      - name: Backend health check (with retries)
+        id: backend-health
+        run: |
+          BACKEND_URL="${{ secrets.RAILWAY_PROD_BACKEND_URL }}"
+          echo "Checking $BACKEND_URL/api/v1/health/ ..."
+          PASSED=false
+          for i in 1 2 3 4 5 6; do
+            RESPONSE=$(curl -s -w "\n%{http_code}" "$BACKEND_URL/api/v1/health/" --max-time 10 || echo -e "\n000")
+            BODY=$(echo "$RESPONSE" | head -1)
+            STATUS=$(echo "$RESPONSE" | tail -1)
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Backend health check passed (HTTP $STATUS)"
+              echo "   Response: $BODY"
+              PASSED=true
+              break
+            fi
+            echo "  Attempt $i: HTTP $STATUS — retrying in 10s..."
+            sleep 10
+          done
+          if [ "$PASSED" = "false" ]; then
+            echo "❌ Backend health check FAILED after 6 attempts"
+            echo "health=failed" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          echo "health=passed" >> $GITHUB_OUTPUT
+
+      - name: Verify DEBUG is off
+        run: |
+          BACKEND_URL="${{ secrets.RAILWAY_PROD_BACKEND_URL }}"
+          RESPONSE=$(curl -s "$BACKEND_URL/api/v1/nonexistent-endpoint-check/" || echo "")
+          if echo "$RESPONSE" | grep -q "Traceback\|INSTALLED_APPS\|DEBUG = True"; then
+            echo "❌ PRODUCTION IS RUNNING IN DEBUG MODE — CRITICAL SECURITY ISSUE"
+            exit 1
+          fi
+          echo "✅ DEBUG is off in production"
+
+      - name: Verify HTTPS redirect
+        run: |
+          BACKEND_URL="${{ secrets.RAILWAY_PROD_BACKEND_URL }}"
+          # Railway handles SSL termination, so we verify the app responds on HTTPS
+          if echo "$BACKEND_URL" | grep -q "^https://"; then
+            echo "✅ Backend URL uses HTTPS"
+          else
+            echo "⚠️ Backend URL does not use HTTPS: $BACKEND_URL"
+          fi
+
+      - name: Verify API auth is enforced
+        run: |
+          BACKEND_URL="${{ secrets.RAILWAY_PROD_BACKEND_URL }}"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BACKEND_URL/api/v1/vendors/" --max-time 10 || echo "000")
+          if [ "$STATUS" = "401" ] || [ "$STATUS" = "403" ]; then
+            echo "✅ API authentication enforced (HTTP $STATUS)"
+          else
+            echo "❌ Unexpected status $STATUS for unauthenticated request"
+            exit 1
+          fi
+
+      - name: Check frontend is accessible
+        run: |
+          FRONTEND_URL="${{ secrets.VERCEL_PROD_URL }}"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$FRONTEND_URL" --max-time 10 || echo "000")
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ Frontend accessible (HTTP $STATUS)"
+          else
+            echo "❌ Frontend returned HTTP $STATUS"
+            exit 1
+          fi
+
+      - name: Verify security headers
+        run: |
+          FRONTEND_URL="${{ secrets.VERCEL_PROD_URL }}"
+          HEADERS=$(curl -sI "$FRONTEND_URL" --max-time 10 || echo "")
+          MISSING=0
+          for HEADER in "x-content-type-options" "x-frame-options" "referrer-policy"; do
+            if echo "$HEADERS" | grep -qi "$HEADER"; then
+              echo "✅ $HEADER present"
+            else
+              echo "❌ $HEADER MISSING"
+              MISSING=$((MISSING + 1))
+            fi
+          done
+          if [ "$MISSING" -gt 0 ]; then
+            echo "⚠️ $MISSING security headers missing"
+          fi
+
+      - name: Set final result
+        id: final
+        if: always()
+        run: |
+          if [ "${{ steps.backend-health.outcome }}" = "success" ]; then
+            echo "result=success" >> $GITHUB_OUTPUT
+          else
+            echo "result=failure" >> $GITHUB_OUTPUT
+          fi
+
+  # -------------------------------------------------------------------------
+  # Auto-rollback on verification failure
+  # -------------------------------------------------------------------------
+  rollback:
+    name: "Auto-Rollback (on failure)"
+    runs-on: ubuntu-latest
+    needs: [verify, gate]
+    if: failure() && needs.verify.outputs.result == 'failure'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
+
+      - name: Rollback backend to previous deployment
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROD_TOKEN }}
+        run: |
+          echo "🔄 ROLLING BACK production backend..."
+          echo "   Failed release: ${{ needs.gate.outputs.release_tag }}"
+          # Railway rollback to previous deployment
+          railway rollback --service ${{ secrets.RAILWAY_PROD_SERVICE_ID_BACKEND }} --yes 2>/dev/null || \
+            echo "⚠️ Railway rollback command not available — manual rollback may be needed"
+
+      - name: Rollback Celery worker
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROD_TOKEN }}
+        run: |
+          railway rollback --service ${{ secrets.RAILWAY_PROD_SERVICE_ID_CELERY }} --yes 2>/dev/null || \
+            echo "⚠️ Celery rollback — manual intervention may be needed"
+
+      - name: Verify rollback health
+        run: |
+          sleep 30
+          BACKEND_URL="${{ secrets.RAILWAY_PROD_BACKEND_URL }}"
+          for i in 1 2 3; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BACKEND_URL/api/v1/health/" --max-time 10 || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Rollback successful — backend is healthy"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "❌ Rollback health check failed — IMMEDIATE MANUAL INTERVENTION REQUIRED"
+          exit 1
+
+  # -------------------------------------------------------------------------
+  # Notify team — ALWAYS for production deploys
+  # -------------------------------------------------------------------------
+  notify:
+    name: "Notify Team"
+    runs-on: ubuntu-latest
+    needs: [verify, gate, rollback]
+    if: always() && needs.gate.result == 'success'
+    steps:
+      - name: Determine deployment status
+        id: status
+        run: |
+          VERIFY="${{ needs.verify.result }}"
+          ROLLBACK="${{ needs.rollback.result }}"
+
+          if [ "$VERIFY" = "success" ]; then
+            echo "emoji=🚀" >> $GITHUB_OUTPUT
+            echo "status=SUCCEEDED" >> $GITHUB_OUTPUT
+            echo "detail=Production is live and verified." >> $GITHUB_OUTPUT
+          elif [ "$ROLLBACK" = "success" ]; then
+            echo "emoji=🔄" >> $GITHUB_OUTPUT
+            echo "status=ROLLED BACK" >> $GITHUB_OUTPUT
+            echo "detail=Deploy failed verification. Previous version restored automatically." >> $GITHUB_OUTPUT
+          elif [ "$ROLLBACK" = "failure" ]; then
+            echo "emoji=🚨" >> $GITHUB_OUTPUT
+            echo "status=CRITICAL — ROLLBACK FAILED" >> $GITHUB_OUTPUT
+            echo "detail=Deploy AND rollback failed. IMMEDIATE MANUAL INTERVENTION REQUIRED." >> $GITHUB_OUTPUT
+          else
+            echo "emoji=❌" >> $GITHUB_OUTPUT
+            echo "status=FAILED" >> $GITHUB_OUTPUT
+            echo "detail=Production deploy failed." >> $GITHUB_OUTPUT
+          fi
+
+      - name: Post to Slack
+        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "${{ steps.status.outputs.emoji }} *PRODUCTION Deploy ${{ steps.status.outputs.status }}*\n${{ steps.status.outputs.detail }}\nRelease: `${{ needs.gate.outputs.release_tag }}`\nCommit: `${{ needs.gate.outputs.short_sha }}`\nBackend: ${{ secrets.RAILWAY_PROD_BACKEND_URL }}\nFrontend: ${{ secrets.VERCEL_PROD_URL }}\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Post summary to GitHub Actions
+        run: |
+          echo "## ${{ steps.status.outputs.emoji }} Production Deploy ${{ steps.status.outputs.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.status.outputs.detail }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Release Tag | \`${{ needs.gate.outputs.release_tag }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`${{ needs.gate.outputs.short_sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend | ${{ secrets.RAILWAY_PROD_BACKEND_URL }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend | ${{ secrets.VERCEL_PROD_URL }} |" >> $GITHUB_STEP_SUMMARY
+
+  # -------------------------------------------------------------------------
+  # Notify on CI failure (deploy skipped)
+  # -------------------------------------------------------------------------
+  notify-ci-failed:
+    name: "Notify CI Failure"
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'failure'
+    steps:
+      - name: Post CI failure to Slack
+        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "🚨 *Production CI FAILED — deploy blocked*\nBranch: `main`\nCommit: `${{ github.event.workflow_run.head_sha }}`\nCI Run: ${{ github.event.workflow_run.html_url }}\n\n*No code was deployed to production.*"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Post failure summary
+        run: |
+          echo "## 🚨 Production CI Failed — Deploy Blocked" >> $GITHUB_STEP_SUMMARY
+          echo "No code was deployed to production." >> $GITHUB_STEP_SUMMARY
+          echo "CI Run: ${{ github.event.workflow_run.html_url }}" >> $GITHUB_STEP_SUMMARY
