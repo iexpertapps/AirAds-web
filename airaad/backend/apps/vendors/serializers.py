@@ -113,7 +113,7 @@ class VendorSerializer(GpsPointMixin, serializers.ModelSerializer):
         if not obj.storefront_photo_key:
             return ""
         try:
-            from core.storage import StorageError, generate_presigned_url
+            from core.storage import generate_presigned_url
 
             return generate_presigned_url(obj.storefront_photo_key)
         except (Exception,):

@@ -6,7 +6,7 @@ POST /api/v1/imports/google-places/enhanced/
 Request body:
 {
   "country_id": "<uuid>",
-  "city_id": "<uuid>", 
+  "city_id": "<uuid>",
   "area_id": "<uuid>",
   "category_tags": ["<uuid>", "<uuid>"],
   "search_query": "restaurants food",
