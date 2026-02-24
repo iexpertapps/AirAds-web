@@ -43,19 +43,16 @@ RUN pip install --upgrade pip wheel && \
 FROM python:3.12-slim AS production
 
 # Install GDAL and runtime dependencies
-# GDAL 3.6.x matches postgis/postgis:16-3.4-alpine (Alpine 3.18 ships gdal 3.6.x)
-# libpq-dev provides libpq.so.5 needed by compiled psycopg2
+# gdal-bin pulls in the correct libgdal, libgeos, libproj as dependencies
+# libpq5 provides libpq.so.5 needed by compiled psycopg2
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
-    libgdal32 \
     gdal-bin \
-    libgeos-c1v5 \
-    libproj25 \
     && rm -rf /var/lib/apt/lists/*
 
-# Set GDAL/GEOS/PROJ paths for GeoDjango
-ENV GDAL_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgdal.so.32
-ENV GEOS_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgeos_c.so.1
+# Set GDAL/GEOS/PROJ paths for GeoDjango (use generic symlinks)
+ENV GDAL_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgdal.so
+ENV GEOS_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgeos_c.so
 ENV PROJ_LIB=/usr/share/proj
 
 # Create non-root user for security
