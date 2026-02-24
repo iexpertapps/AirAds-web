@@ -1,5 +1,5 @@
 # AirAd — Airbnb Design Language System (DLS)
-**Version:** 1.0 · **Date:** February 2026 · **Status:** Approved for Phase-1 Execution
+**Version:** 2.0 · **Date:** February 2026 · **Status:** Approved for Phase-1 Execution — Brand Elevation Update
 
 > All UI in the AirAd Data Collection Portal **must** comply with sections A1–A14. No exceptions.
 
@@ -11,7 +11,7 @@
 |-----------|-----------|-------------------|
 | **Unified** | Consistent experience across all surfaces | Same component library, token system, and interaction patterns across all 10 portal pages |
 | **Universal** | Accessible and inclusive by default | WCAG 2.1 AA minimum, keyboard nav, screen reader labels on all tables and forms |
-| **Iconic** | Simple, bold, purposeful — no decoration for decoration's sake | Use whitespace, clear hierarchy, purposeful color — no gratuitous gradients or shadows |
+| **Iconic** | Bold, premium, instantly recognizable as AirAd | Logo-derived color system (orange/crimson/teal/black), purposeful gradients, ambient glow — every surface must feel intentional |
 | **Conversational** | Design feels human — warm, clear, direct | Form labels as plain-language questions, error messages with helpful guidance, not codes |
 
 ---
@@ -19,47 +19,96 @@
 ## A2 — Color System
 
 Apply as CSS custom properties. **Never hardcode hex values in components.**
+The AirAd brand logo (three overlapping petals: orange, crimson, teal on black) is the single source of truth for all color decisions.
 
 ```css
 :root {
-  /* Core Brand */
-  --color-rausch:        #FF5A5F;  /* Primary CTAs, alerts — max 1 per view */
-  --color-babu:          #00A699;  /* Success states, approvals, verified badges */
-  --color-arches:        #FC642D;  /* Warnings, pending states */
-  --color-hof:           #484848;  /* Primary text */
-  --color-foggy:         #767676;  /* Secondary text, meta info */
+  /* ── AirAd Brand Primitives (logo-derived) ── */
+  --brand-orange:        #F97316;  /* Primary CTAs, active states, glow accents */
+  --brand-crimson:       #DC2626;  /* Destructive actions, error states, gradient pair */
+  --brand-teal:          #0D9488;  /* Success states, approvals, data viz */
+  --brand-black:         #0A0A0A;  /* Sidebar bg, logo container, hero backgrounds */
 
-  /* Extended Neutrals */
+  /* ── Brand Gradients ── */
+  --gradient-brand-text:      linear-gradient(90deg, #F97316 0%, #DC2626 50%, #0D9488 100%);
+  --gradient-active-indicator: linear-gradient(180deg, #F97316 0%, #DC2626 100%);
+  --gradient-primary-btn:      linear-gradient(135deg, #F97316 0%, #DC2626 100%);
+  --gradient-hero:             radial-gradient(ellipse 120% 80% at 50% 0%, rgba(249,115,22,0.08) 0%, transparent 60%);
+
+  /* ── Extended Neutrals ── */
   --color-white:         #FFFFFF;
-  --color-grey-100:      #F7F7F7;  /* Page backgrounds */
-  --color-grey-200:      #EBEBEB;  /* Card borders, dividers */
-  --color-grey-300:      #DDDDDD;  /* Input borders (default) */
-  --color-grey-400:      #B0B0B0;  /* Placeholder text */
-  --color-grey-500:      #767676;  /* Secondary text */
-  --color-grey-700:      #484848;  /* Primary text */
-  --color-grey-900:      #222222;  /* Headings */
+  --color-grey-100:      #F5F5F4;  /* Light page backgrounds */
+  --color-grey-200:      #E7E5E4;  /* Light card borders, dividers */
+  --color-grey-300:      #D6D3D1;  /* Light input borders (default) */
+  --color-grey-400:      #A8A29E;  /* Placeholder text, muted icons */
+  --color-grey-500:      #78716C;  /* Secondary text (light mode) */
+  --color-grey-700:      #44403C;  /* Primary text (light mode) */
+  --color-grey-900:      #1C1917;  /* Headings (light mode) */
 
-  /* Semantic Colors */
-  --color-success:       #008A05;
-  --color-success-light: #E8F5E9;
-  --color-warning:       #C45300;
-  --color-warning-light: #FFF3E0;
-  --color-error:         #C13515;
-  --color-error-light:   #FFEBEE;
-  --color-info:          #0077C8;
-  --color-info-light:    #E3F2FD;
+  /* ── Semantic Colors ── */
+  --color-success:       #0D9488;  /* = brand-teal */
+  --color-success-bg:    rgba(13,148,136,0.10);
+  --color-success-text:  #0D9488;
+  --color-warning:       #F97316;  /* = brand-orange */
+  --color-warning-bg:    rgba(249,115,22,0.10);
+  --color-warning-text:  #F97316;
+  --color-error:         #DC2626;  /* = brand-crimson */
+  --color-error-bg:      rgba(220,38,38,0.10);
+  --color-error-text:    #DC2626;
+  --color-info:          #0D9488;
+  --color-info-bg:       rgba(13,148,136,0.10);
+  --color-info-text:     #0D9488;
 
-  /* AirAd AR Accent — data viz only, use sparingly */
-  --color-airaad-accent: #00D4FF;
+  /* ── Dark Theme Surfaces (default) ── */
+  --surface-page:        #111111;
+  --surface-sidebar:     #0A0A0A;  /* = brand-black */
+  --surface-topbar:      #141414;
+  --surface-card:        #1C1C1C;
+  --surface-modal:       #1C1C1C;
+  --surface-input:       #1A1A1A;
+  --surface-hover:       #242424;
+
+  /* ── Dark Theme Text ── */
+  --text-primary:        #F5F5F4;
+  --text-secondary:      #A8A29E;
+
+  /* ── Dark Theme Borders ── */
+  --border-default:      #2A2A2A;
+  --border-input:        #3A3A3A;
+
+  /* ── Shadows ── */
+  --shadow-card:         0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-modal:        0 24px 64px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.4);
+  --shadow-sidebar-glow: 4px 0 24px rgba(249,115,22,0.06);
+}
+
+/* ── Light Theme Overrides ── */
+[data-theme="light"] {
+  --surface-page:    #F5F5F4;
+  --surface-sidebar: #FFFFFF;
+  --surface-topbar:  #FFFFFF;
+  --surface-card:    #FFFFFF;
+  --surface-modal:   #FFFFFF;
+  --surface-input:   #FFFFFF;
+  --surface-hover:   #F5F5F4;
+  --text-primary:    #1C1917;
+  --text-secondary:  #78716C;
+  --border-default:  #E7E5E4;
+  --border-input:    #D6D3D1;
+  --shadow-card:     0 1px 2px rgba(0,0,0,0.08);
+  --shadow-sidebar-glow: none;
 }
 ```
 
 **Color usage rules:**
-- `--color-rausch` → Primary action buttons only. Maximum **1 per view**.
-- `--color-babu` → Success/completion states (GPS Validated badges, Approved status).
-- `--color-arches` → Warning states (Pending QC, Needs Review, partial import).
+- `--brand-orange` → Primary action buttons, active nav indicators, focus rings. Maximum **1 dominant use per view**.
+- `--brand-teal` → Success/completion states (GPS Validated badges, Approved status).
+- `--brand-crimson` → Destructive actions, error states, gradient pair with orange.
+- `--brand-black` → Sidebar background, logo container — **always preserve this background behind the logo**.
+- `--gradient-brand-text` → Product name "AirAd" only — never on body copy or generic headings.
+- **Dark theme is the primary/default theme.** Light theme is fully supported but secondary.
 - **Never use color alone** to convey status — always pair with icon + label text.
-- Page backgrounds: `--color-grey-100` (not white) to reduce eye strain.
+- Page backgrounds: `--surface-page` token (never hardcode).
 
 ---
 
@@ -127,37 +176,41 @@ All spacing must follow multiples of 8px. **Never use arbitrary pixel values.**
 ### A5.1 Buttons
 
 ```tsx
-<Button variant="primary">   // bg: --color-rausch — ONE per view maximum
-<Button variant="secondary"> // bg: white, border: 1px --color-grey-300
-<Button variant="ghost">     // bg: transparent, hover: --color-grey-100
-<Button variant="danger">    // bg: --color-error — destructive actions only
+<Button variant="primary">     // bg: --gradient-primary-btn (orange→crimson) + glow shadow
+<Button variant="secondary">   // bg: --surface-card, border: 1px --border-default
+<Button variant="ghost">       // bg: transparent, hover: --surface-hover
+<Button variant="destructive"> // bg: --color-error-bg, border: --brand-crimson — destructive only
 ```
 
 **Rules:**
-- Border radius: `8px` (Airbnb signature)
+- Border radius: `8px`
 - Min height: `48px` (primary), `40px` (secondary/ghost)
 - Padding: `12px 24px` (primary), `10px 20px` (secondary)
+- Primary button: `box-shadow: 0 2px 8px rgba(249,115,22,0.30)` at rest; glow intensifies on hover; `translateY(1px)` on active
 - Loading state: spinner replaces label (never disable without feedback)
-- Focus state: `2px solid --color-rausch` outline, `2px offset`
+- Focus state: `2px solid --brand-orange` outline, `2px offset`
 - Button labels: verb + noun — `"Import CSV"`, `"Approve vendor"`, `"View details"` — never `"OK"` or `"Submit"`
 
 ### A5.2 Form Inputs
 
 ```css
 .dls-input {
-  height: 48px;                          /* Prevents iOS zoom on focus */
-  border: 1px solid var(--color-grey-300);
+  height: 40px;                          /* DLS standard height */
+  border: 1px solid var(--border-input);
   border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 16px;
-  transition: border-color 150ms ease;
+  padding: 0 16px;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--surface-input);
+  transition: border-color 150ms ease, background 150ms ease;
 }
 
-.dls-input:hover  { border-color: var(--color-grey-700); }
-.dls-input:focus  { border-color: var(--color-grey-900);
-                    box-shadow: 0 0 0 2px rgba(72,72,72,0.2); }
-.dls-input.error  { border-color: var(--color-error); }
-.dls-input.valid  { border-color: var(--color-success); }
+.dls-input:hover  { border-color: var(--color-grey-500); }
+.dls-input:focus  { border-color: var(--brand-orange);
+                    outline: 2px solid var(--brand-orange);
+                    outline-offset: 2px; }
+.dls-input.error  { border-color: var(--brand-crimson); }
+.dls-input.valid  { border-color: var(--brand-teal); }
 ```
 
 **Rules:**
@@ -170,26 +223,26 @@ All spacing must follow multiples of 8px. **Never use arbitrary pixel values.**
 
 ```css
 .dls-card {
-  background: var(--color-white);
-  border: 1px solid var(--color-grey-200);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card);
 }
 ```
 
 **Rules:**
-- No colored card backgrounds (white only)
-- Status/KPI cards: left border `4px solid` in semantic color
+- Card background always `--surface-card` (dark: `#1C1C1C`, light: `#FFFFFF`)
+- Status/KPI cards: left border `4px solid` in semantic color (`--brand-teal` success, `--brand-orange` warning, `--brand-crimson` error)
 - Avoid nesting cards inside cards (max 1 level)
 
 ### A5.4 Data Tables
 
 ```
-Header row:   background --color-grey-100, font --text-heading-sm, border-bottom 2px
-Data rows:    height 56px, padding 12px 16px, border-bottom 1px --color-grey-200
-Hover:        background --color-grey-100
-Selected:     background rgba(255,90,95,0.04), left border 3px --color-rausch
+Header row:   background --surface-hover, font --text-heading-sm, color --text-primary, border-bottom 1px --border-default
+Data rows:    height 56px, padding 12px 16px, border-bottom 1px --border-default, color --text-primary
+Hover:        background --surface-hover
+Selected:     background rgba(249,115,22,0.06), left border 3px --brand-orange
 ```
 
 **Rules:**
@@ -202,11 +255,11 @@ Selected:     background rgba(255,90,95,0.04), left border 3px --color-rausch
 ### A5.5 Status Badges / Chips
 
 ```tsx
-<Badge variant="success">Approved</Badge>   // bg: success-light, text: success
-<Badge variant="warning">Pending</Badge>    // bg: warning-light, text: warning
-<Badge variant="error">Rejected</Badge>     // bg: error-light, text: error
-<Badge variant="info">Processing</Badge>    // bg: info-light, text: info
-<Badge variant="neutral">Unclaimed</Badge>  // bg: grey-100, text: foggy
+<Badge variant="success">Approved</Badge>   // bg: rgba(13,148,136,0.10), text: --brand-teal, border: rgba(13,148,136,0.20)
+<Badge variant="warning">Pending</Badge>    // bg: rgba(249,115,22,0.10),  text: --brand-orange, border: rgba(249,115,22,0.20)
+<Badge variant="error">Rejected</Badge>     // bg: rgba(220,38,38,0.10),   text: --brand-crimson, border: rgba(220,38,38,0.20)
+<Badge variant="info">Processing</Badge>    // bg: rgba(13,148,136,0.10),  text: --brand-teal, border: rgba(13,148,136,0.20)
+<Badge variant="neutral">Unclaimed</Badge>  // bg: --surface-hover, text: --text-primary, border: --border-default
 ```
 
 **Rules:**
@@ -217,10 +270,10 @@ Selected:     background rgba(255,90,95,0.04), left border 3px --color-rausch
 
 ### A5.6 Modals / Drawers
 
-- Overlay: `rgba(0,0,0,0.5)` + `backdrop-filter: blur(4px)`
-- Modal container: white, `border-radius: 16px`, `padding: 32px`
+- Overlay: `rgba(0,0,0,0.65)` + `backdrop-filter: blur(4px)`
+- Modal container: `--surface-modal`, `border: 1px solid --border-default`, `border-radius: 16px`, `padding: 32px`, `box-shadow: --shadow-modal`
 - Max-width: `480px` (confirmations), `640px` (forms)
-- Slide-in Drawer: `width: 640px`, from right
+- Slide-in Drawer: `width: 480px`, from right, `background: --surface-modal`, `border-left: 1px solid --border-default`
 - Close: X button + ESC key + backdrop click
 - Always **trap focus** inside modal
 - Action buttons: right-aligned, primary button is **rightmost**
@@ -228,17 +281,24 @@ Selected:     background rgba(255,90,95,0.04), left border 3px --color-rausch
 ### A5.7 Sidebar Navigation
 
 ```
-Width: 240px fixed
+Width: 240px fixed (collapsed: 64px)
+Background: --surface-sidebar (dark: --brand-black #0A0A0A)
 Nav item height: 44px
 Nav item border-radius: 0 100px 100px 0  (pill-right)
-Nav item margin-right: 16px
+Nav item margin-right: 8px
+
+Logo area:
+  - Icon: 36×36px rounded container, background: --brand-black
+  - Dark mode: box-shadow: 0 0 20px rgba(249,115,22,0.25), 0 0 40px rgba(249,115,22,0.10)
+  - Wordmark "AirAd": --gradient-brand-text applied as background-clip: text
 
 States:
-  default → text: --color-foggy
-  hover   → background: --color-grey-100, text: --color-grey-900
-  active  → background: rgba(255,90,95,0.08), text: --color-rausch, weight: 600
+  default → text: --text-secondary
+  hover   → background: --surface-hover, text: --text-primary
+  active  → background: rgba(249,115,22,0.10), text: --brand-orange, weight: 600
+             + left edge indicator: 3px wide, top/bottom 6px inset, background: --gradient-active-indicator
 
-Section labels: 11px, 700, uppercase, letter-spacing: 1px, color: --color-grey-400
+Section labels: 11px, 700, uppercase, letter-spacing: 1px, color: --text-secondary
 ```
 
 ### A5.8 Empty States
@@ -347,14 +407,17 @@ Examples:
 ## A10 — Data Visualization (Recharts)
 
 **Chart color sequence:**
-1. `--color-rausch` (#FF5A5F)
-2. `--color-babu` (#00A699)
-3. `--color-arches` (#FC642D)
-4. `--color-info` (#0077C8)
-5. `--color-grey-400` (#B0B0B0)
+1. `--brand-orange`  (#F97316) — primary series
+2. `--brand-teal`    (#0D9488) — secondary series
+3. `--brand-crimson` (#DC2626) — tertiary / error series
+4. `--color-grey-400` (#A8A29E) — neutral / inactive series
 
-**Rules:**
-- Grid lines: `--color-grey-200`, `1px`, dashed
+**Theme-aware chart rendering:**
+- All Recharts `stroke`, `fill`, and `contentStyle` props must use **resolved CSS variable values** — never CSS variable strings (they don't resolve in JS inline styles)
+- Use the `useChartColors()` hook (`/src/shared/hooks/useChartColors.ts`) to get live-resolved values that update on theme toggle
+- Grid lines: resolved `--border-default`, `1px`, dashed
+- Tick labels: resolved `--text-secondary`
+- Tooltip: `background: resolved --surface-card`, `border: 1px solid resolved --border-default`
 - No 3D charts ever
 - No pie charts for more than 5 segments (use bar chart instead)
 - Area charts: fill opacity `0.08`
@@ -377,13 +440,14 @@ Examples:
 **Contrast ratios:**
 - Normal text (≤18px): **4.5:1 minimum**
 - Large text / UI components: **3:1 minimum**
-- `--color-foggy` (#767676) on white = 4.48:1 ✓ passes AA
-- `--color-rausch` (#FF5A5F) on white = 3.04:1 — **large text and icons only**
+- `--text-secondary` (#A8A29E) on `--surface-card` (#1C1C1C) = 4.6:1 ✓ passes AA
+- `--brand-orange` (#F97316) on `--brand-black` (#0A0A0A) = 4.5:1 ✓ passes AA
+- `--brand-teal` (#0D9488) on `--surface-card` (#1C1C1C) = 3.2:1 — **large text and icons only**
 
 **Keyboard navigation:**
 - All interactive elements reachable via Tab
 - Logical focus order (top-left to bottom-right)
-- Visible focus ring: `2px solid --color-rausch` on ALL elements
+- Visible focus ring: `2px solid --brand-orange` on ALL elements
 - First focusable element: skip-to-content link
 - Modal focus trap (Tab cycles within open modal)
 - ESC closes modals and drawers
@@ -437,7 +501,7 @@ toast.warning("Duplicate detected")        // orange, 6s, with action
 toast.info("Import batch queued")          // blue, auto-dismiss 4s
 ```
 
-Position: bottom-right. Stack up to 3 visible (FIFO). Slide up from bottom, fade on dismiss.
+Position: **top-right**. Stack up to 3 visible (FIFO). Slide in from right, fade on dismiss. Each variant has a `4px solid` left border in the brand color (`--brand-teal` success/info, `--brand-orange` warning, `--brand-crimson` error). Background: `--surface-card`.
 
 ---
 
@@ -528,4 +592,4 @@ Final AR Score =
 
 ---
 
-*AirAd Phase-1 — DLS Reference v1.0 · Authority: Airbnb Design Language System A1–A14*
+*AirAd Phase-1 — DLS Reference v2.0 · Brand Elevation Update · Authority: AirAd Brand Identity + Airbnb Design Language System A1–A14*

@@ -3,39 +3,76 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-grey-50);
+  background: var(--brand-black);
+  background-image: var(--gradient-hero);
   padding: var(--space-6);
+  position: relative;
+  overflow: hidden;
+}
+
+.page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 800px 600px at 50% 40%, rgba(249,115,22,0.06) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .card {
   width: 100%;
-  max-width: 480px;
-  background: var(--color-white);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-modal);
+  max-width: 440px;
+  background: rgba(28, 28, 28, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--radius-2xl);
+  border: 1px solid rgba(249,115,22,0.12);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04);
   padding: var(--space-10) var(--space-8);
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
+  animation: fadeUp var(--duration-slow) var(--ease-enter);
 }
 
 .logoArea {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.logoIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+}
+
+.logoImg {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  display: block;
 }
 
 .logo {
   display: block;
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
-  color: var(--color-rausch);
   letter-spacing: -1px;
   line-height: 1;
-  margin-bottom: var(--space-2);
+  background: var(--gradient-brand-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .subtitle {
   font: var(--text-body);
-  color: var(--color-foggy);
+  color: rgba(168,162,158,0.9);
+  letter-spacing: 0.02em;
 }
 
 .form {
@@ -60,17 +97,17 @@
   border: none;
   background: transparent;
   cursor: pointer;
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   border-radius: var(--radius-md);
   transition: color var(--duration-fast) var(--ease-standard);
 }
 
 .showPasswordBtn:hover {
-  color: var(--color-hof);
+  color: var(--brand-orange);
 }
 
 .showPasswordBtn:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: 2px;
 }
 
@@ -80,7 +117,7 @@
   background: var(--color-error-bg);
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
-  border-left: 3px solid var(--color-error);
+  border-left: 3px solid var(--brand-crimson);
 }
 
 .submitBtn {

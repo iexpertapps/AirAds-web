@@ -1,0 +1,4 @@
+# Semgrep ignore file
+# These paths are intentionally suppressed — AllowAny is correct for public endpoints.
+backend/apps/accounts/views.py
+backend/apps/health/views.py

@@ -1,5 +1,5 @@
 import type { Role } from '@/features/auth/store/authStore';
-import { useAuthStore } from '@/features/auth/store/authStore';
+import { useUser } from '@/features/auth/store/authStore';
 
 export function RoleGate({
   allowedRoles,
@@ -10,7 +10,7 @@ export function RoleGate({
   fallback?: React.ReactNode;
   children: React.ReactNode;
 }) {
-  const user = useAuthStore((s) => s.user);
+  const user = useUser();
   if (!user || !allowedRoles.includes(user.role)) {
     return <>{fallback}</>;
   }

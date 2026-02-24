@@ -93,5 +93,17 @@ class RolePermission(BasePermission):
                     "view": view.__class__.__name__,
                 },
             )
+            # Fire security alert for privilege escalation attempts
+            from core.security_alerts import alert_privilege_escalation
+            from core.utils import get_client_ip
+
+            alert_privilege_escalation(
+                user_id=str(request.user.pk),
+                user_role=user_role,
+                attempted_resource=view.__class__.__name__,
+                ip_address=get_client_ip(request._request)
+                if hasattr(request, "_request")
+                else "unknown",
+            )
 
         return allowed

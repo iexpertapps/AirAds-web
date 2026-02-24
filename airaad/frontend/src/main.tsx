@@ -17,17 +17,19 @@ import { router } from '@/router';
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('[AirAd] Root element not found');
 
+const app = (
+  <QueryClientProvider client={queryClient}>
+    <ThemeProvider>
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+      <RouterProvider router={router} />
+      <ToastProvider />
+    </ThemeProvider>
+    {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+  </QueryClientProvider>
+);
+
 createRoot(rootElement).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
-        <RouterProvider router={router} />
-        <ToastProvider />
-      </ThemeProvider>
-      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
-    </QueryClientProvider>
-  </StrictMode>,
+  import.meta.env.VITE_E2E === 'true' ? app : <StrictMode>{app}</StrictMode>,
 );

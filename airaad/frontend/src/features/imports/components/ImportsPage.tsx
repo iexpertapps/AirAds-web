@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react';
+import { lazy, Suspense, useRef, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Papa from 'papaparse';
-import { Upload, Download, Eye } from 'lucide-react';
+import { Upload, Download, Eye, MapPin } from 'lucide-react';
 import { apiClient } from '@/lib/axios';
 import { queryKeys } from '@/queryKeys';
 import { AdminLayout } from '@/shared/components/dls/AdminLayout';
@@ -12,20 +12,31 @@ import { ImportStatusBadge } from '@/shared/components/dls/Badge';
 import { Button } from '@/shared/components/dls/Button';
 import { Drawer } from '@/shared/components/dls/Drawer';
 import { EmptyState } from '@/shared/components/dls/EmptyState';
+import { SkeletonTable } from '@/shared/components/dls/SkeletonTable';
 import { useToast } from '@/shared/hooks/useToast';
+import { usePermission } from '@/shared/hooks/usePermission';
 import styles from './ImportsPage.module.css';
+
+const GooglePlacesSeedForm = lazy(() => import('./GooglePlacesSeedForm'));
+
+type ImportTab = 'csv' | 'google-places';
 
 type ImportStatus = 'QUEUED' | 'PROCESSING' | 'DONE' | 'FAILED';
 
 interface ImportBatch {
   id: string;
+  import_type: string;
+  file_key: string;
   file_name: string;
   status: ImportStatus;
   uploaded_by_email: string;
+  created_by_email: string;
   created_at: string;
+  total_rows: number;
+  processed_rows: number;
   vendors_created: number;
   vendors_failed: number;
-  total_rows: number;
+  error_count: number;
   error_log?: Array<{ row: number; field: string; message: string }>;
 }
 
@@ -34,6 +45,9 @@ interface ImportListResponse {
 }
 
 const REQUIRED_COLUMNS = ['business_name', 'longitude', 'latitude', 'city_slug', 'area_slug'];
+
+const GOOGLE_PLACES_ROLES = ['SUPER_ADMIN', 'CITY_MANAGER', 'OPERATIONS_MANAGER'] as const;
+const CSV_UPLOAD_ROLES = ['SUPER_ADMIN', 'CITY_MANAGER', 'DATA_ENTRY'] as const;
 
 function hasActiveJobs(data: ImportBatch[] | undefined): boolean {
   return (data ?? []).some((b) => b.status === 'QUEUED' || b.status === 'PROCESSING');
@@ -49,6 +63,12 @@ export default function ImportsPage() {
   const [missingCols, setMissingCols] = useState<string[]>([]);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  const canSeedGooglePlaces = usePermission([...GOOGLE_PLACES_ROLES]);
+  const canUploadCSV = usePermission([...CSV_UPLOAD_ROLES]);
+  const defaultTab: ImportTab = canSeedGooglePlaces && !canUploadCSV ? 'google-places' : 'csv';
+  const [activeTab, setActiveTab] = useState<ImportTab>(defaultTab);
+  const showTabs = canSeedGooglePlaces && canUploadCSV;
 
   const { data: liveDrawerBatch } = useQuery({
     queryKey: queryKeys.imports.detail(drawerBatchId ?? ''),
@@ -202,10 +222,44 @@ export default function ImportsPage() {
   return (
     <AdminLayout title="Import Management">
       <PageHeader
-        heading="Import Management"
-        subheading="Upload CSV files to bulk-import vendor data"
+        heading="Import center"
+        subheading="Import vendor data via CSV upload or Google Places seeding"
       />
 
+      {/* Tab bar — only shown when user has access to both methods */}
+      {showTabs && (
+        <div className={styles.tabBar} role="tablist" aria-label="Import method">
+          <button
+            role="tab"
+            aria-selected={activeTab === 'csv'}
+            className={[styles.tab, activeTab === 'csv' ? styles.tabActive : ''].join(' ')}
+            onClick={() => setActiveTab('csv')}
+          >
+            <Upload size={16} strokeWidth={1.5} aria-hidden="true" className={styles.tabIcon} />
+            CSV upload
+          </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === 'google-places'}
+            className={[styles.tab, activeTab === 'google-places' ? styles.tabActive : ''].join(' ')}
+            onClick={() => setActiveTab('google-places')}
+          >
+            <MapPin size={16} strokeWidth={1.5} aria-hidden="true" className={styles.tabIcon} />
+            Google Places
+          </button>
+        </div>
+      )}
+
+      {/* Google Places Seed tab */}
+      {(activeTab === 'google-places' || (!showTabs && canSeedGooglePlaces)) && (
+        <Suspense fallback={<SkeletonTable />}>
+          <GooglePlacesSeedForm />
+        </Suspense>
+      )}
+
+      {/* CSV Upload tab */}
+      {(activeTab === 'csv' || (!showTabs && canUploadCSV)) && (
+      <>
       {/* Upload Zone */}
       <div
         className={[styles.dropZone, isDragging ? styles.dropZoneDragging : ''].join(' ')}
@@ -295,16 +349,18 @@ export default function ImportsPage() {
       <Table
         aria-label="Import batches table"
         columns={columns}
-        data={batches ?? []}
+        data={(batches ?? []).filter((b) => b.import_type === 'CSV' || !b.import_type)}
         isLoading={isLoading}
-        isEmpty={!isLoading && (batches ?? []).length === 0}
+        isEmpty={!isLoading && (batches ?? []).filter((b) => b.import_type === 'CSV' || !b.import_type).length === 0}
         emptyState={
           <EmptyState
-            heading="No imports yet"
+            heading="No CSV imports yet"
             subheading="Upload a CSV file above to start importing vendor data."
           />
         }
       />
+      </>
+      )}
 
       {/* Batch Detail Drawer */}
       <Drawer

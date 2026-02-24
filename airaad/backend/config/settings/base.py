@@ -81,6 +81,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 MIDDLEWARE: list[str] = [
     "core.middleware.RequestIDMiddleware",  # index 0 — FIRST (R3 tracing)
     "django.middleware.security.SecurityMiddleware",
+    "core.security_middleware.SecurityHeadersMiddleware",  # CSP, Permissions-Policy, Referrer-Policy
     "corsheaders.middleware.CorsMiddleware",  # must be before CommonMiddleware
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -180,6 +181,15 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/minute",
+        "user": "300/minute",
+        "login": "10/minute",
+    },
     "DEFAULT_PAGINATION_CLASS": "core.pagination.StandardResultsPagination",
     "PAGE_SIZE": 25,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -238,6 +248,32 @@ AWS_QUERYSTRING_AUTH = True  # Presigned URLs
 # Google Places API
 # ---------------------------------------------------------------------------
 GOOGLE_PLACES_API_KEY = env("GOOGLE_PLACES_API_KEY", default="")
+
+# ---------------------------------------------------------------------------
+# Session security — idle timeout after 30 minutes
+# ---------------------------------------------------------------------------
+SESSION_COOKIE_AGE = 1800  # 30 minutes idle timeout
+SESSION_SAVE_EVERY_REQUEST = True  # Reset timeout on each request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# ---------------------------------------------------------------------------
+# Security — Referrer-Policy
+# ---------------------------------------------------------------------------
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
+# ---------------------------------------------------------------------------
+# File upload limits — 10 MB max per file
+# ---------------------------------------------------------------------------
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
+
+# ---------------------------------------------------------------------------
+# SSRF protection — allowed external domains for outbound requests
+# ---------------------------------------------------------------------------
+ALLOWED_EXTERNAL_DOMAINS: list[str] = [
+    "maps.googleapis.com",
+    "places.googleapis.com",
+]
 
 # ---------------------------------------------------------------------------
 # Internationalization

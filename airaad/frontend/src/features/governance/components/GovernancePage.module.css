@@ -1,0 +1,92 @@
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-6);
+}
+
+.tab {
+  padding: var(--space-2) var(--space-4);
+  font: var(--text-body-strong);
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab:hover {
+  color: var(--text-primary);
+}
+
+.tabActive {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--text-heading-sm);
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 var(--space-2);
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  border-radius: var(--radius-pill);
+  font: var(--text-caption);
+  font-weight: 600;
+}
+
+.filterRow {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.scoreHigh {
+  color: var(--color-error-text);
+  font-weight: 700;
+}
+
+.scoreMed {
+  color: var(--color-warning-text);
+  font-weight: 600;
+}
+
+.scoreLow {
+  color: var(--text-secondary);
+}
+
+.mono {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.85em;
+  color: var(--text-primary);
+}
+
+.formGrid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}

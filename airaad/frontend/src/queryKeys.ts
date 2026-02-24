@@ -47,6 +47,27 @@ interface AuditFilters {
   page_size?: number | undefined;
 }
 
+interface GovernanceFraudFilters {
+  auto_suspended?: boolean | undefined;
+  page?: number | undefined;
+  page_size?: number | undefined;
+}
+
+interface GovernanceBlacklistFilters {
+  blacklist_type?: string | undefined;
+  is_active?: boolean | undefined;
+  page?: number | undefined;
+  page_size?: number | undefined;
+}
+
+interface GovernanceSuspensionFilters {
+  vendor_id?: string | undefined;
+  is_active?: boolean | undefined;
+  action?: string | undefined;
+  page?: number | undefined;
+  page_size?: number | undefined;
+}
+
 export const queryKeys = {
   auth: {
     profile: () => ['auth', 'profile'] as const,
@@ -81,6 +102,13 @@ export const queryKeys = {
     list: () => ['imports', 'list'] as const,
     detail: (id: string) => ['imports', 'detail', id] as const,
   },
+  googlePlaces: {
+    countries: () => ['googlePlaces', 'countries'] as const,
+    cities: (countryId: string) => ['googlePlaces', 'cities', countryId] as const,
+    areas: (cityId: string) => ['googlePlaces', 'areas', cityId] as const,
+    categories: () => ['googlePlaces', 'categories'] as const,
+    seedBatches: () => ['googlePlaces', 'seedBatches'] as const,
+  },
   fieldOps: {
     list: (filters?: FieldOpsFilters) => ['fieldOps', 'list', filters] as const,
     detail: (id: string) => ['fieldOps', 'detail', id] as const,
@@ -94,5 +122,10 @@ export const queryKeys = {
   },
   system: {
     users: () => ['system', 'users'] as const,
+  },
+  governance: {
+    fraudScores: (filters?: GovernanceFraudFilters) => ['governance', 'fraudScores', filters] as const,
+    blacklist: (filters?: GovernanceBlacklistFilters) => ['governance', 'blacklist', filters] as const,
+    suspensions: (filters?: GovernanceSuspensionFilters) => ['governance', 'suspensions', filters] as const,
   },
 };

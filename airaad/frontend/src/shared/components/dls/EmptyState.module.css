@@ -6,22 +6,45 @@
   gap: var(--space-4);
   padding: var(--space-16) var(--space-8);
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.wrapper::before {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background-image: url('/airad_icon.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .illustration {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-grey-400);
+  color: var(--text-secondary);
+  opacity: 0.5;
+  position: relative;
+  z-index: 1;
 }
 
 .heading {
   font: var(--text-heading-3);
-  color: var(--color-hof);
+  color: var(--text-primary);
+  position: relative;
+  z-index: 1;
 }
 
 .subheading {
   font: var(--text-body);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   max-width: 400px;
+  position: relative;
+  z-index: 1;
 }

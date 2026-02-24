@@ -17,6 +17,7 @@ from django.http import HttpRequest
 from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from core.security_alerts import alert_repeated_login_failures
 from core.utils import get_client_ip
 
 from .models import AdminRole, AdminUser
@@ -124,6 +125,12 @@ def authenticate_user(
                     "locked_until": user.locked_until.isoformat(),
                     "ip": ip_address,
                 },
+            )
+            # Fire security alert for monitoring/incident response
+            alert_repeated_login_failures(
+                email=email,
+                ip_address=ip_address,
+                attempt_count=user.failed_login_count,
             )
         else:
             log_action(

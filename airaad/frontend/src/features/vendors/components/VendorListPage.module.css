@@ -1,6 +1,6 @@
 .nameLink {
   font: var(--text-body-strong);
-  color: var(--color-rausch);
+  color: var(--brand-orange);
   text-decoration: none;
 }
 
@@ -9,26 +9,26 @@
 }
 
 .nameLink:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
 
 .location {
   font: var(--text-body);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .phone {
   font-family: var(--font-family-mono);
   font-size: 13px;
-  color: var(--color-hof);
+  color: var(--text-primary);
   letter-spacing: 0.05em;
 }
 
 .date {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .actions {
@@ -42,7 +42,7 @@
 
 .deleteWarning {
   font: var(--text-body);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .headerActions {

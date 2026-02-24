@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useChartColors } from '@/shared/hooks/useChartColors';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell, Legend,
@@ -15,7 +16,16 @@ import { PageHeader } from '@/shared/components/dls/PageHeader';
 import { Badge } from '@/shared/components/dls/Badge';
 import { SkeletonTable } from '@/shared/components/dls/SkeletonTable';
 import { RoleGate } from '@/shared/components/RoleGate';
+import { formatStatus, formatLabel, formatDateTime } from '@/shared/utils/formatters';
 import styles from './PlatformHealthPage.module.css';
+
+const QC_COLORS: Record<string, string> = {
+  APPROVED: '#0D9488',
+  PENDING_QC: '#F97316',
+  REJECTED: '#DC2626',
+  NEEDS_REVISIT: '#F97316',
+  DRAFT: '#A8A29E',
+};
 
 interface SystemAlert {
   id: string;
@@ -74,13 +84,6 @@ interface MetricCardProps {
   variant?: 'default' | 'warning' | 'success';
 }
 
-const QC_COLORS: Record<string, string> = {
-  APPROVED: 'var(--color-babu)',
-  PENDING: 'var(--color-grey-400)',
-  NEEDS_REVIEW: 'var(--color-arches)',
-  REJECTED: 'var(--color-error)',
-  FLAGGED: 'var(--color-warning)',
-};
 
 const ALERT_VARIANT: Record<string, 'error' | 'warning' | 'neutral'> = {
   HIGH: 'error',
@@ -107,6 +110,7 @@ const HEALTH_VARIANT: Record<string, 'success' | 'warning' | 'error'> = {
 };
 
 export default function PlatformHealthPage() {
+  const chartColors = useChartColors();
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.analytics.kpis(),
     queryFn: () =>
@@ -132,15 +136,15 @@ export default function PlatformHealthPage() {
   });
 
   return (
-    <AdminLayout title="Platform Health">
+    <AdminLayout title="Dashboard">
       <PageHeader
-        heading="Platform Health"
-        subheading="Real-time overview of data collection progress"
+        heading="Dashboard"
+        subheading="Real-time platform health and data collection overview"
         actions={
           health ? (
             <Badge
               variant={HEALTH_VARIANT[health.status] ?? 'neutral'}
-              label={`System: ${health.status.toUpperCase()}`}
+              label={`System: ${formatStatus(health.status)}`}
             />
           ) : undefined
         }
@@ -150,17 +154,17 @@ export default function PlatformHealthPage() {
         <SkeletonTable rows={3} columns={4} showHeader={false} />
       ) : (
         <>
-          <RoleGate allowedRoles={['SUPER_ADMIN', 'ANALYST']}>
+          <RoleGate allowedRoles={['SUPER_ADMIN', 'CITY_MANAGER', 'ANALYST']}>
           {/* ── KPI Cards ── */}
           <div className={styles.metricsGrid} role="list" aria-label="Platform metrics">
-            <div role="listitem">
+            <div key="total-vendors" role="listitem">
               <MetricCard
                 label="Total Vendors"
                 value={data?.total_vendors ?? 0}
                 icon={<Store size={20} strokeWidth={1.5} />}
               />
             </div>
-            <div role="listitem">
+            <div key="pending-qa" role="listitem">
               <MetricCard
                 label="Pending QA"
                 value={data?.vendors_pending_qa ?? 0}
@@ -168,7 +172,7 @@ export default function PlatformHealthPage() {
                 variant={data && data.vendors_pending_qa > 50 ? 'warning' : 'default'}
               />
             </div>
-            <div role="listitem">
+            <div key="approved-today" role="listitem">
               <MetricCard
                 label="Approved Today"
                 value={data?.vendors_approved_today ?? 0}
@@ -176,21 +180,21 @@ export default function PlatformHealthPage() {
                 variant="success"
               />
             </div>
-            <div role="listitem">
+            <div key="total-areas" role="listitem">
               <MetricCard
                 label="Total Areas"
                 value={data?.total_areas ?? 0}
                 icon={<MapPin size={20} strokeWidth={1.5} />}
               />
             </div>
-            <div role="listitem">
+            <div key="total-tags" role="listitem">
               <MetricCard
                 label="Total Tags"
                 value={data?.total_tags ?? 0}
                 icon={<Tag size={20} strokeWidth={1.5} />}
               />
             </div>
-            <div role="listitem">
+            <div key="imports-processing" role="listitem">
               <MetricCard
                 label="Imports Processing"
                 value={data?.imports_processing ?? 0}
@@ -208,11 +212,11 @@ export default function PlatformHealthPage() {
                 <h2 className={styles.sectionHeading}>Vendors Added — Last 14 Days</h2>
                 <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={data.daily_vendor_counts} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-grey-200)" />
-                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--color-foggy)' }} tickLine={false} axisLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: 'var(--color-foggy)' }} tickLine={false} axisLine={false} allowDecimals={false} />
-                    <Tooltip contentStyle={{ background: 'var(--color-white)', border: '1px solid var(--color-grey-200)', borderRadius: '8px', fontSize: 12 }} />
-                    <Bar dataKey="count" fill="var(--color-rausch)" radius={[4, 4, 0, 0]} name="Vendors" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={chartColors.gridStroke} />
+                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: chartColors.tickFill }} tickLine={false} axisLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: chartColors.tickFill }} tickLine={false} axisLine={false} allowDecimals={false} />
+                    <Tooltip contentStyle={{ background: chartColors.tooltipBg, border: `1px solid ${chartColors.tooltipBorder}`, borderRadius: '8px', fontSize: 12, color: chartColors.tickFill }} />
+                    <Bar dataKey="count" fill={chartColors.barOrange} radius={[4, 4, 0, 0]} name="Vendors" />
                   </BarChart>
                 </ResponsiveContainer>
               </section>
@@ -234,15 +238,15 @@ export default function PlatformHealthPage() {
                       outerRadius={85}
                       paddingAngle={2}
                     >
-                      {data.qc_status_breakdown.map((entry) => (
+                      {data.qc_status_breakdown.map((entry, index) => (
                         <Cell
-                          key={entry.status}
-                          fill={QC_COLORS[entry.status] ?? 'var(--color-grey-300)'}
+                          key={`${entry.status}-${index}`}
+                          fill={QC_COLORS[entry.status] ?? chartColors.fallback}
                         />
                       ))}
                     </Pie>
                     <Tooltip
-                      contentStyle={{ background: 'var(--color-white)', border: '1px solid var(--color-grey-200)', borderRadius: '8px', fontSize: 12 }}
+                      contentStyle={{ background: chartColors.tooltipBg, border: `1px solid ${chartColors.tooltipBorder}`, borderRadius: '8px', fontSize: 12, color: chartColors.tickFill }}
                       formatter={(value: number, name: string) => [value.toLocaleString(), name]}
                     />
                     <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
@@ -261,17 +265,17 @@ export default function PlatformHealthPage() {
               </h2>
               <ResponsiveContainer width="100%" height={160}>
                 <BarChart data={data.import_activity} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-grey-200)" />
-                  <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--color-foggy)' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: 'var(--color-foggy)' }} tickLine={false} axisLine={false} allowDecimals={false} />
-                  <Tooltip contentStyle={{ background: 'var(--color-white)', border: '1px solid var(--color-grey-200)', borderRadius: '8px', fontSize: 12 }} />
-                  <Bar dataKey="count" fill="var(--color-babu)" radius={[3, 3, 0, 0]} name="Imports" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartColors.gridStroke} />
+                  <XAxis dataKey="date" tick={{ fontSize: 11, fill: chartColors.tickFill }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: chartColors.tickFill }} tickLine={false} axisLine={false} allowDecimals={false} />
+                  <Tooltip contentStyle={{ background: chartColors.tooltipBg, border: `1px solid ${chartColors.tooltipBorder}`, borderRadius: '8px', fontSize: 12, color: chartColors.tickFill }} />
+                  <Bar dataKey="count" fill={chartColors.barTeal} radius={[3, 3, 0, 0]} name="Imports" />
                 </BarChart>
               </ResponsiveContainer>
             </section>
           )}
           </RoleGate>
-          <RoleGate allowedRoles={['SUPER_ADMIN', 'ANALYST']}>
+          <RoleGate allowedRoles={['SUPER_ADMIN', 'CITY_MANAGER', 'ANALYST']}>
           {/* ── Bottom row: Search Terms + Alerts + Activity ── */}
           <div className={styles.bottomRow}>
             {/* Top Search Terms */}
@@ -283,7 +287,7 @@ export default function PlatformHealthPage() {
                 </h2>
                 <ol className={styles.searchList}>
                   {data.top_search_terms.slice(0, 10).map((t, i) => (
-                    <li key={t.term} className={styles.searchItem}>
+                    <li key={`search-${i}-${t.term}`} className={styles.searchItem}>
                       <span className={styles.searchRank}>{i + 1}</span>
                       <span className={styles.searchTerm}>{t.term}</span>
                       <span className={styles.searchCount}>{t.count.toLocaleString()}</span>
@@ -306,12 +310,12 @@ export default function PlatformHealthPage() {
                   System Alerts
                 </h2>
                 <ul className={styles.alertList}>
-                  {data.system_alerts.map((alert) => (
-                    <li key={alert.id} className={[styles.alertItem, styles[`alertItem--${alert.severity.toLowerCase()}`]].join(' ')}>
+                  {data.system_alerts.map((alert, i) => (
+                    <li key={alert.id ?? `alert-${i}`} className={[styles.alertItem, styles[`alertItem--${alert.severity.toLowerCase()}`]].join(' ')}>
                       <div className={styles.alertTop}>
                         <Badge
                           variant={ALERT_VARIANT[alert.severity] ?? 'neutral'}
-                          label={alert.severity}
+                          label={formatLabel(alert.severity)}
                           size="sm"
                         />
                         <p className={styles.alertMessage}>{alert.message}</p>
@@ -335,13 +339,13 @@ export default function PlatformHealthPage() {
                   Recent Activity
                 </h2>
                 <ul className={styles.activityList}>
-                  {data.recent_activity.slice(0, 10).map((entry) => (
-                    <li key={entry.id} className={styles.activityItem}>
+                  {data.recent_activity.slice(0, 10).map((entry, i) => (
+                    <li key={entry.id ?? `activity-${i}`} className={styles.activityItem}>
                       <div className={styles.activityDot} aria-hidden="true" />
                       <div className={styles.activityContent}>
-                        <span className={styles.activityAction}>{entry.action}</span>
+                        <span className={styles.activityAction}>{formatLabel(entry.action)}</span>
                         <span className={styles.activityMeta}>
-                          {entry.actor_label} · {entry.target_type} · {new Date(entry.timestamp).toLocaleTimeString()}
+                          {entry.actor_label} · {entry.target_type} · {formatDateTime(entry.timestamp)}
                         </span>
                       </div>
                     </li>

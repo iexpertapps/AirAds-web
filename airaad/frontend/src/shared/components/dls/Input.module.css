@@ -6,7 +6,7 @@
 
 .label {
   font: var(--text-label);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .required {
@@ -16,33 +16,34 @@
 .input {
   height: 40px;
   padding: 0 var(--space-4);
-  border: 1px solid var(--color-grey-300);
+  border: 1px solid var(--border-input);
   border-radius: var(--radius-md);
   font: var(--text-body);
-  color: var(--color-hof);
-  background: var(--color-white);
-  transition: border-color var(--duration-fast) var(--ease-standard);
+  color: var(--text-primary);
+  background: var(--surface-input);
+  transition: border-color var(--duration-fast) var(--ease-standard),
+              background var(--duration-fast) var(--ease-standard);
   width: 100%;
 }
 
 .input::placeholder {
-  color: var(--color-grey-400);
+  color: var(--text-secondary);
+  opacity: 0.6;
 }
 
 .input:hover:not(:disabled) {
-  border-color: var(--color-grey-700);
+  border-color: var(--color-grey-500);
 }
 
 .input:focus {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: 2px;
-  border-color: var(--color-grey-900);
 }
 
 .input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: var(--color-grey-100);
+  background: var(--surface-hover);
 }
 
 .input.hasError {
@@ -51,7 +52,7 @@
 
 .hint {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .error {
@@ -60,4 +61,8 @@
   gap: var(--space-1);
   font: var(--text-caption);
   color: var(--color-error-text);
+}
+
+.required {
+  color: var(--brand-crimson);
 }

@@ -1,6 +1,7 @@
-import { useAuthStore } from '@/features/auth/store/authStore';
+import { useUser } from '@/features/auth/store/authStore';
 import type { Role } from '@/features/auth/store/authStore';
 
 export function usePermission(allowedRoles: Role[]): boolean {
-  return useAuthStore((s) => s.user !== null && allowedRoles.includes(s.user.role));
+  const user = useUser();
+  return user !== null && allowedRoles.includes(user.role);
 }

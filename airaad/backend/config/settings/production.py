@@ -18,7 +18,9 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=True)
 SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = True
 X_FRAME_OPTIONS = "DENY"
 
 # ---------------------------------------------------------------------------
@@ -97,6 +99,11 @@ LOGGING = {
         "core": {
             "handlers": ["console"],
             "level": "INFO",
+            "propagate": False,
+        },
+        "security.alerts": {
+            "handlers": ["console"],
+            "level": "CRITICAL",
             "propagate": False,
         },
     },

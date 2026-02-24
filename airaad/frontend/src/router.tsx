@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuthStore } from '@/features/auth/store/authStore';
+import { useUser, useIsAuthenticated, useIsHydrated } from '@/features/auth/store/authStore';
 import type { Role } from '@/features/auth/store/authStore';
 import { useUIStore } from '@/shared/store/uiStore';
 import { SkeletonTable } from '@/shared/components/dls/SkeletonTable';
@@ -17,10 +17,11 @@ const FieldOpsPage = lazy(() => import('@/features/field-ops/components/FieldOps
 const QAPage = lazy(() => import('@/features/qa/components/QAPage'));
 const AuditLogPage = lazy(() => import('@/features/audit/components/AuditLogPage'));
 const UsersPage = lazy(() => import('@/features/system/components/UsersPage'));
+const GovernancePage = lazy(() => import('@/features/governance/components/GovernancePage'));
 const NotFoundPage = lazy(() => import('@/features/auth/components/NotFoundPage'));
 
 function RequireRole({ allowedRoles }: { allowedRoles: Role[] }) {
-  const user = useAuthStore((s) => s.user);
+  const user = useUser();
   if (!user || !allowedRoles.includes(user.role)) {
     useUIStore.getState().addToast({ type: 'error', message: 'You do not have permission to access this page.' });
     return <Navigate to="/" replace />;
@@ -29,10 +30,15 @@ function RequireRole({ allowedRoles }: { allowedRoles: Role[] }) {
 }
 
 function ProtectedRoute() {
-  const accessToken = useAuthStore((s) => s.accessToken);
+  const isHydrated = useIsHydrated();
+  const isAuthenticated = useIsAuthenticated();
   const location = useLocation();
 
-  if (!accessToken) {
+  if (!isHydrated) {
+    return <SkeletonTable />;
+  }
+
+  if (!isAuthenticated) {
     const redirect = encodeURIComponent(location.pathname + location.search);
     return <Navigate to={`/login?redirect=${redirect}`} replace />;
   }
@@ -45,8 +51,14 @@ function ProtectedRoute() {
 }
 
 function PublicOnlyRoute() {
-  const accessToken = useAuthStore((s) => s.accessToken);
-  if (accessToken) {
+  const isHydrated = useIsHydrated();
+  const isAuthenticated = useIsAuthenticated();
+
+  if (!isHydrated) {
+    return <SkeletonTable />;
+  }
+
+  if (isAuthenticated) {
     return <Navigate to="/" replace />;
   }
   return (
@@ -72,7 +84,7 @@ export const router = createBrowserRouter([
         children: [{ path: '/geo', element: <GeoPage /> }],
       },
       {
-        element: <RequireRole allowedRoles={['SUPER_ADMIN', 'CITY_MANAGER', 'DATA_ENTRY']} />,
+        element: <RequireRole allowedRoles={['SUPER_ADMIN', 'CITY_MANAGER', 'DATA_ENTRY', 'DATA_QUALITY_ANALYST']} />,
         children: [{ path: '/tags', element: <TagsPage /> }],
       },
       {
@@ -84,7 +96,7 @@ export const router = createBrowserRouter([
         children: [{ path: '/vendors/:id', element: <VendorDetailPage /> }],
       },
       {
-        element: <RequireRole allowedRoles={['SUPER_ADMIN', 'CITY_MANAGER', 'DATA_ENTRY']} />,
+        element: <RequireRole allowedRoles={['SUPER_ADMIN', 'CITY_MANAGER', 'DATA_ENTRY', 'OPERATIONS_MANAGER']} />,
         children: [{ path: '/imports', element: <ImportsPage /> }],
       },
       {
@@ -96,8 +108,12 @@ export const router = createBrowserRouter([
         children: [{ path: '/qa', element: <QAPage /> }],
       },
       {
-        element: <RequireRole allowedRoles={['SUPER_ADMIN', 'ANALYST']} />,
+        element: <RequireRole allowedRoles={['SUPER_ADMIN', 'ANALYST', 'OPERATIONS_MANAGER']} />,
         children: [{ path: '/system/audit', element: <AuditLogPage /> }],
+      },
+      {
+        element: <RequireRole allowedRoles={['SUPER_ADMIN', 'OPERATIONS_MANAGER', 'CONTENT_MODERATOR']} />,
+        children: [{ path: '/governance', element: <GovernancePage /> }],
       },
       {
         element: <RequireRole allowedRoles={['SUPER_ADMIN']} />,

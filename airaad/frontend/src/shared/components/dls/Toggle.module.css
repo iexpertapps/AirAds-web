@@ -9,7 +9,7 @@
 
 .labelText {
   font: var(--text-body);
-  color: var(--color-hof);
+  color: var(--text-primary);
   user-select: none;
 }
 
@@ -20,7 +20,7 @@
   width: 44px;
   height: 24px;
   border-radius: var(--radius-pill);
-  background: var(--color-grey-300);
+  background: var(--border-input);
   transition: background var(--duration-fast) var(--ease-standard);
   flex-shrink: 0;
 }
@@ -40,17 +40,13 @@
 }
 
 .input:focus-visible ~ .thumb {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: 2px;
-}
-
-.input:checked {
-  background: var(--color-rausch);
 }
 
 .input:checked + .track,
 .wrapper:has(.input:checked) .track {
-  background: var(--color-rausch);
+  background: var(--gradient-primary-btn);
 }
 
 .thumb {

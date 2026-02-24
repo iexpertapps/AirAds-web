@@ -7,7 +7,7 @@
 
 .tabs {
   margin-bottom: var(--space-6);
-  border-bottom: 1px solid var(--color-grey-200);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .tabList {
@@ -22,7 +22,7 @@
   gap: var(--space-1);
   padding: var(--space-3) var(--space-5);
   font: var(--text-body-strong);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
@@ -34,17 +34,17 @@
 }
 
 .tab:hover {
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .tab:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: -2px;
 }
 
 .tabActive {
-  color: var(--color-rausch);
-  border-bottom-color: var(--color-rausch);
+  color: var(--brand-orange);
+  border-bottom-color: var(--brand-orange);
 }
 
 .tabPanel {
@@ -58,15 +58,15 @@
 }
 
 .infoCard {
-  background: var(--color-white);
+  background: var(--surface-card);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-grey-200);
+  border: 1px solid var(--border-default);
   padding: var(--space-6);
 }
 
 .cardHeading {
   font: var(--text-heading-sm);
-  color: var(--color-hof);
+  color: var(--text-primary);
   margin-bottom: var(--space-4);
 }
 
@@ -78,16 +78,16 @@
 
 .dl dt {
   font: var(--text-label);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .dl dd {
   font: var(--text-body);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .link {
-  color: var(--color-rausch);
+  color: var(--brand-orange);
   text-decoration: none;
 }
 
@@ -96,25 +96,25 @@
 }
 
 .link:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
 
 .placeholder {
-  background: var(--color-white);
+  background: var(--surface-card);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-grey-200);
+  border: 1px solid var(--border-default);
   padding: var(--space-10);
   text-align: center;
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   font: var(--text-body);
 }
 
 .notesPanel {
-  background: var(--color-white);
+  background: var(--surface-card);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-grey-200);
+  border: 1px solid var(--border-default);
   padding: var(--space-6);
   display: flex;
   flex-direction: column;
@@ -123,7 +123,7 @@
 
 .notesHint {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   background: var(--color-info-bg);
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
@@ -133,12 +133,12 @@
   display: flex;
   justify-content: flex-end;
   padding-top: var(--space-2);
-  border-top: 1px solid var(--color-grey-200);
+  border-top: 1px solid var(--border-default);
 }
 
 .notFound {
   font: var(--text-body);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   margin-bottom: var(--space-4);
 }
 
@@ -164,8 +164,8 @@
 }
 
 .photoCard {
-  background: var(--color-white);
-  border: 1px solid var(--color-grey-200);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   overflow: hidden;
 }
@@ -174,7 +174,7 @@
   display: block;
   width: 100%;
   aspect-ratio: 4/3;
-  background: var(--color-grey-100);
+  background: var(--surface-hover);
   border: none;
   cursor: pointer;
   padding: 0;
@@ -182,7 +182,7 @@
 }
 
 .photoThumb:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: 2px;
 }
 
@@ -207,7 +207,7 @@
 
 .photoAgent {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -234,7 +234,7 @@
   flex-direction: column;
   gap: 0;
   padding-left: var(--space-6);
-  border-left: 2px solid var(--color-grey-200);
+  border-left: 2px solid var(--border-default);
 }
 
 .timelineItem {
@@ -249,14 +249,14 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--color-rausch);
-  border: 2px solid var(--color-white);
-  box-shadow: 0 0 0 2px var(--color-grey-200);
+  background: var(--brand-orange);
+  border: 2px solid var(--surface-card);
+  box-shadow: 0 0 0 2px var(--border-default);
 }
 
 .timelineCard {
-  background: var(--color-white);
-  border: 1px solid var(--color-grey-200);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   padding: var(--space-4) var(--space-5);
 }
@@ -272,7 +272,7 @@
 
 .timelineDate {
   font: var(--text-body-strong);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .timelineBadges {
@@ -289,12 +289,12 @@
 
 .visitDl dt {
   font: var(--text-label);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .visitDl dd {
   font: var(--text-body);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 /* ── Tags ── */
@@ -309,21 +309,22 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  background: var(--color-white);
-  border: 1px solid var(--color-grey-200);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
 }
 
 .tagType {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   min-width: 80px;
+  margin-right: auto;
 }
 
 .tagSource {
   font: var(--text-caption);
-  color: var(--color-foggy);
-  background: var(--color-grey-100);
+  color: var(--text-secondary);
+  background: var(--surface-hover);
   padding: 2px var(--space-2);
   border-radius: var(--radius-sm);
 }
@@ -342,8 +343,8 @@
 }
 
 .analyticsCard {
-  background: var(--color-white);
-  border: 1px solid var(--color-grey-200);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   padding: var(--space-5) var(--space-6);
   display: flex;
@@ -358,18 +359,18 @@
 
 .analyticsValue {
   font: var(--text-heading-lg);
-  color: var(--color-hof);
+  color: var(--text-primary);
   line-height: 1;
 }
 
 .analyticsLabel {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .analyticsChart {
-  background: var(--color-white);
-  border: 1px solid var(--color-grey-200);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
 }
@@ -402,14 +403,14 @@
 
 .searchTermText {
   font: var(--text-body);
-  color: var(--color-hof);
+  color: var(--text-primary);
   position: relative;
   z-index: 1;
 }
 
 .searchTermCount {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   position: relative;
   z-index: 1;
 }
@@ -420,7 +421,7 @@
   top: 0;
   height: 100%;
   width: var(--search-term-bar-width, 0%);
-  background: var(--color-grey-100);
+  background: var(--surface-hover);
   border-radius: var(--radius-sm);
   transition: width var(--duration-normal) var(--ease-standard);
 }
@@ -428,5 +429,5 @@
 /* ── Delete warning ── */
 .deleteWarning {
   font: var(--text-body);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }

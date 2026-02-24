@@ -12,9 +12,9 @@
 }
 
 .tree {
-  background: var(--color-white);
+  background: var(--surface-card);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-grey-200);
+  border: 1px solid var(--border-default);
   overflow-y: auto;
   max-height: calc(100vh - 220px);
 }
@@ -35,7 +35,7 @@
   width: 100%;
   padding: var(--space-2) var(--space-4);
   font: var(--text-body);
-  color: var(--color-hof);
+  color: var(--text-primary);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -45,33 +45,33 @@
 }
 
 .treeNode:hover {
-  background: var(--color-grey-50);
+  background: var(--surface-hover);
 }
 
 .treeNode:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: -2px;
 }
 
 .treeNodeActive {
-  background: rgba(255, 90, 95, 0.08);
-  color: var(--color-rausch);
+  background: rgba(249, 115, 22, 0.10);
+  color: var(--brand-orange);
   font-weight: 500;
 }
 
 .treeCode {
   font: var(--text-caption);
-  color: var(--color-foggy);
-  background: var(--color-grey-100);
+  color: var(--text-secondary);
+  background: var(--surface-hover);
   padding: 1px var(--space-2);
   border-radius: var(--radius-pill);
   margin-left: auto;
 }
 
 .detail {
-  background: var(--color-white);
+  background: var(--surface-card);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-grey-200);
+  border: 1px solid var(--border-default);
   padding: var(--space-6);
 }
 
@@ -111,7 +111,7 @@
 
 .detailType {
   font: var(--text-heading-sm);
-  color: var(--color-hof);
+  color: var(--text-primary);
   margin-bottom: 2px;
 }
 
@@ -134,24 +134,24 @@
   display: flex;
   justify-content: flex-end;
   padding-top: var(--space-2);
-  border-top: 1px solid var(--color-grey-200);
+  border-top: 1px solid var(--border-default);
 }
 
 .mapPreview {
   border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid var(--color-grey-200);
+  border: 1px solid var(--border-default);
 }
 
 .noGps {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   font-style: italic;
 }
 
 .deleteWarning {
   font: var(--text-body);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .drawerForm {

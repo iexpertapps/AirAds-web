@@ -19,6 +19,7 @@ import { Drawer } from '@/shared/components/dls/Drawer';
 import { Modal } from '@/shared/components/dls/Modal';
 import { EmptyState } from '@/shared/components/dls/EmptyState';
 import { useToast } from '@/shared/hooks/useToast';
+import { formatActiveStatus } from '@/shared/utils/formatters';
 import styles from './UsersPage.module.css';
 
 type Role = 'SUPER_ADMIN' | 'CITY_MANAGER' | 'DATA_ENTRY' | 'QA_REVIEWER' | 'FIELD_AGENT' | 'ANALYST' | 'SUPPORT';
@@ -182,7 +183,7 @@ export default function UsersPage() {
         }
         return (
           <span className={u.is_active ? styles.active : styles.inactive}>
-            {u.is_active ? 'Active' : 'Inactive'}
+            {formatActiveStatus(u.is_active)}
           </span>
         );
       },

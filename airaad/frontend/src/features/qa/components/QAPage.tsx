@@ -12,6 +12,7 @@ import { Modal } from '@/shared/components/dls/Modal';
 import { Textarea } from '@/shared/components/dls/Textarea';
 import { EmptyState } from '@/shared/components/dls/EmptyState';
 import { useToast } from '@/shared/hooks/useToast';
+import { formatLabel } from '@/shared/utils/formatters';
 import styles from './QAPage.module.css';
 
 interface QAVendor {
@@ -116,7 +117,7 @@ export default function QAPage() {
     {
       key: 'data_source',
       header: 'Source',
-      render: (v) => <span>{v.data_source}</span>,
+      render: (v) => <span>{formatLabel(v.data_source)}</span>,
     },
     {
       key: 'days_waiting',

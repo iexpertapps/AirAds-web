@@ -7,16 +7,16 @@
 
 .tagName {
   font: var(--text-body-strong);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .slug {
   font-family: var(--font-family-mono);
   font-size: 12px;
-  background: var(--color-grey-100);
+  background: var(--surface-hover);
   padding: 2px var(--space-2);
   border-radius: var(--radius-sm);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .systemLock {
@@ -39,7 +39,7 @@
   align-items: center;
   gap: var(--space-2);
   font: var(--text-heading-sm);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   margin-bottom: var(--space-4);
 }
 
@@ -58,7 +58,7 @@
 
 .slugLabel {
   font: var(--text-label);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .slugHint {
@@ -68,5 +68,5 @@
 
 .deleteWarning {
   font: var(--text-body);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }

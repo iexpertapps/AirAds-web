@@ -22,9 +22,10 @@ import { EmptyState } from '@/shared/components/dls/EmptyState';
 import { RoleGate } from '@/shared/components/RoleGate';
 import { useToast } from '@/shared/hooks/useToast';
 import { useDebounce } from '@/shared/hooks/useDebounce';
+import { formatLabel } from '@/shared/utils/formatters';
 import styles from './TagsPage.module.css';
 
-type TagType = 'CATEGORY' | 'INTENT' | 'PROMOTION' | 'TIME' | 'SYSTEM';
+type TagType = 'LOCATION' | 'CATEGORY' | 'INTENT' | 'PROMOTION' | 'TIME' | 'SYSTEM';
 
 interface Tag {
   id: string;
@@ -37,6 +38,7 @@ interface Tag {
 }
 
 const TAG_TYPE_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: 'LOCATION', label: 'Location' },
   { value: 'CATEGORY', label: 'Category' },
   { value: 'INTENT', label: 'Intent' },
   { value: 'PROMOTION', label: 'Promotion' },
@@ -44,6 +46,7 @@ const TAG_TYPE_OPTIONS: Array<{ value: string; label: string }> = [
 ];
 
 const TAG_TYPE_VARIANT: Record<TagType, 'info' | 'success' | 'warning' | 'neutral'> = {
+  LOCATION: 'info',
   CATEGORY: 'info',
   INTENT: 'success',
   PROMOTION: 'warning',
@@ -53,7 +56,7 @@ const TAG_TYPE_VARIANT: Record<TagType, 'info' | 'success' | 'warning' | 'neutra
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
-  tag_type: z.enum(['CATEGORY', 'INTENT', 'PROMOTION', 'TIME']),
+  tag_type: z.enum(['LOCATION', 'CATEGORY', 'INTENT', 'PROMOTION', 'TIME']),
   display_order: z.coerce.number().int().min(0),
   is_active: z.boolean(),
 });
@@ -89,7 +92,7 @@ export default function TagsPage() {
 
   function openCreate() {
     setEditTag(null);
-    reset({ name: '', tag_type: 'CATEGORY', display_order: 0, is_active: true });
+    reset({ name: '', tag_type: 'LOCATION', display_order: 0, is_active: true });
     setDrawerOpen(true);
   }
 
@@ -178,7 +181,7 @@ export default function TagsPage() {
       render: (t) => (
         <Badge
           variant={TAG_TYPE_VARIANT[t.tag_type]}
-          label={t.tag_type}
+          label={formatLabel(t.tag_type)}
           icon={t.tag_type === 'SYSTEM' ? <Lock size={10} /> : undefined}
         />
       ),

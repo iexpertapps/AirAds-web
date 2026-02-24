@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useChartColors } from '@/shared/hooks/useChartColors';
 import {
   CheckCircle, XCircle, Flag, Lock, ArrowLeft,
   Trash2, Plus, AlertTriangle, Camera, MapPin,
@@ -24,6 +25,7 @@ import { Select } from '@/shared/components/dls/Select';
 import { RoleGate } from '@/shared/components/RoleGate';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { useToast } from '@/shared/hooks/useToast';
+import { formatStatus, formatLabel } from '@/shared/utils/formatters';
 import styles from './VendorDetailPage.module.css';
 
 type QCStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'NEEDS_REVIEW' | 'FLAGGED';
@@ -70,11 +72,11 @@ interface FieldVisit {
 
 interface VendorTag {
   id: string;
-  tag_id: string;
-  tag_name: string;
+  name: string;
+  slug: string;
   tag_type: string;
-  source: 'MANUAL' | 'AUTO' | 'IMPORT';
-  assigned_at: string;
+  display_label: string;
+  is_active: boolean;
 }
 
 interface AvailableTag {
@@ -107,6 +109,7 @@ export default function VendorDetailPage() {
   const qc = useQueryClient();
   const toast = useToast();
   const user = useAuthStore((s) => s.user);
+  const chartColors = useChartColors();
 
   const activeTab = (searchParams.get('tab') ?? 'overview') as TabId;
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
@@ -229,7 +232,7 @@ export default function VendorDetailPage() {
     mutationFn: (payload: { qc_status: QCStatus; qc_notes?: string }) =>
       apiClient.patch(`/api/v1/vendors/${id}/qc-status/`, payload),
     onSuccess: (_, vars) => {
-      toast.success(`Vendor ${vars.qc_status.toLowerCase()}`);
+      toast.success(`Vendor ${formatStatus(vars.qc_status).toLowerCase()}`);
       setRejectModalOpen(false);
       setQcNotes('');
       void qc.invalidateQueries({ queryKey: queryKeys.vendors.detail(id ?? '') });
@@ -401,7 +404,7 @@ export default function VendorDetailPage() {
                 <dt>Location</dt>
                 <dd>{[vendor.city_name, vendor.area_name].filter(Boolean).join(' › ') || '—'}</dd>
                 <dt>Data Source</dt>
-                <dd>{vendor.data_source}</dd>
+                <dd>{formatLabel(vendor.data_source)}</dd>
                 <dt>Created</dt>
                 <dd>{new Date(vendor.created_at).toLocaleString()}</dd>
               </dl>
@@ -545,17 +548,13 @@ export default function VendorDetailPage() {
               <div className={styles.tagsList}>
                 {vendorTags.map((vt) => (
                   <div key={vt.id} className={styles.tagRow}>
-                    <Badge variant="info" label={vt.tag_name} />
-                    <span className={styles.tagType}>{vt.tag_type}</span>
-                    <span className={styles.tagSource}>{vt.source}</span>
-                    <span className={styles.tagDate}>
-                      {new Date(vt.assigned_at).toLocaleDateString()}
-                    </span>
+                    <Badge variant="info" label={vt.display_label || vt.name} />
+                    <span className={styles.tagType}>{formatLabel(vt.tag_type)}</span>
                     <RoleGate allowedRoles={['SUPER_ADMIN', 'CITY_MANAGER', 'DATA_ENTRY', 'QA_REVIEWER']}>
                       <Button
                         variant="ghost"
                         size="compact"
-                        aria-label={`Remove tag ${vt.tag_name}`}
+                        aria-label={`Remove tag ${vt.name}`}
                         loading={removeTagMutation.isPending && removeTagMutation.variables === vt.id}
                         onClick={() => removeTagMutation.mutate(vt.id)}
                       >
@@ -584,48 +583,48 @@ export default function VendorDetailPage() {
                 <div className={styles.analyticsMetrics}>
                   <div className={styles.analyticsCard}>
                     <Eye size={20} strokeWidth={1.5} className={styles.analyticsIcon} aria-hidden="true" />
-                    <p className={styles.analyticsValue}>{analytics.total_views.toLocaleString()}</p>
+                    <p className={styles.analyticsValue}>{(analytics.total_views ?? 0).toLocaleString()}</p>
                     <p className={styles.analyticsLabel}>Total Views</p>
                   </div>
                   <div className={styles.analyticsCard}>
                     <TrendingUp size={20} strokeWidth={1.5} className={styles.analyticsIcon} aria-hidden="true" />
-                    <p className={styles.analyticsValue}>{analytics.views_last_7d.toLocaleString()}</p>
+                    <p className={styles.analyticsValue}>{(analytics.views_last_7d ?? 0).toLocaleString()}</p>
                     <p className={styles.analyticsLabel}>Last 7 Days</p>
                   </div>
                   <div className={styles.analyticsCard}>
                     <BarChart2 size={20} strokeWidth={1.5} className={styles.analyticsIcon} aria-hidden="true" />
-                    <p className={styles.analyticsValue}>{analytics.views_last_30d.toLocaleString()}</p>
+                    <p className={styles.analyticsValue}>{(analytics.views_last_30d ?? 0).toLocaleString()}</p>
                     <p className={styles.analyticsLabel}>Last 30 Days</p>
                   </div>
                 </div>
 
-                {analytics.daily_views.length > 0 && (
+                {(analytics.daily_views?.length ?? 0) > 0 && (
                   <div className={styles.analyticsChart}>
                     <h3 className={styles.cardHeading}>Daily Views — Last 14 Days</h3>
                     <ResponsiveContainer width="100%" height={200}>
                       <BarChart data={analytics.daily_views} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-grey-200)" />
-                        <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--color-foggy)' }} tickLine={false} axisLine={false} />
-                        <YAxis tick={{ fontSize: 11, fill: 'var(--color-foggy)' }} tickLine={false} axisLine={false} allowDecimals={false} />
-                        <Tooltip contentStyle={{ background: 'var(--color-white)', border: '1px solid var(--color-grey-200)', borderRadius: '8px', fontSize: 12 }} />
-                        <Bar dataKey="count" fill="var(--color-babu)" radius={[3, 3, 0, 0]} name="Views" />
+                        <CartesianGrid strokeDasharray="3 3" stroke={chartColors.gridStroke} />
+                        <XAxis dataKey="date" tick={{ fontSize: 11, fill: chartColors.tickFill }} tickLine={false} axisLine={false} />
+                        <YAxis tick={{ fontSize: 11, fill: chartColors.tickFill }} tickLine={false} axisLine={false} allowDecimals={false} />
+                        <Tooltip contentStyle={{ background: chartColors.tooltipBg, border: `1px solid ${chartColors.tooltipBorder}`, borderRadius: '8px', fontSize: 12, color: chartColors.tickFill }} />
+                        <Bar dataKey="count" fill={chartColors.barTeal} radius={[3, 3, 0, 0]} name="Views" />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                 )}
 
-                {analytics.top_search_terms.length > 0 && (
+                {(analytics.top_search_terms?.length ?? 0) > 0 && (
                   <div className={styles.analyticsChart}>
                     <h3 className={styles.cardHeading}>Top Search Terms</h3>
                     <ol className={styles.searchTermsList}>
-                      {analytics.top_search_terms.slice(0, 10).map((t, i) => (
+                      {(analytics.top_search_terms ?? []).slice(0, 10).map((t, i) => (
                         <li key={t.term} className={styles.searchTermRow}>
                           <span className={styles.searchTermRank}>{i + 1}</span>
                           <span className={styles.searchTermText}>{t.term}</span>
-                          <span className={styles.searchTermCount}>{t.count.toLocaleString()}</span>
+                          <span className={styles.searchTermCount}>{(t.count ?? 0).toLocaleString()}</span>
                           <div
                             className={styles.searchTermBar}
-                            style={{ ['--search-term-bar-width' as string]: `${(t.count / (analytics.top_search_terms[0]?.count || 1)) * 100}%` } as React.CSSProperties}
+                            style={{ ['--search-term-bar-width' as string]: `${(t.count / ((analytics.top_search_terms ?? [])[0]?.count || 1)) * 100}%` } as React.CSSProperties}
                             aria-hidden="true"
                           />
                         </li>
@@ -642,7 +641,7 @@ export default function VendorDetailPage() {
           <RoleGate allowedRoles={['SUPER_ADMIN', 'QA_REVIEWER']}>
             <div className={styles.notesPanel}>
               <h2 className={styles.cardHeading}>Internal QC Notes</h2>
-              <p className={styles.notesHint}>These notes are only visible to SUPER_ADMIN and QA_REVIEWER.</p>
+              <p className={styles.notesHint}>These notes are only visible to Super Admins and QA Reviewers.</p>
               <Textarea
                 id="qc-notes-edit"
                 label="QC Notes"
@@ -726,7 +725,7 @@ export default function VendorDetailPage() {
           id="add-tag-select"
           label="Select tag"
           required
-          options={(allTags ?? []).map((t) => ({ value: t.id, label: `${t.name} (${t.tag_type})` }))}
+          options={(allTags ?? []).map((t) => ({ value: t.id, label: `${t.name} (${formatLabel(t.tag_type)})` }))}
           placeholder="Choose a tag…"
           value={addTagId}
           onChange={(e) => setAddTagId(e.target.value)}

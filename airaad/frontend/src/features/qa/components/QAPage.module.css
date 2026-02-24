@@ -9,7 +9,7 @@
   align-items: center;
   gap: var(--space-3);
   font: var(--text-heading-sm);
-  color: var(--color-hof);
+  color: var(--text-primary);
   margin-bottom: var(--space-4);
 }
 
@@ -29,12 +29,12 @@
 
 .vendorName {
   font: var(--text-body-strong);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .location {
   font: var(--text-body);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .urgentDays {
@@ -49,5 +49,5 @@
 
 .bulkNote {
   font: var(--text-body);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }

@@ -13,6 +13,7 @@ interface UIState {
   theme: 'light' | 'dark';
   toasts: Toast[];
   toggleSidebar: () => void;
+  toggleTheme: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
   addToast: (toast: Omit<Toast, 'id'>) => void;
   removeToast: (id: string) => void;
@@ -22,12 +23,16 @@ const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
 function readPersistedTheme(): 'light' | 'dark' {
   try {
-    const stored = localStorage.getItem('airaad-theme');
+    const stored = localStorage.getItem('airad-theme');
     if (stored === 'dark' || stored === 'light') return stored;
   } catch {
     // ignore storage errors
   }
-  return 'light';
+  // Fall back to system preference, then default to dark
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    return 'dark';
+  }
+  return 'dark'; // Default to dark for premium feel
 }
 
 export const useUIStore = create<UIState>()(
@@ -40,6 +45,18 @@ export const useUIStore = create<UIState>()(
       set((state) => {
         state.sidebarCollapsed = !state.sidebarCollapsed;
       });
+    },
+
+    toggleTheme: () => {
+      set((state) => {
+        state.theme = state.theme === 'light' ? 'dark' : 'light';
+      });
+      try {
+        const currentTheme = useUIStore.getState().theme;
+        localStorage.setItem('airad-theme', currentTheme);
+      } catch {
+        // ignore storage errors
+      }
     },
 
     setTheme: (theme) => {

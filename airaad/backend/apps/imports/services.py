@@ -13,6 +13,7 @@ from django.db import transaction
 from django.http import HttpRequest
 
 from apps.audit.utils import log_action
+from core.file_validation import FileValidationError, validate_uploaded_file
 from core.storage import upload_file_to_s3
 
 from .models import ImportBatch, ImportStatus
@@ -66,6 +67,16 @@ def create_import_batch(
         StorageError: If S3 upload fails.
     """
     from apps.imports.tasks import process_import_batch
+
+    # Validate file type (magic bytes) and size before uploading to S3
+    try:
+        validate_uploaded_file(
+            file=file,
+            filename=filename,
+            allowed_types=["text/csv", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+        )
+    except FileValidationError as e:
+        raise ValueError(f"File validation failed: {e}") from e
 
     s3_key = upload_file_to_s3(file, prefix="imports")
 

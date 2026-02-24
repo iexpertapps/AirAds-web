@@ -11,21 +11,21 @@
   cursor: pointer;
   min-height: 44px;
   font: var(--text-body);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .checkbox {
   width: 18px;
   height: 18px;
-  border: 1.5px solid var(--color-grey-300);
+  border: 1.5px solid var(--border-input);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  accent-color: var(--color-rausch);
+  accent-color: var(--brand-orange);
   flex-shrink: 0;
 }
 
 .checkbox:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: 2px;
 }
 

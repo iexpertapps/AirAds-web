@@ -65,35 +65,44 @@
 - Follow the same API patterns as DLS components (`controlled` vs `uncontrolled`, `size`, `variant` props) when building custom components.
 - Keep DLS components at the leaf level — only wrap them in domain components when business logic needs to be injected.
 - Token system is the only source of truth — never hardcode values:
-  - **Color**: `--color-rausch` (primary CTA, max 1/view), `--color-babu` (success), `--color-arches` (warning), `--color-hof`/`--color-foggy` (text), `--color-grey-100` through `--color-grey-900` (neutrals), semantic `--color-success/warning/error/info` + `-light` variants, `--color-airaad-accent` (data viz only)
+  - **Brand primitives**: `--brand-orange` (#F97316, primary CTA/active, max 1 dominant use/view), `--brand-crimson` (#DC2626, destructive/error), `--brand-teal` (#0D9488, success/approved), `--brand-black` (#0A0A0A, sidebar/logo bg — never change)
+  - **Brand gradients**: `--gradient-brand-text` ("AirAd" wordmark only), `--gradient-primary-btn` (primary button bg), `--gradient-active-indicator` (sidebar active strip), `--gradient-hero` (page hero bg)
+  - **Surfaces**: `--surface-page`, `--surface-sidebar`, `--surface-topbar`, `--surface-card`, `--surface-modal`, `--surface-input`, `--surface-hover` — all theme-aware via `[data-theme]`
+  - **Text**: `--text-primary`, `--text-secondary` — never hardcode text colors
+  - **Borders**: `--border-default`, `--border-input` — never hardcode border colors
+  - **Semantic**: `--color-success/warning/error/info` + `-bg` / `-text` variants (all mapped to brand colors)
+  - **Neutrals**: `--color-grey-100` through `--color-grey-900` (warm stone scale)
   - **Typography**: `--text-display` (32px/700) through `--text-caption` (11px/400); `--font-family-base` (Circular/DM Sans); min size 11px; sentence case; max 3 weights/view
   - **Spacing**: `--space-1` (4px) through `--space-16` (64px); 8px base grid; never arbitrary px values
-  - **Layout**: sidebar `240px` fixed, content max-width `1280px`, topbar `64px`, table row `56px`, card padding `24px`
+  - **Layout**: sidebar `240px` fixed (collapsed `64px`), content max-width `1280px`, topbar `64px`, table row `56px`, card padding `24px`
   - **Motion**: `--duration-instant` (100ms) / `--duration-fast` (150ms) / `--duration-normal` (250ms) / `--duration-slow` (350ms); `--ease-standard/enter/exit`; always respect `prefers-reduced-motion`
 - **Icons**: `lucide-react` exclusively — stroke width `1.5`, never filled, sizes: `16px` inline / `20px` nav / `24px` standalone / `32px` empty states
 - **Components (A5.1–A5.8)**:
-  - Buttons: border-radius `8px`, min-height `48px` primary / `40px` secondary, verb+noun labels, max 1 primary/view
-  - Inputs: height `48px`, validate on blur only, error below input, never placeholder-only labels
-  - Cards: white bg, `border-radius: 12px`, `1px --color-grey-200` border, `box-shadow: 0 1px 2px rgba(0,0,0,0.08)`
-  - Tables: skeleton rows for loading (not spinners), always show row count, 25 rows default, sticky header >10 rows
-  - Badges: pill shape (`border-radius: 100px`), always icon/dot prefix + text, never color alone
-  - Modals: overlay `rgba(0,0,0,0.5)` + `backdrop-filter: blur(4px)`, focus trap, ESC closes
-  - Sidebar: `240px`, nav item height `44px`, pill-right active state in `--color-rausch`
+  - Buttons: border-radius `8px`, min-height `48px` primary / `40px` secondary, verb+noun labels, max 1 primary/view; primary uses `--gradient-primary-btn` + orange glow shadow
+  - Inputs: height `40px`, `background: --surface-input`, `border: 1px --border-input`, focus ring `--brand-orange`, validate on blur only, error below input
+  - Cards: `background: --surface-card`, `border-radius: 12px`, `border: 1px --border-default`, `box-shadow: --shadow-card`
+  - Tables: skeleton rows for loading (not spinners), always show row count, 25 rows default, sticky header >10 rows; selected row uses `--brand-orange` left border
+  - Badges: pill shape (`border-radius: 100px`), always icon/dot prefix + text, never color alone; use brand color `rgba()` backgrounds
+  - Modals: overlay `rgba(0,0,0,0.65)` + `backdrop-filter: blur(4px)`, `background: --surface-modal`, focus trap, ESC closes
+  - Sidebar: `240px`, `background: --surface-sidebar` (dark = `--brand-black`), nav item height `44px`, active state uses `--brand-orange` text + `--gradient-active-indicator` left strip
   - Empty states: illustration + plain-language heading + action CTA — never blank
-- **Accessibility (A11 — WCAG 2.1 AA mandatory)**: contrast 4.5:1 normal text / 3:1 large, focus ring `2px solid --color-rausch`, `aria-live="polite"` for toasts, `aria-describedby` for form errors, `aria-hidden="true"` on decorative icons
+- **Charts (A10 — Recharts)**: CSS variable strings do **not** resolve in JS inline style objects — always use the `useChartColors()` hook (`/src/shared/hooks/useChartColors.ts`) to get live computed values for `stroke`, `fill`, and `contentStyle` props
+- **Accessibility (A11 — WCAG 2.1 AA mandatory)**: contrast 4.5:1 normal text / 3:1 large, focus ring `2px solid --brand-orange`, `aria-live="polite"` for toasts, `aria-describedby` for form errors, `aria-hidden="true"` on decorative icons
 - **Portal pages**: Dashboard `/`, Vendor Management `/vendors`, Vendor Detail `/vendors/:id`, Geographic Management `/geo`, Tag Management `/tags`, Import Center `/import`, Field Operations `/field`, QA Center `/qa`, Analytics `/analytics`, Admin & Audit `/admin`
 
 ---
 
 ## 6. Theme System
 
-- **Default theme is light** (AirAd portal uses `--color-grey-100` page backgrounds per A2) — the app must never flash an unstyled state on first load.
-- Store theme preference in Zustand and persist it to `localStorage`.
+- **Default theme is dark** — the AirAd portal is dark-first. The `index.html` must set `data-theme="dark"` immediately (before React hydrates) via an inline script to prevent flash.
+- Store theme preference in Zustand (`useUIStore`) and persist it to `localStorage` under the key `'airad-theme'`.
+- `ThemeProvider` reads from Zustand and sets `document.documentElement.setAttribute('data-theme', theme)` — this is the only place the theme attribute is written.
 - One single `ThemeProvider` at the root level wraps the entire app — theme logic never lives inside individual components.
-- Both light and dark themes must be fully implemented and tested — no half-baked light mode.
-- All theme values must come from DLS design tokens — never define your own color primitives.
+- Both dark and light themes must be fully implemented — no half-baked light mode.
+- All theme values must come from DLS surface/text/border tokens — never define your own color primitives.
 - Use CSS variables under the hood so theme switching is instant with zero re-renders.
 - `ThemeProvider` is the only place the theme is set — components only consume tokens, they never decide the theme.
+- The TopBar exposes a Sun/Moon toggle button that calls `toggleTheme()` from `useUIStore`.
 
 ---
 

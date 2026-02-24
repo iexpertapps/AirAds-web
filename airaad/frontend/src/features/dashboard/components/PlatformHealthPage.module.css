@@ -10,10 +10,10 @@
   align-items: center;
   gap: var(--space-4);
   padding: var(--space-5) var(--space-6);
-  background: var(--color-white);
+  background: var(--surface-card);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  border: 1px solid var(--color-grey-200);
+  border: 1px solid var(--border-default);
 }
 
 .metricCard--warning {
@@ -33,8 +33,8 @@
   width: 44px;
   height: 44px;
   border-radius: var(--radius-md);
-  background: var(--color-grey-100);
-  color: var(--color-hof);
+  background: var(--surface-hover);
+  color: var(--text-primary);
   flex-shrink: 0;
 }
 
@@ -50,40 +50,40 @@
 
 .metricValue {
   font: var(--text-heading-lg);
-  color: var(--color-hof);
+  color: var(--text-primary);
   line-height: 1;
 }
 
 .metricLabel {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   margin-top: var(--space-1);
 }
 
 .chartSection {
-  background: var(--color-white);
+  background: var(--surface-card);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  border: 1px solid var(--color-grey-200);
+  border: 1px solid var(--border-default);
   padding: var(--space-6);
+  width: 100%;
+}
+
+.chartSection :global(.recharts-wrapper),
+.chartSection :global(.recharts-surface) {
+  background: transparent !important;
 }
 
 .chartWrapper {
   width: 100%;
 }
 
-/* ── Charts row (bar + donut side by side) ── */
+/* ── Charts row (full width stacked) ── */
 .chartsRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: var(--space-4);
   margin-bottom: var(--space-4);
-}
-
-@media (max-width: 900px) {
-  .chartsRow {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ── Section heading (supports optional icon) ── */
@@ -92,23 +92,23 @@
   align-items: center;
   gap: var(--space-2);
   font: var(--text-heading-sm);
-  color: var(--color-hof);
+  color: var(--text-primary);
   margin-bottom: var(--space-4);
 }
 
-/* ── Bottom row: 3 equal columns ── */
+/* ── Bottom row: full width stacked ── */
 .bottomRow {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: var(--space-4);
   margin-top: var(--space-4);
 }
 
 .listSection {
-  background: var(--color-white);
+  background: var(--surface-card);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  border: 1px solid var(--color-grey-200);
+  border: 1px solid var(--border-default);
   padding: var(--space-6);
   display: flex;
   flex-direction: column;
@@ -144,7 +144,7 @@
 
 .searchTerm {
   font: var(--text-body);
-  color: var(--color-hof);
+  color: var(--text-primary);
   position: relative;
   z-index: 1;
   overflow: hidden;
@@ -154,7 +154,7 @@
 
 .searchCount {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   position: relative;
   z-index: 1;
   white-space: nowrap;
@@ -166,7 +166,7 @@
   top: 0;
   height: 100%;
   width: var(--search-bar-width, 0%);
-  background: var(--color-grey-100);
+  background: var(--surface-hover);
   border-radius: var(--radius-sm);
   transition: width var(--duration-normal) var(--ease-standard);
 }
@@ -184,8 +184,8 @@
 .alertItem {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
-  border-left: 3px solid var(--color-grey-300);
-  background: var(--color-grey-50);
+  border-left: 3px solid var(--border-input);
+  background: var(--surface-hover);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -214,13 +214,13 @@
 
 .alertMessage {
   font: var(--text-body);
-  color: var(--color-hof);
+  color: var(--text-primary);
   flex: 1;
 }
 
 .alertAction {
   font: var(--text-caption);
-  color: var(--color-rausch);
+  color: var(--brand-orange);
   text-decoration: none;
   font-weight: 500;
 }
@@ -249,7 +249,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--color-rausch);
+  background: var(--brand-orange);
   flex-shrink: 0;
   margin-top: 5px;
 }
@@ -262,17 +262,17 @@
 
 .activityAction {
   font: var(--text-body-strong);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .activityMeta {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .viewAllLink {
   font: var(--text-caption);
-  color: var(--color-rausch);
+  color: var(--brand-orange);
   font-weight: 500;
   text-decoration: none;
   margin-top: var(--space-2);

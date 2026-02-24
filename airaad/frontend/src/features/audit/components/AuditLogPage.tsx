@@ -17,6 +17,7 @@ import { Select } from '@/shared/components/dls/Select';
 import { EmptyState } from '@/shared/components/dls/EmptyState';
 import { useToast } from '@/shared/hooks/useToast';
 import { useDebounce } from '@/shared/hooks/useDebounce';
+import { formatLabel } from '@/shared/utils/formatters';
 import styles from './AuditLogPage.module.css';
 
 interface AuditEntry {
@@ -167,7 +168,7 @@ export default function AuditLogPage() {
     {
       key: 'action',
       header: 'Action',
-      render: (e) => <code className={styles.action}>{e.action}</code>,
+      render: (e) => <span className={styles.action}>{formatLabel(e.action)}</span>,
     },
     {
       key: 'actor_label',
@@ -177,7 +178,7 @@ export default function AuditLogPage() {
     {
       key: 'target_type',
       header: 'Target Type',
-      render: (e) => <span>{e.target_type}</span>,
+      render: (e) => <span>{formatLabel(e.target_type)}</span>,
     },
     {
       key: 'target_id',

@@ -6,6 +6,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    try {
+      localStorage.setItem('airad-theme', theme);
+    } catch {
+      // ignore storage errors
+    }
   }, [theme]);
 
   return <>{children}</>;

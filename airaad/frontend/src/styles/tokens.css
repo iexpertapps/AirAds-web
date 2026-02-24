@@ -1,0 +1,206 @@
+/* ================================================================
+   AIRAAD DESIGN SYSTEM — DUAL THEME TOKENS
+   Derived from airad_icon3x.png brand colors
+   ================================================================ */
+
+/* ── BRAND PRIMITIVES (theme-independent) ── */
+:root {
+  --brand-orange:          #FF8C00;
+  --brand-orange-light:    #FFB347;
+  --brand-orange-dark:     #E67E00;
+  --brand-orange-glow:     rgba(255, 140, 0, 0.25);
+
+  --brand-crimson:         #C41E3A;
+  --brand-crimson-light:   #E8405A;
+  --brand-crimson-dark:    #9E1830;
+  --brand-crimson-glow:    rgba(196, 30, 58, 0.25);
+
+  --brand-teal:            #00BCD4;
+  --brand-teal-light:      #4DD0E1;
+  --brand-teal-dark:       #0097A7;
+  --brand-teal-glow:       rgba(0, 188, 212, 0.25);
+
+  --brand-black:           #000000;
+  --brand-dark:            #0D0D0D;
+
+  /* Gradient shorthands */
+  --gradient-brand:        linear-gradient(135deg, #FF8C00 0%, #C41E3A 50%, #00BCD4 100%);
+  --gradient-brand-soft:   linear-gradient(135deg, rgba(255,140,0,0.15) 0%, rgba(196,30,58,0.10) 50%, rgba(0,188,212,0.15) 100%);
+  --gradient-orange-crimson: linear-gradient(135deg, #FF8C00 0%, #C41E3A 100%);
+  --gradient-crimson-teal: linear-gradient(135deg, #C41E3A 0%, #00BCD4 100%);
+  --gradient-teal-orange:  linear-gradient(135deg, #00BCD4 0%, #FF8C00 100%);
+}
+
+/* ================================================================
+   LIGHT THEME
+   ================================================================ */
+[data-theme="light"], .theme-light {
+
+  /* Backgrounds */
+  --bg-base:               #F5F5F5;   /* page canvas */
+  --bg-surface:            #FFFFFF;   /* cards, modals */
+  --bg-surface-raised:     #FFFFFF;   /* dropdowns, popovers */
+  --bg-surface-sunken:     #EFEFEF;   /* input fields, table rows alt */
+  --bg-sidebar:            #FFFFFF;   /* sidebar background */
+  --bg-sidebar-active:     rgba(255, 140, 0, 0.08);  /* active nav item */
+  --bg-hover:              rgba(0, 0, 0, 0.04);
+  --bg-overlay:            rgba(0, 0, 0, 0.45);
+
+  /* Text */
+  --text-primary:          #111111;
+  --text-secondary:        #555555;
+  --text-tertiary:         #888888;
+  --text-disabled:         #BBBBBB;
+  --text-inverse:          #FFFFFF;
+  --text-on-brand:         #FFFFFF;
+
+  /* Borders */
+  --border-default:        #E0E0E0;
+  --border-strong:         #BDBDBD;
+  --border-focus:          #FF8C00;
+  --border-error:          #C41E3A;
+  --border-success:        #00897B;
+
+  /* Brand semantic on light */
+  --color-primary:         #FF8C00;
+  --color-primary-hover:   #E67E00;
+  --color-primary-active:  #CC7000;
+  --color-primary-subtle:  rgba(255, 140, 0, 0.10);
+  --color-primary-text:    #CC6600;
+
+  --color-accent:          #C41E3A;
+  --color-accent-hover:    #9E1830;
+  --color-accent-subtle:   rgba(196, 30, 58, 0.08);
+
+  --color-info:            #0097A7;
+  --color-info-hover:      #00838F;
+  --color-info-subtle:     rgba(0, 188, 212, 0.10);
+  --color-info-text:       #006978;
+
+  /* Status colors */
+  --color-success:         #00897B;
+  --color-success-bg:      #E0F2F1;
+  --color-success-text:    #004D40;
+  --color-success-border:  #80CBC4;
+
+  --color-warning:         #FF8C00;
+  --color-warning-bg:      #FFF3E0;
+  --color-warning-text:    #E65100;
+  --color-warning-border:  #FFCC02;
+
+  --color-error:           #C41E3A;
+  --color-error-bg:        #FFEBEE;
+  --color-error-text:      #B71C1C;
+  --color-error-border:    #EF9A9A;
+
+  --color-neutral:         #757575;
+  --color-neutral-bg:      #F5F5F5;
+  --color-neutral-text:    #424242;
+
+  /* Sidebar specific (light) */
+  --sidebar-bg:            #FFFFFF;
+  --sidebar-border:        #EEEEEE;
+  --sidebar-text:          #444444;
+  --sidebar-text-active:   #FF8C00;
+  --sidebar-icon:          #777777;
+  --sidebar-icon-active:   #FF8C00;
+  --sidebar-item-active-bg: rgba(255, 140, 0, 0.08);
+  --sidebar-item-active-border: #FF8C00;
+
+  /* Shadows (light theme — crisp, premium) */
+  --shadow-xs:  0 1px 2px rgba(0,0,0,0.06);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:  0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg:  0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.05);
+  --shadow-xl:  0 20px 25px rgba(0,0,0,0.09), 0 10px 10px rgba(0,0,0,0.04);
+  --shadow-brand: 0 4px 14px rgba(255, 140, 0, 0.30);
+  --shadow-brand-crimson: 0 4px 14px rgba(196, 30, 58, 0.30);
+  --shadow-brand-teal: 0 4px 14px rgba(0, 188, 212, 0.30);
+}
+
+/* ================================================================
+   DARK THEME
+   ================================================================ */
+[data-theme="dark"], .theme-dark {
+
+  /* Backgrounds */
+  --bg-base:               #0A0A0A;   /* deepest — page canvas */
+  --bg-surface:            #141414;   /* cards */
+  --bg-surface-raised:     #1C1C1C;   /* dropdowns, modals */
+  --bg-surface-sunken:     #0D0D0D;   /* input backgrounds */
+  --bg-sidebar:            #000000;   /* pure black like the logo bg */
+  --bg-sidebar-active:     rgba(255, 140, 0, 0.12);
+  --bg-hover:              rgba(255, 255, 255, 0.05);
+  --bg-overlay:            rgba(0, 0, 0, 0.75);
+
+  /* Text */
+  --text-primary:          #F0F0F0;
+  --text-secondary:        #A0A0A0;
+  --text-tertiary:         #606060;
+  --text-disabled:         #404040;
+  --text-inverse:          #111111;
+  --text-on-brand:         #FFFFFF;
+
+  /* Borders */
+  --border-default:        rgba(255,255,255,0.08);
+  --border-strong:         rgba(255,255,255,0.15);
+  --border-focus:          #FF8C00;
+  --border-error:          #E8405A;
+  --border-success:        #4DD0E1;
+
+  /* Brand semantic on dark */
+  --color-primary:         #FF8C00;
+  --color-primary-hover:   #FFB347;
+  --color-primary-active:  #FF9E26;
+  --color-primary-subtle:  rgba(255, 140, 0, 0.15);
+  --color-primary-text:    #FFB347;
+
+  --color-accent:          #E8405A;
+  --color-accent-hover:    #FF6B85;
+  --color-accent-subtle:   rgba(232, 64, 90, 0.12);
+
+  --color-info:            #4DD0E1;
+  --color-info-hover:      #80DEEA;
+  --color-info-subtle:     rgba(77, 208, 225, 0.12);
+  --color-info-text:       #80DEEA;
+
+  /* Status colors */
+  --color-success:         #4DD0E1;
+  --color-success-bg:      rgba(0, 188, 212, 0.12);
+  --color-success-text:    #80DEEA;
+  --color-success-border:  rgba(0, 188, 212, 0.30);
+
+  --color-warning:         #FFB347;
+  --color-warning-bg:      rgba(255, 140, 0, 0.12);
+  --color-warning-text:    #FFCC80;
+  --color-warning-border:  rgba(255, 140, 0, 0.35);
+
+  --color-error:           #E8405A;
+  --color-error-bg:        rgba(196, 30, 58, 0.15);
+  --color-error-text:      #FF8A9A;
+  --color-error-border:    rgba(196, 30, 58, 0.40);
+
+  --color-neutral:         #888888;
+  --color-neutral-bg:      rgba(255,255,255,0.06);
+  --color-neutral-text:    #BBBBBB;
+
+  /* Sidebar specific (dark — pure black, logo-matched) */
+  --sidebar-bg:            #000000;
+  --sidebar-border:        rgba(255,255,255,0.06);
+  --sidebar-text:          #888888;
+  --sidebar-text-active:   #FF8C00;
+  --sidebar-icon:          #555555;
+  --sidebar-icon-active:   #FF8C00;
+  --sidebar-item-active-bg: rgba(255, 140, 0, 0.12);
+  --sidebar-item-active-border: #FF8C00;
+
+  /* Shadows (dark theme — glow-based, brand-aware) */
+  --shadow-xs:  0 1px 2px rgba(0,0,0,0.40);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.50), 0 1px 2px rgba(0,0,0,0.40);
+  --shadow-md:  0 4px 6px rgba(0,0,0,0.50), 0 2px 4px rgba(0,0,0,0.40);
+  --shadow-lg:  0 10px 15px rgba(0,0,0,0.55), 0 4px 6px rgba(0,0,0,0.40);
+  --shadow-xl:  0 20px 25px rgba(0,0,0,0.60), 0 10px 10px rgba(0,0,0,0.40);
+  --shadow-brand: 0 0 20px rgba(255, 140, 0, 0.40), 0 4px 14px rgba(255, 140, 0, 0.25);
+  --shadow-brand-crimson: 0 0 20px rgba(196, 30, 58, 0.40), 0 4px 14px rgba(196, 30, 58, 0.25);
+  --shadow-brand-teal: 0 0 20px rgba(0, 188, 212, 0.40), 0 4px 14px rgba(0, 188, 212, 0.25);
+}

@@ -3,17 +3,19 @@
   align-items: center;
   height: var(--topbar-height);
   padding: 0 var(--space-6);
-  background: var(--color-white);
-  border-bottom: 1px solid var(--color-grey-200);
+  background: var(--surface-topbar);
+  border-bottom: 1px solid var(--border-default);
   position: sticky;
   top: 0;
   z-index: 10;
   flex-shrink: 0;
+  transition: background var(--duration-normal) var(--ease-standard),
+              border-color var(--duration-normal) var(--ease-standard);
 }
 
 .title {
   font: var(--text-heading-sm);
-  color: var(--color-hof);
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -42,20 +44,49 @@
   width: 32px;
   height: 32px;
   border-radius: var(--radius-pill);
-  background: var(--color-grey-200);
-  color: var(--color-foggy);
+  background: linear-gradient(135deg, rgba(249,115,22,0.20) 0%, rgba(13,148,136,0.20) 100%);
+  border: 1px solid rgba(249,115,22,0.30);
+  color: var(--brand-orange);
   flex-shrink: 0;
 }
 
 .userName {
   font: var(--text-body-strong);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .userRole {
   font: var(--text-caption);
-  color: var(--color-foggy);
-  background: var(--color-grey-100);
+  color: var(--text-secondary);
+  background: var(--surface-hover);
   padding: 2px var(--space-2);
   border-radius: var(--radius-pill);
+  border: 1px solid var(--border-default);
+}
+
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard),
+              color var(--duration-fast) var(--ease-standard),
+              border-color var(--duration-fast) var(--ease-standard);
+}
+
+.themeToggle:hover {
+  background: var(--surface-hover);
+  color: var(--brand-orange);
+  border-color: var(--brand-orange);
+}
+
+.themeToggle:focus-visible {
+  outline: 2px solid var(--brand-orange);
+  outline-offset: 2px;
 }

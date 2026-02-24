@@ -24,6 +24,7 @@ import { EmptyState } from '@/shared/components/dls/EmptyState';
 import { RoleGate } from '@/shared/components/RoleGate';
 import { useToast } from '@/shared/hooks/useToast';
 import { useDebounce } from '@/shared/hooks/useDebounce';
+import { formatStatus, formatLabel } from '@/shared/utils/formatters';
 import styles from './VendorListPage.module.css';
 
 type QCStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'NEEDS_REVIEW' | 'FLAGGED';
@@ -224,7 +225,7 @@ export default function VendorListPage() {
         count++;
       } catch { /* continue */ }
     }
-    toast.success(`${count} vendor(s) ${status.toLowerCase()}`);
+    toast.success(`${count} vendor(s) ${formatStatus(status).toLowerCase()}`);
     setSelectedIds([]);
     void qc.invalidateQueries({ queryKey: queryKeys.vendors.list(filters) });
   }
@@ -257,7 +258,7 @@ export default function VendorListPage() {
     {
       key: 'data_source',
       header: 'Source',
-      render: (v) => <Badge variant="neutral" label={v.data_source} />,
+      render: (v) => <Badge variant="neutral" label={formatLabel(v.data_source)} />,
     },
     {
       key: 'phone',

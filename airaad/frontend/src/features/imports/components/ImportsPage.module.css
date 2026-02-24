@@ -5,9 +5,9 @@
   justify-content: center;
   gap: var(--space-2);
   padding: var(--space-10) var(--space-8);
-  border: 2px dashed var(--color-grey-300);
+  border: 2px dashed var(--border-input);
   border-radius: var(--radius-lg);
-  background: var(--color-white);
+  background: var(--surface-card);
   cursor: pointer;
   transition: border-color var(--duration-fast) var(--ease-standard),
     background var(--duration-fast) var(--ease-standard);
@@ -16,14 +16,14 @@
 
 .dropZone:hover,
 .dropZone:focus-visible {
-  border-color: var(--color-rausch);
-  background: rgba(255, 90, 95, 0.02);
+  border-color: var(--brand-orange);
+  background: rgba(249, 115, 22, 0.03);
   outline: none;
 }
 
 .dropZoneDragging {
-  border-color: var(--color-rausch);
-  background: rgba(255, 90, 95, 0.04);
+  border-color: var(--brand-orange);
+  background: rgba(249, 115, 22, 0.06);
 }
 
 .uploadIcon {
@@ -32,17 +32,17 @@
 
 .dropText {
   font: var(--text-body-strong);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .browseLink {
-  color: var(--color-rausch);
+  color: var(--brand-orange);
   text-decoration: underline;
 }
 
 .dropHint {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .hiddenInput {
@@ -50,9 +50,9 @@
 }
 
 .preview {
-  background: var(--color-white);
+  background: var(--surface-card);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-grey-200);
+  border: 1px solid var(--border-default);
   padding: var(--space-6);
   margin-bottom: var(--space-6);
 }
@@ -63,7 +63,7 @@
 
 .previewTitle {
   font: var(--text-heading-sm);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .missingCols {
@@ -88,8 +88,8 @@
 
 .previewTh {
   padding: var(--space-2) var(--space-3);
-  background: var(--color-grey-50);
-  border-bottom: 1px solid var(--color-grey-200);
+  background: var(--surface-hover);
+  border-bottom: 1px solid var(--border-default);
   text-align: left;
   font-weight: 600;
   white-space: nowrap;
@@ -102,8 +102,8 @@
 
 .previewTd {
   padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--color-grey-100);
-  color: var(--color-hof);
+  border-bottom: 1px solid var(--surface-hover);
+  color: var(--text-primary);
 }
 
 .previewActions {
@@ -114,7 +114,7 @@
 
 .fileName {
   font: var(--text-body-strong);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .statGood {
@@ -146,12 +146,12 @@
 
 .progressLabel {
   font: var(--text-body-strong);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .progressBar {
   height: 8px;
-  background: var(--color-grey-200);
+  background: var(--border-default);
   border-radius: var(--radius-pill);
   overflow: hidden;
 }
@@ -159,7 +159,7 @@
 .progressFill {
   height: 100%;
   width: var(--progress-width, 0%);
-  background: var(--color-rausch);
+  background: var(--brand-orange);
   border-radius: var(--radius-pill);
   transition: width var(--duration-normal) var(--ease-standard);
 }
@@ -183,7 +183,7 @@
 
 .errorLogTitle {
   font: var(--text-heading-sm);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .errorTable {
@@ -194,14 +194,57 @@
 
 .errorTable th {
   padding: var(--space-2) var(--space-3);
-  background: var(--color-grey-50);
-  border-bottom: 1px solid var(--color-grey-200);
+  background: var(--surface-hover);
+  border-bottom: 1px solid var(--border-default);
   text-align: left;
   font-weight: 600;
 }
 
 .errorTable td {
   padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--color-grey-100);
-  color: var(--color-hof);
+  border-bottom: 1px solid var(--surface-hover);
+  color: var(--text-primary);
+}
+
+/* ── Import tab switcher ── */
+
+.tabBar {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  font: var(--text-label);
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard);
+}
+
+.tab:hover {
+  color: var(--text-primary);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--brand-orange);
+  outline-offset: -2px;
+}
+
+.tabActive {
+  color: var(--brand-orange);
+  border-bottom-color: var(--brand-orange);
+  font-weight: 600;
+}
+
+.tabIcon {
+  flex-shrink: 0;
 }

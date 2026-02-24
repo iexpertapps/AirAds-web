@@ -19,6 +19,7 @@ import { useToast } from '@/shared/hooks/useToast';
 import type { GeoJSONPoint } from '@/shared/types/geo';
 import { GPSInput } from '@/shared/components/dls/GPSInput';
 import { GPSMap } from '@/shared/components/dls/GPSMap';
+import { formatLabel } from '@/shared/utils/formatters';
 import styles from './GeoPage.module.css';
 
 interface Country { id: string; name: string; code: string; }
@@ -137,7 +138,7 @@ function GeoDetailPanel({
       <div className={styles.detailHeader}>
         <span className={styles.detailIcon} aria-hidden="true">{iconMap[type]}</span>
         <div>
-          <p className={styles.detailType}>{type.charAt(0).toUpperCase() + type.slice(1)}</p>
+          <p className={styles.detailType}>{formatLabel(type)}</p>
           <p className={styles.detailId}>ID: {id}</p>
         </div>
         <RoleGate allowedRoles={['SUPER_ADMIN', 'CITY_MANAGER']}>

@@ -4,10 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuthStore } from '@/features/auth/store/authStore';
+import { useMutation } from '@tanstack/react-query';
+import { AuthStateManager } from '@/features/auth/store/authStore';
 import type { AuthUser } from '@/features/auth/store/authStore';
-import { queryKeys } from '@/queryKeys';
 import { apiClient } from '@/lib/axios';
 import { Button } from '@/shared/components/dls/Button';
 import { Input } from '@/shared/components/dls/Input';
@@ -29,11 +28,18 @@ interface LoginResponse {
   message?: string;
 }
 
+function getDefaultRoute(role: string): string {
+  switch (role) {
+    case 'DATA_ENTRY':
+      return '/vendors';
+    default:
+      return '/';
+  }
+}
+
 export default function LoginPage() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const login = useAuthStore((s) => s.login);
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -46,15 +52,25 @@ export default function LoginPage() {
   const mutation = useMutation({
     mutationFn: (data: FormValues) =>
       apiClient.post<LoginResponse>('/api/v1/auth/login/', data).then((r) => r.data),
-    onSuccess: (data) => {
-      login(data.data.tokens, data.data.user);
-      void queryClient.prefetchQuery({
-        queryKey: queryKeys.auth.profile(),
-        queryFn: () =>
-          apiClient.get('/api/v1/auth/profile/').then((r) => r.data),
-      });
-      const redirect = searchParams.get('redirect');
-      navigate(redirect ? decodeURIComponent(redirect) : '/', { replace: true });
+    onSuccess: async (data) => {
+      // Use unified state manager for consistent login
+      AuthStateManager.login(data.data.tokens, data.data.user);
+      
+      // Wait for state to be properly set before navigation
+      try {
+        await AuthStateManager.waitForAuthentication(2000);
+        const redirect = searchParams.get('redirect');
+        const destination = redirect ? decodeURIComponent(redirect) : getDefaultRoute(data.data.user.role);
+        
+        // Use React Router navigation for SPA experience
+        navigate(destination, { replace: true });
+      } catch (error) {
+        console.error('Authentication state error:', error);
+        // Fallback to immediate navigation if timeout occurs
+        const redirect = searchParams.get('redirect');
+        const destination = redirect ? decodeURIComponent(redirect) : getDefaultRoute(data.data.user.role);
+        navigate(destination, { replace: true });
+      }
     },
     onError: (err: unknown) => {
       if (
@@ -82,6 +98,9 @@ export default function LoginPage() {
     <div className={styles.page}>
       <div className={styles.card} role="main">
         <div className={styles.logoArea} aria-label="AirAd Admin Portal">
+          <div className={styles.logoIconWrap} aria-hidden="true">
+            <img src="/airad_icon.png" alt="" className={styles.logoImg} />
+          </div>
           <span className={styles.logo}>AirAd</span>
           <p className={styles.subtitle}>Internal Admin Portal</p>
         </div>

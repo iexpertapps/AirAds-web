@@ -1,6 +1,6 @@
 .vendorLink {
   font: var(--text-body-strong);
-  color: var(--color-rausch);
+  color: var(--brand-orange);
   text-decoration: none;
 }
 
@@ -9,7 +9,7 @@
 }
 
 .vendorLink:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
@@ -19,7 +19,7 @@
   align-items: center;
   gap: var(--space-1);
   font: var(--text-body);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .noDrift {
@@ -28,7 +28,7 @@
 
 .filterNote {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .visitDetail {
@@ -45,12 +45,12 @@
 
 .dl dt {
   font: var(--text-label);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .dl dd {
   font: var(--text-body);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .driftWarning {
@@ -61,7 +61,7 @@
 /* ── Section headings ── */
 .sectionHeading {
   font: var(--text-heading-sm);
-  color: var(--color-hof);
+  color: var(--text-primary);
   margin-bottom: var(--space-3);
 }
 
@@ -84,7 +84,7 @@
 
 .splitMapLabel {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
@@ -92,7 +92,7 @@
   height: 200px;
   border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid var(--color-grey-200);
+  border: 1px solid var(--border-default);
 }
 
 /* ── Photo Gallery ── */
@@ -109,8 +109,8 @@
 .photoCard {
   border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid var(--color-grey-200);
-  background: var(--color-white);
+  border: 1px solid var(--border-default);
+  background: var(--surface-card);
 }
 
 .photoImg {
@@ -122,7 +122,7 @@
 
 .photoCaption {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   padding: var(--space-1) var(--space-2);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -133,7 +133,7 @@
 .uploadSection {
   margin-top: var(--space-5);
   padding-top: var(--space-5);
-  border-top: 1px solid var(--color-grey-200);
+  border-top: 1px solid var(--border-default);
 }
 
 .uploadForm {
@@ -163,11 +163,11 @@
   gap: var(--space-1);
   height: 32px;
   padding: 0 var(--space-3);
-  border: 1px solid var(--color-grey-300);
+  border: 1px solid var(--border-input);
   border-radius: var(--radius-md);
   font: var(--text-caption);
-  color: var(--color-hof);
-  background: var(--color-white);
+  color: var(--text-primary);
+  background: var(--surface-card);
   white-space: nowrap;
   max-width: 180px;
   overflow: hidden;
@@ -182,7 +182,7 @@
   height: 24px;
   border: none;
   background: transparent;
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   cursor: pointer;
   border-radius: var(--radius-sm);
   padding: 0;
@@ -194,23 +194,23 @@
 }
 
 .clearFile:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: 2px;
 }
 
 .captionInput {
   height: 32px;
   padding: 0 var(--space-3);
-  border: 1px solid var(--color-grey-300);
+  border: 1px solid var(--border-input);
   border-radius: var(--radius-md);
   font: var(--text-caption);
-  color: var(--color-hof);
-  background: var(--color-white);
+  color: var(--text-primary);
+  background: var(--surface-card);
   flex: 1;
   min-width: 120px;
 }
 
 .captionInput:focus {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: -1px;
 }

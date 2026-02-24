@@ -1,46 +1,90 @@
 .sidebar {
   width: var(--sidebar-width);
   height: 100vh;
-  background: var(--color-white);
-  border-right: 1px solid var(--color-grey-200);
+  background: var(--surface-sidebar);
+  border-right: 1px solid var(--border-default);
   display: flex;
   flex-direction: column;
   position: sticky;
   top: 0;
   flex-shrink: 0;
-  transition: width var(--duration-normal) var(--ease-standard);
+  transition: width var(--duration-normal) var(--ease-standard),
+              background var(--duration-normal) var(--ease-standard);
   overflow: hidden;
+  box-shadow: var(--shadow-sidebar-glow);
 }
 
 .collapsed {
   width: 64px;
 }
 
+/* ── Logo Area ── */
 .logo {
   display: flex;
   align-items: center;
+  gap: var(--space-3);
   height: var(--topbar-height);
   padding: 0 var(--space-4);
-  border-bottom: 1px solid var(--color-grey-200);
+  border-bottom: 1px solid var(--border-default);
   flex-shrink: 0;
+  position: relative;
+}
+
+.logoIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+
+.logoImg {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+}
+
+.logoText {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  background: var(--gradient-brand-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
 }
 
 .logoMark {
-  font: var(--text-heading-md);
-  color: var(--color-rausch);
+  font-size: 18px;
   font-weight: 700;
+  line-height: 1;
+  background: var(--gradient-brand-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .logoFull {
-  font: var(--text-heading-md);
-  color: var(--color-rausch);
+  font-size: 18px;
   font-weight: 700;
+  line-height: 1;
+  background: var(--gradient-brand-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   white-space: nowrap;
 }
 
+/* ── Nav List ── */
 .navList {
   flex: 1;
-  padding: var(--space-4) 0;
+  padding: var(--space-3) 0;
   overflow-y: auto;
   overflow-x: hidden;
   list-style: none;
@@ -53,39 +97,53 @@
   height: 44px;
   padding: 0 var(--space-4);
   font: var(--text-body-strong);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   border-radius: var(--radius-nav-item);
-  margin: 2px var(--space-2) 2px 0;
+  margin: 1px var(--space-2) 1px 0;
   transition: background var(--duration-fast) var(--ease-standard),
-    color var(--duration-fast) var(--ease-standard);
+              color var(--duration-fast) var(--ease-standard);
   white-space: nowrap;
   text-decoration: none;
+  position: relative;
 }
 
 .navItem:hover {
-  background: var(--color-grey-100);
-  color: var(--color-hof);
+  background: var(--surface-hover);
+  color: var(--text-primary);
 }
 
 .navItem:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: -2px;
 }
 
+/* Active state: orange left-edge gradient indicator */
 .navItemActive {
-  background: rgba(255, 90, 95, 0.08);
-  color: var(--color-rausch);
+  background: rgba(249, 115, 22, 0.10);
+  color: var(--brand-orange);
+}
+
+.navItemActive::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--gradient-active-indicator);
 }
 
 .navItemActive:hover {
-  background: rgba(255, 90, 95, 0.12);
-  color: var(--color-rausch);
+  background: rgba(249, 115, 22, 0.14);
+  color: var(--brand-orange);
 }
 
 .navIcon {
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  transition: color var(--duration-fast) var(--ease-standard);
 }
 
 .navLabel {
@@ -93,27 +151,29 @@
   text-overflow: ellipsis;
 }
 
+/* ── Collapse Button ── */
 .collapseBtn {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 44px;
+  height: 40px;
   margin: var(--space-2);
   border-radius: var(--radius-md);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: background var(--duration-fast) var(--ease-standard);
+  transition: background var(--duration-fast) var(--ease-standard),
+              color var(--duration-fast) var(--ease-standard);
   flex-shrink: 0;
 }
 
 .collapseBtn:hover {
-  background: var(--color-grey-100);
-  color: var(--color-hof);
+  background: var(--surface-hover);
+  color: var(--text-primary);
 }
 
 .collapseBtn:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: 2px;
 }

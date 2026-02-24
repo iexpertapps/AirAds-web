@@ -29,26 +29,31 @@
 .success {
   background: var(--color-success-bg);
   color: var(--color-success-text);
+  border: 1px solid rgba(13,148,136,0.20);
 }
 
 .warning {
   background: var(--color-warning-bg);
   color: var(--color-warning-text);
+  border: 1px solid rgba(249,115,22,0.20);
 }
 
 .error {
   background: var(--color-error-bg);
   color: var(--color-error-text);
+  border: 1px solid rgba(220,38,38,0.20);
 }
 
 .info {
   background: var(--color-info-bg);
   color: var(--color-info-text);
+  border: 1px solid rgba(13,148,136,0.20);
 }
 
 .neutral {
-  background: var(--color-grey-100);
-  color: var(--color-hof);
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
 }
 
 /* Animated spinner for PROCESSING state */

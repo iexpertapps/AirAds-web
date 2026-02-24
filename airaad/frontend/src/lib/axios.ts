@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { useAuthStore } from '@/features/auth/store/authStore';
+import { AuthStateManager } from '@/features/auth/store/authStore';
 import { useUIStore } from '@/shared/store/uiStore';
 import { queryClient } from '@/lib/queryClient';
 
@@ -36,8 +36,38 @@ export const apiClient = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = useAuthStore.getState().accessToken;
+let proactiveRefreshPromise: Promise<string | null> | null = null;
+
+async function ensureAccessToken(): Promise<string | null> {
+  const current = AuthStateManager.getCurrentAccessToken();
+  if (current) return current;
+
+  const refreshToken = AuthStateManager.getCurrentRefreshToken();
+  if (!refreshToken) return null;
+
+  if (proactiveRefreshPromise) return proactiveRefreshPromise;
+
+  proactiveRefreshPromise = (async () => {
+    try {
+      const { data } = await axios.post<RefreshResponse>(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/refresh/`,
+        { refresh: refreshToken },
+      );
+      const newToken = data.access;
+      AuthStateManager.setAccessToken(newToken);
+      return newToken;
+    } catch {
+      return null;
+    } finally {
+      proactiveRefreshPromise = null;
+    }
+  })();
+
+  return proactiveRefreshPromise;
+}
+
+apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+  const token = await ensureAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -70,14 +100,14 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshToken = useAuthStore.getState().refreshToken;
+        const refreshToken = AuthStateManager.getCurrentRefreshToken();
         const { data } = await axios.post<RefreshResponse>(
           `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/refresh/`,
           { refresh: refreshToken },
         );
         // SimpleJWT returns { access } directly — no data wrapper
         const newToken = data.access;
-        useAuthStore.getState().setAccessToken(newToken);
+        AuthStateManager.setAccessToken(newToken);
         if (original.headers) {
           original.headers.Authorization = `Bearer ${newToken}`;
         }
@@ -85,7 +115,7 @@ apiClient.interceptors.response.use(
         return apiClient(original);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        useAuthStore.getState().logout();
+        AuthStateManager.logout();
         queryClient.clear();
         window.location.href = '/login';
         return Promise.reject(refreshError);

@@ -1,105 +1,222 @@
+/* ============================================================
+   AirAd Design Language System — Token Foundation
+   Brand: Orange (#F97316) · Crimson (#DC2626) · Teal (#0D9488) · Black (#0A0A0A)
+   ============================================================ */
+
 :root {
-  /* Brand Colors */
-  --color-rausch: #FF5A5F;
-  --color-babu: #00A699;
-  --color-arches: #FC642D;
-  --color-hof: #484848;
-  --color-foggy: #767676;
-  --color-white: #FFFFFF;
+  /* ── AirAd Brand Primitives ── */
+  --brand-orange:        #F97316;   /* Primary CTAs, active states, energy */
+  --brand-orange-light:  #FB923C;   /* Hover, lighter accent */
+  --brand-orange-deep:   #EA6C0A;   /* Pressed state */
+  --brand-crimson:       #DC2626;   /* Alerts, destructive, passion */
+  --brand-crimson-light: #EF4444;   /* Hover */
+  --brand-crimson-deep:  #B91C1C;   /* Pressed */
+  --brand-teal:          #0D9488;   /* Success, trust, verification */
+  --brand-teal-light:    #14B8A6;   /* Hover */
+  --brand-teal-deep:     #0F766E;   /* Pressed */
+  --brand-black:         #0A0A0A;   /* Sidebar, hero panels, logo bg */
+  --brand-black-soft:    #111111;   /* Card surfaces in dark mode */
+  --brand-black-card:    #1A1A1A;   /* Elevated cards in dark mode */
+  --brand-black-border:  #2A2A2A;   /* Subtle borders in dark mode */
 
-  /* Extended Neutrals */
-  --color-grey-50: #F7F7F7;
-  --color-grey-100: #F7F7F7;
-  --color-grey-200: #EBEBEB;
-  --color-grey-300: #DDDDDD;
-  --color-grey-400: #B0B0B0;
-  --color-grey-500: #767676;
-  --color-grey-700: #484848;
-  --color-grey-900: #222222;
+  /* ── DLS Semantic Aliases (light mode defaults) ── */
+  --color-rausch:        var(--brand-orange);
+  --color-babu:          var(--brand-teal);
+  --color-arches:        var(--brand-orange-light);
+  --color-hof:           #1A1A1A;
+  --color-foggy:         #6B7280;
+  --color-white:         #FFFFFF;
 
-  /* Semantic */
-  --color-success: #008A05;
-  --color-success-light: #E8F5E9;
-  --color-success-text: #008A05;
-  --color-success-bg: #E8F5E9;
-  --color-warning: #C45300;
-  --color-warning-light: #FFF3E0;
-  --color-warning-text: #C45300;
-  --color-warning-bg: #FFF3E0;
-  --color-error: #C13515;
-  --color-error-light: #FFEBEE;
-  --color-error-text: #C13515;
-  --color-error-bg: #FFEBEE;
-  --color-info: #0077C8;
-  --color-info-light: #E3F2FD;
-  --color-info-text: #0077C8;
-  --color-info-bg: #E3F2FD;
+  /* ── Extended Neutrals (light) ── */
+  --color-grey-50:       #FAFAF9;
+  --color-grey-100:      #F5F5F4;
+  --color-grey-200:      #E7E5E4;
+  --color-grey-300:      #D6D3D1;
+  --color-grey-400:      #A8A29E;
+  --color-grey-500:      #78716C;
+  --color-grey-700:      #44403C;
+  --color-grey-900:      #1C1917;
 
-  /* AirAd AR Accent — data viz only */
+  /* ── Semantic Colors ── */
+  --color-success:       var(--brand-teal);
+  --color-success-light: #CCFBF1;
+  --color-success-text:  var(--brand-teal-deep);
+  --color-success-bg:    #F0FDFA;
+  --color-warning:       var(--brand-orange);
+  --color-warning-light: #FFF7ED;
+  --color-warning-text:  var(--brand-orange-deep);
+  --color-warning-bg:    #FFF7ED;
+  --color-error:         var(--brand-crimson);
+  --color-error-light:   #FEE2E2;
+  --color-error-text:    var(--brand-crimson-deep);
+  --color-error-bg:      #FEF2F2;
+  --color-info:          var(--brand-teal);
+  --color-info-light:    #CCFBF1;
+  --color-info-text:     var(--brand-teal-deep);
+  --color-info-bg:       #F0FDFA;
+
+  /* ── AirAd AR Accent — data viz only ── */
   --color-airaad-accent: #00D4FF;
 
-  /* Typography */
-  --font-family: 'Circular', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* ── Surface Tokens (light mode) ── */
+  --surface-page:        var(--color-grey-100);
+  --surface-card:        var(--color-white);
+  --surface-sidebar:     var(--color-white);
+  --surface-topbar:      var(--color-white);
+  --surface-modal:       var(--color-white);
+  --surface-input:       var(--color-white);
+  --surface-hover:       var(--color-grey-100);
+
+  --border-default:      var(--color-grey-200);
+  --border-input:        var(--color-grey-300);
+  --border-focus:        var(--brand-orange);
+
+  --text-primary:        var(--color-hof);
+  --text-secondary:      var(--color-foggy);
+  --text-on-brand:       var(--color-white);
+
+  /* ── Typography ── */
+  --font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-family-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
 
-  --text-display: 700 32px/1.25 var(--font-family);
-  --text-heading-xl: 600 26px/1.3 var(--font-family);
-  --text-heading-lg: 600 22px/1.35 var(--font-family);
-  --text-heading-md: 600 18px/1.4 var(--font-family);
-  --text-heading-sm: 600 16px/1.4 var(--font-family);
-  --text-heading-1: 700 24px/1.3 var(--font-family);
-  --text-heading-2: 600 20px/1.4 var(--font-family);
-  --text-heading-3: 600 16px/1.5 var(--font-family);
-  --text-body: 400 14px/1.5 var(--font-family);
-  --text-body-lg: 400 16px/1.6 var(--font-family);
-  --text-body-md: 400 14px/1.6 var(--font-family);
-  --text-body-sm: 400 12px/1.5 var(--font-family);
-  --text-body-strong: 500 14px/1.5 var(--font-family);
-  --text-caption: 400 12px/1.4 var(--font-family);
-  --text-label: 500 13px/1.4 var(--font-family);
-  --text-micro: 400 11px/1.3 var(--font-family);
+  --text-display:      700 32px/1.25 var(--font-family);
+  --text-heading-xl:   600 26px/1.3  var(--font-family);
+  --text-heading-lg:   600 22px/1.35 var(--font-family);
+  --text-heading-md:   600 18px/1.4  var(--font-family);
+  --text-heading-sm:   600 16px/1.4  var(--font-family);
+  --text-heading-1:    700 24px/1.3  var(--font-family);
+  --text-heading-2:    600 20px/1.4  var(--font-family);
+  --text-heading-3:    600 16px/1.5  var(--font-family);
+  --text-body:         400 14px/1.5  var(--font-family);
+  --text-body-lg:      400 16px/1.6  var(--font-family);
+  --text-body-md:      400 14px/1.6  var(--font-family);
+  --text-body-sm:      400 12px/1.5  var(--font-family);
+  --text-body-strong:  500 14px/1.5  var(--font-family);
+  --text-caption:      400 12px/1.4  var(--font-family);
+  --text-label:        500 13px/1.4  var(--font-family);
+  --text-micro:        400 11px/1.3  var(--font-family);
 
-  /* Spacing (8px grid) */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
+  /* ── Spacing (8px grid) ── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
 
-  /* Layout */
-  --sidebar-width: 240px;
-  --topbar-height: 64px;
-  --content-max-width: 1280px;
-  --table-row-height: 56px;
-  --card-padding: var(--space-6);
+  /* ── Layout ── */
+  --sidebar-width:      240px;
+  --topbar-height:      64px;
+  --content-max-width:  1280px;
+  --table-row-height:   56px;
+  --card-padding:       var(--space-6);
 
-  /* Border Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-pill: 100px;
+  /* ── Border Radius ── */
+  --radius-sm:       4px;
+  --radius-md:       8px;
+  --radius-lg:       12px;
+  --radius-xl:       16px;
+  --radius-2xl:      20px;
+  --radius-pill:     100px;
   --radius-nav-item: 0 100px 100px 0;
 
-  /* Motion */
+  /* ── Motion ── */
   --duration-instant: 100ms;
-  --duration-fast: 150ms;
-  --duration-normal: 250ms;
-  --duration-slow: 350ms;
-  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
-  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --duration-fast:    150ms;
+  --duration-normal:  250ms;
+  --duration-slow:    350ms;
+  --ease-standard:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-enter:       cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit:        cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* Shadows */
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.08);
-  --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.16);
-  --shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.12);
+  /* ── Shadows (light mode) ── */
+  --shadow-card:    0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 4px 16px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-modal:   0 20px 60px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.10);
+  --shadow-dropdown: 0 8px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-sidebar-glow: none;
+
+  /* ── Brand Gradients ── */
+  --gradient-brand-text: linear-gradient(90deg, var(--brand-orange) 0%, var(--brand-crimson) 50%, var(--brand-teal) 100%);
+  --gradient-active-indicator: linear-gradient(180deg, var(--brand-orange) 0%, var(--brand-crimson) 100%);
+  --gradient-primary-btn: linear-gradient(135deg, var(--brand-orange) 0%, var(--brand-orange-deep) 100%);
+  --gradient-hero: radial-gradient(ellipse at 20% 50%, rgba(249,115,22,0.12) 0%, transparent 60%),
+                   radial-gradient(ellipse at 80% 50%, rgba(13,148,136,0.10) 0%, transparent 60%),
+                   radial-gradient(ellipse at 50% 80%, rgba(220,38,38,0.08) 0%, transparent 50%);
 }
+
+/* ============================================================
+   DARK THEME — [data-theme="dark"]
+   ============================================================ */
+[data-theme="dark"] {
+  --color-rausch:        var(--brand-orange);
+  --color-babu:          var(--brand-teal);
+  --color-arches:        var(--brand-orange-light);
+  --color-hof:           #F5F5F4;
+  --color-foggy:         #A8A29E;
+  --color-white:         #FFFFFF;
+
+  --color-grey-50:       #1A1A1A;
+  --color-grey-100:      #141414;
+  --color-grey-200:      #2A2A2A;
+  --color-grey-300:      #3A3A3A;
+  --color-grey-400:      #525252;
+  --color-grey-500:      #737373;
+  --color-grey-700:      #A3A3A3;
+  --color-grey-900:      #F5F5F5;
+
+  --color-success:       var(--brand-teal-light);
+  --color-success-light: rgba(13,148,136,0.15);
+  --color-success-text:  var(--brand-teal-light);
+  --color-success-bg:    rgba(13,148,136,0.12);
+  --color-warning:       var(--brand-orange);
+  --color-warning-light: rgba(249,115,22,0.15);
+  --color-warning-text:  var(--brand-orange-light);
+  --color-warning-bg:    rgba(249,115,22,0.12);
+  --color-error:         var(--brand-crimson-light);
+  --color-error-light:   rgba(220,38,38,0.15);
+  --color-error-text:    var(--brand-crimson-light);
+  --color-error-bg:      rgba(220,38,38,0.12);
+  --color-info:          var(--brand-teal-light);
+  --color-info-light:    rgba(13,148,136,0.15);
+  --color-info-text:     var(--brand-teal-light);
+  --color-info-bg:       rgba(13,148,136,0.12);
+
+  --surface-page:        #111111;
+  --surface-card:        #1C1C1C;
+  --surface-sidebar:     var(--brand-black);
+  --surface-topbar:      #141414;
+  --surface-modal:       #1C1C1C;
+  --surface-input:       #1A1A1A;
+  --surface-hover:       #242424;
+
+  --border-default:      #2A2A2A;
+  --border-input:        #3A3A3A;
+  --border-focus:        var(--brand-orange);
+
+  --text-primary:        #F5F5F4;
+  --text-secondary:      #A8A29E;
+  --text-on-brand:       #FFFFFF;
+
+  --shadow-card:    0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-card-hover: 0 4px 24px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.4);
+  --shadow-modal:   0 24px 80px rgba(0,0,0,0.6), 0 8px 32px rgba(0,0,0,0.4);
+  --shadow-dropdown: 0 8px 32px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-sidebar-glow: 0 0 60px rgba(249,115,22,0.08), 0 0 120px rgba(249,115,22,0.04);
+
+  --gradient-hero: radial-gradient(ellipse at 20% 50%, rgba(249,115,22,0.06) 0%, transparent 60%),
+                   radial-gradient(ellipse at 80% 50%, rgba(13,148,136,0.05) 0%, transparent 60%),
+                   radial-gradient(ellipse at 50% 80%, rgba(220,38,38,0.04) 0%, transparent 50%);
+}
+
+/* ============================================================
+   Global Reset & Base Styles
+   ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -124,21 +241,80 @@ html,
 body {
   height: 100%;
   font: var(--text-body);
-  color: var(--color-hof);
-  background-color: var(--color-grey-100);
+  color: var(--text-primary);
+  background-color: var(--surface-page);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--duration-normal) var(--ease-standard),
+              color var(--duration-normal) var(--ease-standard);
 }
 
 #root {
   height: 100%;
 }
 
+/* ── Styled Scrollbars ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-grey-300);
+  border-radius: var(--radius-pill);
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-orange);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--color-grey-400);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-orange);
+}
+
+/* ── Page Transition ── */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmerBrand {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+/* ── Skip Link ── */
 .skip-link {
   position: absolute;
   top: -40px;
   left: var(--space-4);
-  background: var(--color-rausch);
+  background: var(--brand-orange);
   color: var(--color-white);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-md);
@@ -168,4 +344,12 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+/* ── Brand Gradient Text Utility ── */
+.brand-gradient-text {
+  background: var(--gradient-brand-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

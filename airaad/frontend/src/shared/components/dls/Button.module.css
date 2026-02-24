@@ -8,15 +8,18 @@
   cursor: pointer;
   border: none;
   transition:
+    transform var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard),
     filter var(--duration-fast) var(--ease-standard),
     opacity var(--duration-fast) var(--ease-standard);
   outline-offset: 2px;
   white-space: nowrap;
   text-decoration: none;
+  position: relative;
 }
 
 .btn:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: 2px;
 }
 
@@ -25,38 +28,59 @@
   cursor: not-allowed;
 }
 
-.btn:not(:disabled):hover {
-  filter: brightness(0.92);
-}
-
 .btn:not(:disabled):active {
-  filter: brightness(0.88);
+  transform: translateY(1px);
 }
 
 /* Variants */
 .primary {
-  background: var(--color-rausch);
+  background: var(--gradient-primary-btn);
   color: var(--color-white);
+  box-shadow: 0 2px 8px rgba(249,115,22,0.30), 0 1px 2px rgba(249,115,22,0.20);
+}
+
+.primary:not(:disabled):hover {
+  box-shadow: 0 4px 16px rgba(249,115,22,0.45), 0 2px 4px rgba(249,115,22,0.25);
+  filter: brightness(1.05);
+}
+
+.primary:not(:disabled):active {
+  box-shadow: 0 1px 4px rgba(249,115,22,0.20);
+  filter: brightness(0.95);
 }
 
 .secondary {
-  background: var(--color-white);
-  color: var(--color-hof);
-  border: 1px solid var(--color-grey-300);
+  background: var(--surface-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-card);
+}
+
+.secondary:not(:disabled):hover {
+  background: var(--surface-hover);
+  border-color: var(--color-grey-400);
+  filter: none;
 }
 
 .destructive {
   background: var(--color-error-bg);
   color: var(--color-error-text);
+  border: 1px solid var(--color-error-light);
+}
+
+.destructive:not(:disabled):hover {
+  background: var(--color-error-light);
+  filter: none;
 }
 
 .ghost {
   background: transparent;
-  color: var(--color-hof);
+  color: var(--text-secondary);
 }
 
 .ghost:not(:disabled):hover {
-  background: var(--color-grey-100);
+  background: var(--surface-hover);
+  color: var(--text-primary);
   filter: none;
 }
 

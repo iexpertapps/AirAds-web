@@ -22,25 +22,25 @@
   align-items: center;
   gap: var(--space-2);
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .separator {
-  color: var(--color-grey-400);
+  color: var(--border-default);
 }
 
 .breadcrumbLink {
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   text-decoration: none;
   transition: color var(--duration-fast) var(--ease-standard);
 }
 
 .breadcrumbLink:hover {
-  color: var(--color-hof);
+  color: var(--brand-orange);
 }
 
 .breadcrumbLink:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
@@ -55,12 +55,12 @@
 
 .heading {
   font: var(--text-heading-1);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .subheading {
   font: var(--text-body);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   margin-top: var(--space-1);
 }
 

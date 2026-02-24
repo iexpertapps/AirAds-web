@@ -7,23 +7,29 @@
   gap: var(--space-4);
   padding: var(--space-8);
   text-align: center;
-  background: var(--color-grey-50);
+  background: var(--surface-page);
+  background-image: var(--gradient-hero);
+  animation: pageEnter var(--duration-normal) var(--ease-enter);
 }
 
 .code {
   font-size: 96px;
   font-weight: 700;
-  color: var(--color-grey-300);
   line-height: 1;
+  background: var(--gradient-brand-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0.4;
 }
 
 .heading {
   font: var(--text-heading-xl);
-  color: var(--color-hof);
+  color: var(--text-primary);
 }
 
 .body {
   font: var(--text-body-lg);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
   max-width: 400px;
 }

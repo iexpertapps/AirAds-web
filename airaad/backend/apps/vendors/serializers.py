@@ -120,18 +120,28 @@ class VendorSerializer(GpsPointMixin, serializers.ModelSerializer):
             return ""
 
     def get_phone_number(self, obj: Vendor) -> str:
-        """Decrypt and return the phone number on read.
+        """Decrypt and return the phone number MASKED on read.
+
+        Phone numbers are NEVER returned in plain text in any API response.
+        Only the last 4 digits are visible; the rest is replaced with asterisks.
+        Example: +92300****567 → ********4567
 
         Args:
             obj: Vendor instance.
 
         Returns:
-            Decrypted phone number string, or empty string on error.
+            Masked phone number string, or empty string on error.
         """
         if not obj.phone_number_encrypted:
             return ""
         try:
-            return decrypt(bytes(obj.phone_number_encrypted))
+            plain = decrypt(bytes(obj.phone_number_encrypted))
+            if not plain:
+                return ""
+            # Mask all but last 4 digits
+            if len(plain) > 4:
+                return "*" * (len(plain) - 4) + plain[-4:]
+            return "*" * len(plain)
         except EncryptionError as e:
             logger.error(
                 "Failed to decrypt phone for vendor",

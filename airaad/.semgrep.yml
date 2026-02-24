@@ -223,10 +223,10 @@ rules:
   # ---------------------------------------------------------------------------
 
   - id: react-dangerouslysetinnerhtml
-    pattern: dangerouslySetInnerHTML={{ __html: $EXPR }}
+    pattern-regex: 'dangerouslySetInnerHTML=\{\{\s*__html:'
     message: >
       dangerouslySetInnerHTML with a dynamic expression risks XSS.
-      Sanitise $EXPR with DOMPurify before rendering.
+      Sanitise the value with DOMPurify before rendering.
     languages: [typescript, javascript]
     severity: ERROR
     metadata:

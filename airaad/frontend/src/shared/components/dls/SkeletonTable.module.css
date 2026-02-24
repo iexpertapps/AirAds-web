@@ -11,13 +11,13 @@
 .th {
   height: var(--table-row-height);
   padding: 0 var(--space-4);
-  background: var(--color-grey-50);
-  border-bottom: 1px solid var(--color-grey-200);
+  background: var(--surface-hover);
+  border-bottom: 1px solid var(--border-default);
   text-align: left;
 }
 
 .row {
-  border-bottom: 1px solid var(--color-grey-200);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .td {
@@ -29,13 +29,13 @@
   display: block;
   width: var(--cell-width, 60%);
   height: 14px;
-  background: var(--color-grey-200);
+  background: linear-gradient(
+    90deg,
+    var(--border-default) 0%,
+    var(--surface-hover) 40%,
+    var(--border-default) 80%
+  );
+  background-size: 800px 100%;
   border-radius: var(--radius-sm);
-  animation: shimmer 1.5s linear infinite;
-}
-
-@keyframes shimmer {
-  0% { opacity: 1; }
-  50% { opacity: 0.4; }
-  100% { opacity: 1; }
+  animation: shimmerBrand 1.6s linear infinite;
 }

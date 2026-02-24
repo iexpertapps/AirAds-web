@@ -476,6 +476,7 @@ class GDPRDataExportView(APIView):
             200 with JSON export containing account data and audit log entries.
         """
         from apps.audit.models import AuditLog
+        from apps.audit.utils import log_action
 
         user = request.user
         audit_entries = AuditLog.objects.filter(actor=user).order_by("created_at")
@@ -500,6 +501,16 @@ class GDPRDataExportView(APIView):
                 for entry in audit_entries
             ],
         }
+
+        log_action(
+            action="GDPR_DATA_EXPORTED",
+            actor=user,
+            target_obj=user,
+            request=request._request,
+            before={},
+            after={"export_type": "JSON", "records_count": len(export["audit_log"])},
+        )
+
         return success_response(data=export, message="Personal data export")
 
 

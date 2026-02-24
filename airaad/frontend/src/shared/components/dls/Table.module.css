@@ -15,7 +15,7 @@
 }
 
 .thead {
-  background: var(--color-grey-50);
+  background: var(--surface-hover);
 }
 
 .stickyHeader .thead {
@@ -28,9 +28,9 @@
   height: var(--table-row-height);
   padding: 0 var(--space-4);
   font: var(--text-body-strong);
-  color: var(--color-hof);
+  color: var(--text-primary);
   text-align: left;
-  border-bottom: 1px solid var(--color-grey-200);
+  border-bottom: 1px solid var(--border-default);
   white-space: nowrap;
 }
 
@@ -44,7 +44,7 @@
 }
 
 .sortable:hover {
-  background: var(--color-grey-100);
+  background: var(--surface-hover);
 }
 
 .thContent {
@@ -63,17 +63,17 @@
 }
 
 .tr {
-  border-bottom: 1px solid var(--color-grey-200);
+  border-bottom: 1px solid var(--border-default);
   transition: background var(--duration-instant) var(--ease-standard);
 }
 
 .tr:hover {
-  background: var(--color-grey-50);
+  background: var(--surface-hover);
 }
 
 .trSelected {
-  background: rgba(255, 90, 95, 0.04);
-  border-left: 3px solid var(--color-rausch);
+  background: rgba(249, 115, 22, 0.06);
+  border-left: 3px solid var(--brand-orange);
 }
 
 .trClickable {
@@ -81,7 +81,7 @@
 }
 
 .trClickable:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: -2px;
 }
 
@@ -89,7 +89,7 @@
   height: var(--table-row-height);
   padding: 0 var(--space-4);
   font: var(--text-body);
-  color: var(--color-hof);
+  color: var(--text-primary);
   vertical-align: middle;
 }
 
@@ -103,11 +103,11 @@
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: var(--color-rausch);
+  accent-color: var(--brand-orange);
 }
 
 .checkbox:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: 2px;
 }
 
@@ -117,13 +117,13 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--space-4) var(--space-4);
-  border-top: 1px solid var(--color-grey-200);
-  background: var(--color-white);
+  border-top: 1px solid var(--border-default);
+  background: var(--surface-card);
 }
 
 .rowCount {
   font: var(--text-caption);
-  color: var(--color-foggy);
+  color: var(--text-secondary);
 }
 
 .paginationControls {
@@ -135,11 +135,11 @@
 .pageSizeSelect {
   height: 32px;
   padding: 0 var(--space-3);
-  border: 1px solid var(--color-grey-300);
+  border: 1px solid var(--border-input);
   border-radius: var(--radius-md);
   font: var(--text-caption);
-  color: var(--color-hof);
-  background: var(--color-white);
+  color: var(--text-primary);
+  background: var(--surface-input);
   cursor: pointer;
   margin-right: var(--space-2);
 }
@@ -151,17 +151,20 @@
   min-width: 32px;
   height: 32px;
   padding: 0 var(--space-2);
-  border: 1px solid var(--color-grey-300);
+  border: 1px solid var(--border-input);
   border-radius: var(--radius-md);
   font: var(--text-caption);
-  color: var(--color-hof);
-  background: var(--color-white);
+  color: var(--text-primary);
+  background: var(--surface-card);
   cursor: pointer;
-  transition: background var(--duration-instant) var(--ease-standard);
+  transition: background var(--duration-instant) var(--ease-standard),
+              border-color var(--duration-instant) var(--ease-standard);
 }
 
 .pageBtn:hover:not(:disabled) {
-  background: var(--color-grey-100);
+  background: var(--surface-hover);
+  border-color: var(--brand-orange);
+  color: var(--brand-orange);
 }
 
 .pageBtn:disabled {
@@ -170,17 +173,17 @@
 }
 
 .pageBtn:focus-visible {
-  outline: 2px solid var(--color-rausch);
+  outline: 2px solid var(--brand-orange);
   outline-offset: 2px;
 }
 
 .pageBtnActive {
-  background: var(--color-rausch);
+  background: var(--gradient-primary-btn);
   color: var(--color-white);
-  border-color: var(--color-rausch);
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(249,115,22,0.30);
 }
 
 .pageBtnActive:hover:not(:disabled) {
-  background: var(--color-rausch);
-  filter: brightness(0.92);
+  filter: brightness(1.05);
 }

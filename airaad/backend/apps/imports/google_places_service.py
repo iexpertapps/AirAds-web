@@ -45,6 +45,7 @@ from apps.imports.models import ImportBatch
 from apps.tags.models import Tag
 from apps.vendors.models import Vendor
 from core.encryption import encrypt
+from core.ssrf_protection import validate_external_url
 
 logger = logging.getLogger(__name__)
 
@@ -437,7 +438,12 @@ class GooglePlacesImportService:
     # ── HTTP with exponential backoff & rate-limit handling ───────────
 
     def _request_with_backoff(self, method: str, url: str, **kwargs) -> httpx.Response:
-        """HTTP request with retry + exponential backoff on 429 / 5xx."""
+        """HTTP request with retry + exponential backoff on 429 / 5xx.
+
+        SSRF protection: validates URL against settings.ALLOWED_EXTERNAL_DOMAINS
+        before making any outbound request.
+        """
+        validate_external_url(url)
         for attempt in range(MAX_RETRIES_PER_REQUEST + 1):
             try:
                 resp = self.client.request(method, url, **kwargs)
