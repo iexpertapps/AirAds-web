@@ -52,9 +52,20 @@ def _validate_row(row: dict[str, str], row_num: int) -> list[dict[str, Any]]:
             errors.append({"row": row_num, "field": coord_field, "msg": f"{coord_field} is required"})
         else:
             try:
-                float(raw)
+                val = float(raw)
             except ValueError:
-                errors.append({"row": row_num, "field": coord_field, "msg": f"{coord_field} must be a number, got '{raw}'"})
+                errors.append({
+                    "row": row_num, "field": coord_field,
+                    "msg": f"{coord_field} must be a number, got '{raw}'"
+                })
+            else:
+                # Reject null-island and out-of-range coordinates (spec §8.1 GPS validation)
+                if coord_field == "longitude" and not (-180.0 < val < 180.0):
+                    errors.append({"row": row_num, "field": coord_field, "msg": f"longitude {val} is out of valid range (-180, 180)"})
+                elif coord_field == "latitude" and not (-90.0 < val < 90.0):
+                    errors.append({"row": row_num, "field": coord_field, "msg": f"latitude {val} is out of valid range (-90, 90)"})
+                elif val == 0.0:
+                    errors.append({"row": row_num, "field": coord_field, "msg": f"{coord_field} is 0.0 — likely a null-island placeholder, not a real GPS coordinate"})
 
     for slug_field in ("city_slug", "area_slug"):
         if not row.get(slug_field, "").strip():
@@ -97,9 +108,11 @@ def _process_row(row: dict[str, str], row_num: int, batch: Any) -> bool:
     base_slug = slugify(business_name)
     slug = base_slug
 
-    # Ensure unique slug — append row number on collision
-    if Vendor.all_objects.filter(slug=slug).exists():
-        slug = f"{base_slug}-{row_num}"
+    # Ensure unique slug — use select_for_update to prevent concurrent
+    # imports from creating duplicate slugs under race conditions.
+    with transaction.atomic():
+        if Vendor.all_objects.select_for_update().filter(slug=slug).exists():
+            slug = f"{base_slug}-{row_num}"
 
     create_vendor(
         business_name=business_name,

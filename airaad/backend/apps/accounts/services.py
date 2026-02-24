@@ -145,7 +145,9 @@ def authenticate_user(
     authenticated_user.locked_until = None
     authenticated_user.last_login_ip = ip_address
     authenticated_user.must_change_password = False
-    authenticated_user.save(update_fields=["failed_login_count", "locked_until", "last_login_ip", "must_change_password"])
+    authenticated_user.save(
+        update_fields=["failed_login_count", "locked_until", "last_login_ip", "must_change_password"]
+    )
 
     # Step 6 — Generate JWT tokens
     refresh = RefreshToken.for_user(authenticated_user)
@@ -276,7 +278,6 @@ def update_admin_user(
         The updated AdminUser instance.
     """
     from apps.audit.utils import log_action
-    from django.utils import timezone
 
     before = {
         "full_name": user.full_name,

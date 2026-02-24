@@ -4,12 +4,18 @@ CELERY_TASK_ALWAYS_EAGER=True, fast hashing, dummy AWS vars, in-memory cache.
 """
 
 from .development import *  # noqa: F401, F403
+from .base import env  # noqa: F811 — explicit import to satisfy flake8 F405
 
 # ---------------------------------------------------------------------------
 # Celery — run tasks synchronously in tests (no broker needed)
 # ---------------------------------------------------------------------------
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
+
+# ---------------------------------------------------------------------------
+# Testing flag — allows weak dev encryption key in core/encryption.py
+# ---------------------------------------------------------------------------
+TESTING = True
 
 # ---------------------------------------------------------------------------
 # Database — test database (Django creates/destroys automatically)
@@ -58,7 +64,7 @@ AWS_S3_REGION_NAME = "us-east-1"
 # Encryption — deterministic test key (32 bytes, base64-encoded)
 # Generated: python -c "import base64; print(base64.b64encode(b'a'*32).decode())"
 # ---------------------------------------------------------------------------
-ENCRYPTION_KEY = "YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE="
+ENCRYPTION_KEY = "dGVzdGtleV9haXJhYWRfMzJieXRlc19wYWRkaW5nISE="
 
 # ---------------------------------------------------------------------------
 # Email — suppress all emails in tests
