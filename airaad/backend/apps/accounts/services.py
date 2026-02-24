@@ -12,13 +12,12 @@ import secrets
 import string
 from datetime import timedelta
 
+from core.security_alerts import alert_repeated_login_failures
+from core.utils import get_client_ip
 from django.contrib.auth import authenticate
 from django.http import HttpRequest
 from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
-
-from core.security_alerts import alert_repeated_login_failures
-from core.utils import get_client_ip
 
 from .models import AdminRole, AdminUser
 

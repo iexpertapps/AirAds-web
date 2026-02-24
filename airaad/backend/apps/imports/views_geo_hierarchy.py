@@ -5,15 +5,14 @@ Provides endpoints for frontend dropdowns: Country->City->Area->Category
 
 import logging
 
-from rest_framework import serializers, status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
 from apps.accounts.models import AdminRole
 from apps.accounts.permissions import RolePermission
 from apps.geo.models import Area, City, Country
 from apps.tags.models import Tag, TagType
 from core.exceptions import success_response
+from rest_framework import serializers, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
 

@@ -39,9 +39,8 @@ def expire_promotion_tags(self) -> None:
     Logs the count of deactivated tags. Never raises — failures are logged only.
     """
     try:
-        from django.utils import timezone
-
         from apps.tags.models import Tag, TagType
+        from django.utils import timezone
 
         now = timezone.now()
         expired_qs = Tag.objects.filter(

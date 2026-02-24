@@ -29,10 +29,9 @@ def expire_temporary_suspensions(self) -> None:
     Sets is_active=False on expired suspensions and writes AuditLog.
     """
     try:
-        from django.utils import timezone
-
         from apps.audit.utils import log_action
         from apps.governance.models import EnforcementAction, VendorSuspension
+        from django.utils import timezone
 
         now = timezone.now()
         expired_qs = VendorSuspension.objects.filter(
@@ -82,10 +81,9 @@ def purge_deleted_user_data(self) -> None:
     try:
         from datetime import timedelta
 
-        from django.utils import timezone
-
         from apps.accounts.models import AdminUser
         from apps.audit.utils import log_action
+        from django.utils import timezone
 
         cutoff = timezone.now() - timedelta(days=30)
 
@@ -128,10 +126,9 @@ def purge_old_analytics_events(self) -> None:
     try:
         from datetime import timedelta
 
-        from django.utils import timezone
-
         from apps.analytics.models import AnalyticsEvent
         from apps.audit.utils import log_action
+        from django.utils import timezone
 
         cutoff = timezone.now() - timedelta(days=90)
         old_qs = AnalyticsEvent.objects.filter(created_at__lt=cutoff)
@@ -174,9 +171,8 @@ def audit_log_retention_check(self) -> None:
     try:
         from datetime import timedelta
 
-        from django.utils import timezone
-
         from apps.audit.models import AuditLog
+        from django.utils import timezone
 
         now = timezone.now()
         warning_start = now - timedelta(days=335)
@@ -239,11 +235,10 @@ def deprecate_unused_tags(self) -> None:
     SYSTEM and PROMOTION tags are excluded (auto-managed).
     """
     try:
-        from django.db.models import Count
-
         from apps.audit.utils import log_action
         from apps.tags.models import Tag, TagType
         from apps.vendors.models import Vendor
+        from django.db.models import Count
 
         total_vendors = Vendor.objects.count()
         if total_vendors == 0:

@@ -12,11 +12,10 @@ import difflib
 import logging
 from typing import Any
 
-from django.db import transaction
-from django.http import HttpRequest
-
 from apps.audit.utils import log_action
 from apps.vendors.models import QCStatus, Vendor
+from django.db import transaction
+from django.http import HttpRequest
 
 logger = logging.getLogger(__name__)
 

@@ -7,12 +7,11 @@ Zero business logic — all filtering delegated to queryset.
 
 import logging
 
-from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework.generics import ListAPIView
-
 from apps.accounts.models import AdminRole
 from apps.accounts.permissions import RolePermission
 from core.pagination import StandardResultsPagination
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework.generics import ListAPIView
 
 from .models import AuditLog
 from .serializers import AuditLogSerializer

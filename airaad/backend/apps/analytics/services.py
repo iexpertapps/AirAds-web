@@ -48,13 +48,12 @@ def get_platform_kpis() -> dict[str, Any]:
     """
     from datetime import timedelta
 
-    from django.db.models import Count
-    from django.db.models.functions import TruncDate
-    from django.utils import timezone
-
     from apps.audit.models import AuditLog
     from apps.imports.models import ImportBatch, ImportStatus
     from apps.vendors.models import QCStatus, Vendor
+    from django.db.models import Count
+    from django.db.models.functions import TruncDate
+    from django.utils import timezone
 
     today = timezone.now().date()
 

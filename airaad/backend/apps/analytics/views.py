@@ -8,14 +8,13 @@ Analytics recording is fire-and-forget — API response never waits for write.
 
 import logging
 
+from apps.accounts.models import AdminRole
+from apps.accounts.permissions import RolePermission
+from core.exceptions import success_response
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from apps.accounts.models import AdminRole
-from apps.accounts.permissions import RolePermission
-from core.exceptions import success_response
 
 from .services import get_platform_kpis
 

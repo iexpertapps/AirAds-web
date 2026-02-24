@@ -11,12 +11,6 @@ Multi-step mutations wrapped in @transaction.atomic.
 import logging
 from typing import Any
 
-from django.contrib.gis.geos import Point
-from django.db import transaction
-from django.http import HttpRequest
-from django.utils import timezone
-from pydantic import ValidationError as PydanticValidationError
-
 from apps.audit.utils import log_action
 from core.encryption import (  # noqa: F401 (EncryptionError used in docstrings)
     EncryptionError,
@@ -24,6 +18,11 @@ from core.encryption import (  # noqa: F401 (EncryptionError used in docstrings)
     encrypt,
 )
 from core.schemas import BusinessHoursSchema
+from django.contrib.gis.geos import Point
+from django.db import transaction
+from django.http import HttpRequest
+from django.utils import timezone
+from pydantic import ValidationError as PydanticValidationError
 
 from .models import DataSource, QCStatus, Vendor
 

@@ -5,11 +5,10 @@ Usage examples:
   python manage.py seed_google_places --city lahore --area gulberg
 """
 
-from django.core.management.base import BaseCommand, CommandError
-
 from apps.geo.models import Area, City
 from apps.imports.google_places_service import GooglePlacesImportService
 from apps.imports.models import ImportBatch
+from django.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):

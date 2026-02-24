@@ -9,10 +9,9 @@ Every mutation calls log_action() (R5).
 import logging
 from typing import Any
 
+from apps.audit.utils import log_action
 from django.db import transaction
 from django.http import HttpRequest
-
-from apps.audit.utils import log_action
 
 from .models import Tag, TagType
 

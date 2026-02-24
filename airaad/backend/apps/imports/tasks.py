@@ -128,11 +128,10 @@ def _process_row(row: dict[str, str], row_num: int, batch: Any) -> bool:
     Returns:
         True if the row was processed successfully, False on error.
     """
-    from django.utils.text import slugify
-
     from apps.geo.models import Area, City
     from apps.vendors.models import Vendor
     from apps.vendors.services import create_vendor
+    from django.utils.text import slugify
 
     try:
         city = City.objects.get(slug=row["city_slug"].strip())
