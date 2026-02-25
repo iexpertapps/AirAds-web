@@ -1,13 +1,13 @@
 # =============================================================================
 # AirAd Backend — Multi-Stage Dockerfile
 # =============================================================================
-# Stage 1 (builder): Compiles psycopg2 from source — NOT psycopg2-binary (R7)
-# Stage 2 (production): Minimal runtime image with GDAL pinned to PostGIS version
-# Stage 3 (development): Adds dev tools, mounts source at /app
+# Stage 1 (builder):     Compiles psycopg2 from source — NOT psycopg2-binary
+# Stage 2 (development): Dev tools, source mounted at runtime
+# Stage 3 (production):  LAST stage = default build target for Railway/Docker
 #
-# PostGIS image used: postgis/postgis:16-3.4-alpine
-# GDAL version in that image: 3.6.x (Alpine 3.18 package)
-# Pin GDAL to match exactly to prevent silent GeoDjango failures.
+# IMPORTANT: production MUST be the last stage so that Railway, which builds
+# the default (last) stage, always gets the production image with gunicorn.
+# Local dev uses: docker build --target development
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -31,58 +31,15 @@ WORKDIR /build
 COPY requirements/ requirements/
 
 # Build wheels for production dependencies
-# psycopg2 is compiled from source here — never psycopg2-binary (R7)
+# psycopg2 is compiled from source here — never psycopg2-binary
 RUN pip install --upgrade pip wheel && \
     pip wheel --no-cache-dir --wheel-dir /build/wheels -r requirements/production.txt
 
 # -----------------------------------------------------------------------------
-# Stage 2 — Production
-# Minimal runtime image. GDAL version pinned to match postgis:16-3.4-alpine.
-# Backend is NOT directly port-exposed — nginx proxies all traffic.
-# -----------------------------------------------------------------------------
-FROM python:3.12-slim AS production
-
-# Install GDAL and runtime dependencies
-# gdal-bin pulls in the correct libgdal, libgeos, libproj as dependencies
-# libpq5 provides libpq.so.5 needed by compiled psycopg2
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq5 \
-    gdal-bin \
-    && rm -rf /var/lib/apt/lists/*
-
-# Set GDAL/GEOS/PROJ paths for GeoDjango (use generic symlinks)
-ENV GDAL_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgdal.so
-ENV GEOS_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgeos_c.so
-ENV PROJ_LIB=/usr/share/proj
-
-# Create non-root user for security
-RUN groupadd --gid 1001 airaad && \
-    useradd --uid 1001 --gid airaad --no-create-home --shell /bin/false airaad
-
-WORKDIR /app
-
-# Install pre-built wheels from builder stage (no compilation needed here)
-COPY --from=builder /build/wheels /wheels
-RUN pip install --no-cache-dir --no-index --find-links=/wheels /wheels/* && \
-    rm -rf /wheels
-
-# Copy application source
-COPY --chown=airaad:airaad . /app/
-
-# Collect static files
-RUN python manage.py collectstatic --noinput || true
-
-# Switch to non-root user
-USER airaad
-
-EXPOSE 8000
-
-# gunicorn: 2 workers, bind to $PORT (Railway injects this), 120s timeout for long CSV imports
-CMD gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120 --access-logfile - --error-logfile -
-
-# -----------------------------------------------------------------------------
-# Stage 3 — Development
+# Stage 2 — Development (NOT the default target)
 # Adds dev tools. Source code is mounted as a volume at runtime.
+# Use: docker build --target development
+# Use: docker-compose -f docker-compose.dev.yml up
 # -----------------------------------------------------------------------------
 FROM python:3.12-slim AS development
 
@@ -113,3 +70,51 @@ RUN pip install --upgrade pip && \
 EXPOSE 8000
 
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+# -----------------------------------------------------------------------------
+# Stage 3 — Production (DEFAULT — last stage, built by Railway automatically)
+# Minimal runtime image with gunicorn, GDAL, and compiled wheels.
+# -----------------------------------------------------------------------------
+FROM python:3.12-slim AS production
+
+# Install GDAL and runtime dependencies
+# gdal-bin pulls in the correct libgdal, libgeos, libproj as dependencies
+# libpq5 provides libpq.so.5 needed by compiled psycopg2
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    gdal-bin \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set GDAL/GEOS/PROJ paths for GeoDjango
+ENV GDAL_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgdal.so
+ENV GEOS_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgeos_c.so
+ENV PROJ_LIB=/usr/share/proj
+
+# Set Django settings for collectstatic and runtime
+ENV DJANGO_SETTINGS_MODULE=config.settings.production
+
+# Create non-root user for security
+RUN groupadd --gid 1001 airaad && \
+    useradd --uid 1001 --gid airaad --no-create-home --shell /bin/false airaad
+
+WORKDIR /app
+
+# Install pre-built wheels from builder stage (includes gunicorn + all deps)
+COPY --from=builder /build/wheels /wheels
+RUN pip install --no-cache-dir --no-index --find-links=/wheels /wheels/* && \
+    rm -rf /wheels
+
+# Copy application source AFTER installing dependencies (layer caching)
+COPY --chown=airaad:airaad . /app/
+
+# Collect static files (fails gracefully if env vars like SECRET_KEY not set at build time)
+RUN python manage.py collectstatic --noinput || true
+
+# Switch to non-root user
+USER airaad
+
+EXPOSE 8000
+
+# gunicorn: 2 workers, bind to $PORT (Railway injects this), 120s timeout for long CSV imports
+# Shell form required for $PORT variable expansion at runtime
+CMD gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120 --access-logfile - --error-logfile -
