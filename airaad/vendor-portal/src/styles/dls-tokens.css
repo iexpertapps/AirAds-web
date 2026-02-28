@@ -1,0 +1,273 @@
+/* ============================================================
+   AirAd Design Language System — Token Foundation (Vendor Portal)
+   Brand: Orange (#F97316) · Crimson (#DC2626) · Teal (#0D9488) · Black (#0A0A0A)
+   Shared with Admin Portal — IDENTICAL tokens
+   ============================================================ */
+
+:root {
+  /* ── AirAd Brand Primitives ── */
+  --brand-orange:        #F97316;
+  --brand-orange-light:  #FB923C;
+  --brand-orange-deep:   #EA6C0A;
+  --brand-crimson:       #DC2626;
+  --brand-crimson-light: #EF4444;
+  --brand-crimson-deep:  #B91C1C;
+  --brand-teal:          #0D9488;
+  --brand-teal-light:    #14B8A6;
+  --brand-teal-deep:     #0F766E;
+  --brand-black:         #0A0A0A;
+  --brand-black-soft:    #111111;
+  --brand-black-card:    #1A1A1A;
+  --brand-black-border:  #2A2A2A;
+
+  /* ── DLS Semantic Aliases (light mode defaults) ── */
+  --color-rausch:        var(--brand-orange);
+  --color-babu:          var(--brand-teal);
+  --color-arches:        var(--brand-orange-light);
+  --color-hof:           #1A1A1A;
+  --color-foggy:         #6B7280;
+  --color-white:         #FFFFFF;
+
+  /* ── Extended Neutrals (light) ── */
+  --color-grey-50:       #FAFAF9;
+  --color-grey-100:      #F5F5F4;
+  --color-grey-200:      #E7E5E4;
+  --color-grey-300:      #D6D3D1;
+  --color-grey-400:      #A8A29E;
+  --color-grey-500:      #78716C;
+  --color-grey-700:      #44403C;
+  --color-grey-900:      #1C1917;
+
+  /* ── Semantic Colors ── */
+  --color-success:       var(--brand-teal);
+  --color-success-light: #CCFBF1;
+  --color-success-text:  var(--brand-teal-deep);
+  --color-success-bg:    #F0FDFA;
+  --color-warning:       var(--brand-orange);
+  --color-warning-light: #FFF7ED;
+  --color-warning-text:  var(--brand-orange-deep);
+  --color-warning-bg:    #FFF7ED;
+  --color-error:         var(--brand-crimson);
+  --color-error-light:   #FEE2E2;
+  --color-error-text:    var(--brand-crimson-deep);
+  --color-error-bg:      #FEF2F2;
+  --color-info:          var(--brand-teal);
+  --color-info-light:    #CCFBF1;
+  --color-info-text:     var(--brand-teal-deep);
+  --color-info-bg:       #F0FDFA;
+
+  /* ── AirAd AR Accent — data viz only ── */
+  --color-airaad-accent: #00D4FF;
+
+  /* ── Surface Tokens (light mode) ── */
+  --surface-page:        var(--color-white);
+  --surface-card:        var(--color-white);
+  --surface-sidebar:     var(--color-white);
+  --surface-topbar:      var(--color-white);
+  --surface-modal:       var(--color-white);
+  --surface-input:       var(--color-white);
+  --surface-hover:       var(--color-grey-100);
+
+  --border-default:      var(--color-grey-200);
+  --border-input:        var(--color-grey-300);
+  --border-focus:        var(--brand-orange);
+
+  --text-primary:        var(--color-hof);
+  --text-secondary:      var(--color-foggy);
+  --text-on-brand:       var(--color-white);
+
+  /* ── Typography ── */
+  --font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  --text-display:      700 56px/1.1  var(--font-family);
+  --text-display-sm:   700 40px/1.15 var(--font-family);
+  --text-heading-xl:   600 32px/1.2  var(--font-family);
+  --text-heading-lg:   600 24px/1.3  var(--font-family);
+  --text-heading-md:   600 20px/1.35 var(--font-family);
+  --text-heading-sm:   600 16px/1.4  var(--font-family);
+  --text-body-xl:      400 20px/1.6  var(--font-family);
+  --text-body-lg:      400 18px/1.6  var(--font-family);
+  --text-body:         400 16px/1.5  var(--font-family);
+  --text-body-md:      400 14px/1.6  var(--font-family);
+  --text-body-sm:      400 13px/1.5  var(--font-family);
+  --text-body-strong:  500 16px/1.5  var(--font-family);
+  --text-caption:      400 12px/1.4  var(--font-family);
+  --text-label:        500 14px/1.4  var(--font-family);
+  --text-micro:        400 11px/1.3  var(--font-family);
+
+  /* ── Spacing (8px grid) ── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* ── Layout ── */
+  --sidebar-width:       240px;
+  --topbar-height:       64px;
+  --content-max-width:   1280px;
+  --landing-max-width:   1440px;
+  --table-row-height:    56px;
+  --card-padding:        var(--space-6);
+
+  /* ── Border Radius ── */
+  --radius-sm:       4px;
+  --radius-md:       8px;
+  --radius-lg:       12px;
+  --radius-xl:       16px;
+  --radius-2xl:      20px;
+  --radius-pill:     100px;
+  --radius-nav-item: 0 100px 100px 0;
+
+  /* ── Motion ── */
+  --duration-instant: 100ms;
+  --duration-fast:    150ms;
+  --duration-normal:  250ms;
+  --duration-slow:    400ms;
+  --ease-standard:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-enter:       cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit:        cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Shadows ── */
+  --shadow-card:       0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 8px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-modal:      0 20px 60px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.10);
+  --shadow-dropdown:   0 8px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-navbar:     0 1px 0 rgba(0,0,0,0.08);
+
+  /* ── Brand Gradients ── */
+  --gradient-brand-text: linear-gradient(90deg, var(--brand-orange) 0%, var(--brand-crimson) 50%, var(--brand-teal) 100%);
+  --gradient-primary-btn: linear-gradient(135deg, var(--brand-orange) 0%, var(--brand-orange-deep) 100%);
+  --gradient-hero: linear-gradient(180deg, rgba(10,10,10,0.7) 0%, rgba(10,10,10,0.3) 50%, rgba(10,10,10,0.8) 100%);
+}
+
+/* ============================================================
+   DARK THEME
+   ============================================================ */
+[data-theme="dark"] {
+  --color-hof:           #F5F5F4;
+  --color-foggy:         #A8A29E;
+
+  --color-grey-50:       #1A1A1A;
+  --color-grey-100:      #141414;
+  --color-grey-200:      #2A2A2A;
+  --color-grey-300:      #3A3A3A;
+  --color-grey-400:      #525252;
+  --color-grey-500:      #737373;
+  --color-grey-700:      #A3A3A3;
+  --color-grey-900:      #F5F5F5;
+
+  --surface-page:        #111111;
+  --surface-card:        #1C1C1C;
+  --surface-sidebar:     var(--brand-black);
+  --surface-topbar:      #141414;
+  --surface-modal:       #1C1C1C;
+  --surface-input:       #1A1A1A;
+  --surface-hover:       #242424;
+
+  --border-default:      #2A2A2A;
+  --border-input:        #3A3A3A;
+
+  --text-primary:        #F5F5F4;
+  --text-secondary:      #A8A29E;
+
+  --shadow-card:       0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-card-hover: 0 8px 30px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.4);
+  --shadow-modal:      0 24px 80px rgba(0,0,0,0.6), 0 8px 32px rgba(0,0,0,0.4);
+  --shadow-navbar:     0 1px 0 rgba(255,255,255,0.06);
+
+  /* Dark mode semantic color backgrounds */
+  --color-success-bg:    rgba(13, 148, 136, 0.1);
+  --color-warning-bg:    rgba(249, 115, 22, 0.1);
+  --color-error-bg:      rgba(220, 38, 38, 0.1);
+  --color-info-bg:       rgba(13, 148, 136, 0.1);
+}
+
+/* ============================================================
+   Global Reset & Base Styles
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  height: 100%;
+  font: var(--text-body);
+  color: var(--text-primary);
+  background-color: var(--surface-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font: inherit;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── Styled Scrollbars ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-grey-300); border-radius: var(--radius-pill); }
+::-webkit-scrollbar-thumb:hover { background: var(--brand-orange); }
+
+/* ── Brand Gradient Text Utility ── */
+.brand-gradient-text {
+  background: var(--gradient-brand-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

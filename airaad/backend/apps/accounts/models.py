@@ -148,7 +148,28 @@ class AdminUser(AbstractBaseUser, PermissionsMixin):
     # Lockout tracking
     failed_login_count = models.PositiveIntegerField(default=0)
     locked_until = models.DateTimeField(null=True, blank=True)
+    last_login_ip = models.GenericIPAddressField(null=True, blank=True)
 
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Fix reverse accessor conflicts
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='adminuser_groups',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        verbose_name='groups',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='adminuser_user_permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions',
+    )
+    
     # Password management
     must_change_password = models.BooleanField(
         default=False,
@@ -156,7 +177,6 @@ class AdminUser(AbstractBaseUser, PermissionsMixin):
     )
 
     # Audit fields
-    last_login_ip = models.GenericIPAddressField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -185,3 +205,208 @@ class AdminUser(AbstractBaseUser, PermissionsMixin):
         if self.locked_until is None:
             return False
         return timezone.now() < self.locked_until
+
+
+class UserType(models.TextChoices):
+    """User type discriminator for JWT payload (Phase B §3.2).
+
+    JWT claims include user_type so the frontend/mobile can branch UI logic.
+    """
+
+    ADMIN = "ADMIN", "Admin"
+    CUSTOMER = "CUSTOMER", "Customer"
+    VENDOR = "VENDOR", "Vendor"
+
+
+class CustomerUser(models.Model):
+    """Public-facing customer/vendor user for Phase B (§3.2).
+
+    Authenticates via OTP (SMS or WhatsApp). Phone is the unique identifier.
+    Phone stored encrypted via AES-256-GCM in phone_encrypted (BinaryField).
+    phone_hash stores a SHA-256 hash of the phone for unique lookups without
+    decryption.
+
+    The same model is used for both CUSTOMER and VENDOR user types —
+    a customer becomes a vendor by claiming a Vendor listing.
+
+    Attributes:
+        id: UUID primary key.
+        phone_hash: SHA-256 hash of phone number — indexed, unique, used for lookups.
+        phone_encrypted: AES-256-GCM encrypted phone number (BinaryField).
+        full_name: Display name (optional at first, required for vendor).
+        email: Optional email (required for vendor).
+        user_type: CUSTOMER or VENDOR.
+        device_token: Push notification token (FCM/APNS).
+        is_active: Whether the account is active.
+        is_phone_verified: Set True after first successful OTP verification.
+        last_login_at: Timestamp of most recent successful login.
+        last_login_ip: IP address of most recent login.
+        created_at: Auto-set on creation.
+        updated_at: Auto-updated on every save.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    phone_hash = models.CharField(
+        max_length=64,
+        unique=True,
+        db_index=True,
+        help_text="SHA-256 hash of phone number for unique lookups without decryption.",
+    )
+    phone_encrypted = models.BinaryField(
+        help_text="AES-256-GCM encrypted phone number. Decrypt in services.py only.",
+    )
+
+    full_name = models.CharField(max_length=255, blank=True)
+    email = models.EmailField(blank=True, db_index=True)
+
+    user_type = models.CharField(
+        max_length=10,
+        choices=[
+            (UserType.CUSTOMER, "Customer"),
+            (UserType.VENDOR, "Vendor"),
+        ],
+        default=UserType.CUSTOMER,
+        db_index=True,
+    )
+
+    device_token = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text="FCM/APNS push notification token.",
+    )
+
+    is_active = models.BooleanField(default=True, db_index=True)
+    is_phone_verified = models.BooleanField(
+        default=False,
+        help_text="Set True after first successful OTP verification.",
+    )
+
+    # Customer preferences (§B-1)
+    preferred_radius = models.PositiveIntegerField(
+        default=500,
+        help_text="Default search radius in meters for nearby discovery.",
+    )
+    preferred_categories = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="List of preferred category tag slugs for personalised results.",
+    )
+    last_known_lat = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Last known latitude — updated on each discovery request.",
+    )
+    last_known_lng = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Last known longitude — updated on each discovery request.",
+    )
+
+    last_login_at = models.DateTimeField(null=True, blank=True)
+    last_login_ip = models.GenericIPAddressField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Customer User"
+        verbose_name_plural = "Customer Users"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["user_type", "is_active"]),
+        ]
+
+    def __str__(self) -> str:
+        label = self.full_name or self.phone_hash[:8]
+        return f"{label} ({self.user_type})"
+
+    @property
+    def is_authenticated(self) -> bool:
+        """Required by DRF IsAuthenticated permission."""
+        return True
+
+    @property
+    def is_anonymous(self) -> bool:
+        """Required by DRF for anonymous user checks."""
+        return False
+
+
+class OTPRequest(models.Model):
+    """Tracks OTP send/verify attempts for rate limiting and audit (Phase B §3.2).
+
+    OTPs are never stored in plaintext — only a SHA-256 hash.
+    Expires after 5 minutes. Max 3 verify attempts per OTP.
+
+    Attributes:
+        id: UUID primary key.
+        phone_hash: SHA-256 of phone number (matches CustomerUser.phone_hash).
+        otp_hash: SHA-256 hash of the OTP code — never plaintext.
+        purpose: What the OTP is for (LOGIN, CLAIM_VERIFY, EMAIL_VERIFY).
+        attempts: Number of verify attempts (max 3).
+        is_used: Whether this OTP has been successfully verified.
+        expires_at: When the OTP expires (5 minutes from creation).
+        created_at: Auto-set on creation.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    phone_hash = models.CharField(
+        max_length=64,
+        db_index=True,
+        help_text="SHA-256 hash of phone number.",
+    )
+    otp_hash = models.CharField(
+        max_length=64,
+        help_text="SHA-256 hash of the OTP code — never store plaintext.",
+    )
+
+    purpose = models.CharField(
+        max_length=20,
+        choices=[
+            ("LOGIN", "Login"),
+            ("CLAIM_VERIFY", "Claim Verify"),
+            ("EMAIL_VERIFY", "Email Verify"),
+        ],
+        default="LOGIN",
+    )
+
+    attempts = models.PositiveSmallIntegerField(
+        default=0,
+        help_text="Number of verify attempts. Max 3 before OTP is invalidated.",
+    )
+    is_used = models.BooleanField(default=False)
+    expires_at = models.DateTimeField(
+        help_text="OTP expires 5 minutes after creation.",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "OTP Request"
+        verbose_name_plural = "OTP Requests"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["phone_hash", "is_used", "expires_at"]),
+        ]
+
+    def __str__(self) -> str:
+        return f"OTP {self.phone_hash[:8]}... ({self.purpose})"
+
+    @property
+    def is_expired(self) -> bool:
+        """Check if this OTP has expired.
+
+        Returns:
+            True if current time is past expires_at.
+        """
+        return timezone.now() > self.expires_at
+
+    @property
+    def is_valid(self) -> bool:
+        """Check if this OTP can still be used.
+
+        Returns:
+            True if not used, not expired, and attempts < 3.
+        """
+        return not self.is_used and not self.is_expired and self.attempts < 3

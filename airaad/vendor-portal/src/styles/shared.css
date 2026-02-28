@@ -1,0 +1,94 @@
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--space-4);
+  z-index: 9999;
+  padding: var(--space-2) var(--space-4);
+  background: var(--brand-orange);
+  color: var(--color-white);
+  font: var(--text-label);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: top var(--duration-fast) var(--ease-standard);
+}
+
+.skip-link:focus {
+  top: var(--space-4);
+}
+
+.loading-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: var(--space-4);
+  color: var(--text-secondary);
+  font: var(--text-body);
+}
+
+.loading-fallback-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  animation: pulse-logo 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-logo {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.onboarding-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: none;
+  margin-bottom: var(--space-4);
+}
+
+.onboarding-logo-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+}
+
+.onboarding-logo-text {
+  font: var(--text-heading-md);
+  color: var(--text-primary);
+}
+
+.inline-icon {
+  display: inline;
+  vertical-align: middle;
+  margin-right: var(--space-1);
+}
+
+.empty-icon {
+  margin: 0 auto var(--space-3);
+  display: block;
+  opacity: 0.4;
+}
+
+.gps-error {
+  color: var(--color-error-text);
+  font: var(--text-body-sm);
+  margin-bottom: var(--space-4);
+}
+
+.claimed-label {
+  font: var(--text-caption);
+  color: var(--text-secondary);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.loading-invoices {
+  color: var(--text-secondary);
+  font: var(--text-body-sm);
+}

@@ -70,6 +70,13 @@ LOCAL_APPS: list[str] = [
     "apps.subscriptions",
     "apps.discovery",
     "apps.governance",
+    "apps.vendor_portal",
+    "apps.payments",
+    "apps.reels",
+    "apps.notifications",
+    "apps.customer_auth",
+    "apps.user_portal",
+    "apps.user_preferences",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -248,6 +255,49 @@ AWS_QUERYSTRING_AUTH = True  # Presigned URLs
 # Google Places API
 # ---------------------------------------------------------------------------
 GOOGLE_PLACES_API_KEY = env("GOOGLE_PLACES_API_KEY", default="")
+
+# ---------------------------------------------------------------------------
+# Stripe — Subscription Payments (Phase C §8)
+# ---------------------------------------------------------------------------
+STRIPE_SECRET_KEY: str = env("STRIPE_SECRET_KEY", default="")
+STRIPE_PUBLISHABLE_KEY: str = env("STRIPE_PUBLISHABLE_KEY", default="")
+STRIPE_WEBHOOK_SECRET: str = env("STRIPE_WEBHOOK_SECRET", default="")
+STRIPE_PRICE_GOLD: str = env("STRIPE_PRICE_GOLD", default="")
+STRIPE_PRICE_DIAMOND: str = env("STRIPE_PRICE_DIAMOND", default="")
+STRIPE_PRICE_PLATINUM: str = env("STRIPE_PRICE_PLATINUM", default="")
+STRIPE_SILVER_PRICE_ID: str = env("STRIPE_SILVER_PRICE_ID", default="")
+
+# ---------------------------------------------------------------------------
+# Twilio SMS (Phase B — core/sms.py)
+# ---------------------------------------------------------------------------
+TWILIO_ACCOUNT_SID: str = env("TWILIO_ACCOUNT_SID", default="")
+TWILIO_AUTH_TOKEN: str = env("TWILIO_AUTH_TOKEN", default="")
+TWILIO_PHONE_NUMBER: str = env("TWILIO_PHONE_NUMBER", default="")
+
+# ---------------------------------------------------------------------------
+# Firebase Cloud Messaging (Phase B — notifications)
+# ---------------------------------------------------------------------------
+FIREBASE_CREDENTIALS_JSON: str = env("FIREBASE_CREDENTIALS_JSON", default="")
+
+# ---------------------------------------------------------------------------
+# Sentry error tracking
+# ---------------------------------------------------------------------------
+SENTRY_DSN: str = env("SENTRY_DSN", default="")
+
+# ---------------------------------------------------------------------------
+# OTP Manual Mode (Temporary — until Twilio is integrated)
+# When set, _generate_otp() returns this fixed code instead of a random one,
+# and SMS sending is skipped (logged only). Set to empty string "" to disable.
+# To enable Twilio: remove this setting (or set to ""), configure TWILIO_*
+# env vars, and the OTP system will automatically use real SMS delivery.
+# ---------------------------------------------------------------------------
+MANUAL_OTP_CODE: str = env("MANUAL_OTP_CODE", default="005261")
+
+# ---------------------------------------------------------------------------
+# JWT token lifetimes
+# ---------------------------------------------------------------------------
+JWT_ACCESS_LIFETIME_MINUTES: int = env.int("JWT_ACCESS_LIFETIME_MINUTES", default=60)
+JWT_REFRESH_LIFETIME_DAYS: int = env.int("JWT_REFRESH_LIFETIME_DAYS", default=7)
 
 # ---------------------------------------------------------------------------
 # Session security — idle timeout after 30 minutes

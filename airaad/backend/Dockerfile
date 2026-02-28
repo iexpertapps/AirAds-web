@@ -3,10 +3,10 @@
 # =============================================================================
 # Stage 1 (builder):     Compiles psycopg2 from source — NOT psycopg2-binary
 # Stage 2 (development): Dev tools, source mounted at runtime
-# Stage 3 (production):  LAST stage = default build target for Railway/Docker
+# Stage 3 (production):  LAST stage = default build target for DO App Platform/Docker
 #
-# IMPORTANT: production MUST be the last stage so that Railway, which builds
-# the default (last) stage, always gets the production image with gunicorn.
+# IMPORTANT: production MUST be the last stage so that DigitalOcean App Platform,
+# which builds the default (last) stage, always gets the production image with gunicorn.
 # Local dev uses: docker build --target development
 # =============================================================================
 
@@ -72,7 +72,7 @@ EXPOSE 8000
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 
 # -----------------------------------------------------------------------------
-# Stage 3 — Production (DEFAULT — last stage, built by Railway automatically)
+# Stage 3 — Production (DEFAULT — last stage, built by DO App Platform automatically)
 # Minimal runtime image with gunicorn, GDAL, and compiled wheels.
 # -----------------------------------------------------------------------------
 FROM python:3.12-slim AS production

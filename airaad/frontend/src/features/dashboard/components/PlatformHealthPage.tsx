@@ -28,19 +28,15 @@ const QC_COLORS: Record<string, string> = {
 };
 
 interface SystemAlert {
-  id: string;
-  severity: 'HIGH' | 'MED' | 'LOW';
+  level: 'error' | 'warning' | 'info';
   message: string;
-  action_url?: string;
-  action_label?: string;
 }
 
 interface RecentActivity {
-  id: string;
   action: string;
-  actor_label: string;
+  actor: string;
   target_type: string;
-  timestamp: string;
+  created_at: string;
 }
 
 interface KPIData {
@@ -51,9 +47,9 @@ interface KPIData {
   total_tags: number;
   imports_processing: number;
   daily_vendor_counts: Array<{ date: string; count: number }>;
-  qc_status_breakdown: Array<{ status: string; count: number }>;
-  import_activity: Array<{ date: string; count: number }>;
-  top_search_terms: Array<{ term: string; count: number }>;
+  qc_status_breakdown: Record<string, number>;
+  import_activity: Array<{ date: string; total: number }>;
+  top_search_terms: Array<{ query: string; count: number }>;
   system_alerts: SystemAlert[];
   recent_activity: RecentActivity[];
 }
@@ -86,9 +82,9 @@ interface MetricCardProps {
 
 
 const ALERT_VARIANT: Record<string, 'error' | 'warning' | 'neutral'> = {
-  HIGH: 'error',
-  MED: 'warning',
-  LOW: 'neutral',
+  error: 'error',
+  warning: 'warning',
+  info: 'neutral',
 };
 
 function MetricCard({ label, value, icon, variant = 'default' }: MetricCardProps) {
@@ -223,13 +219,13 @@ export default function PlatformHealthPage() {
             )}
 
             {/* QC Status donut */}
-            {data?.qc_status_breakdown && data.qc_status_breakdown.length > 0 && (
+            {data?.qc_status_breakdown && Object.keys(data.qc_status_breakdown).length > 0 && (
               <section className={styles.chartSection} aria-label="QC status breakdown">
                 <h2 className={styles.sectionHeading}>QC Status Breakdown</h2>
                 <ResponsiveContainer width="100%" height={220}>
                   <PieChart>
                     <Pie
-                      data={data.qc_status_breakdown}
+                      data={Object.entries(data.qc_status_breakdown).map(([status, count]) => ({ status, count }))}
                       dataKey="count"
                       nameKey="status"
                       cx="50%"
@@ -238,10 +234,10 @@ export default function PlatformHealthPage() {
                       outerRadius={85}
                       paddingAngle={2}
                     >
-                      {data.qc_status_breakdown.map((entry, index) => (
+                      {Object.entries(data.qc_status_breakdown).map(([status], index) => (
                         <Cell
-                          key={`${entry.status}-${index}`}
-                          fill={QC_COLORS[entry.status] ?? chartColors.fallback}
+                          key={`${status}-${index}`}
+                          fill={QC_COLORS[status] ?? chartColors.fallback}
                         />
                       ))}
                     </Pie>
@@ -269,7 +265,7 @@ export default function PlatformHealthPage() {
                   <XAxis dataKey="date" tick={{ fontSize: 11, fill: chartColors.tickFill }} tickLine={false} axisLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: chartColors.tickFill }} tickLine={false} axisLine={false} allowDecimals={false} />
                   <Tooltip contentStyle={{ background: chartColors.tooltipBg, border: `1px solid ${chartColors.tooltipBorder}`, borderRadius: '8px', fontSize: 12, color: chartColors.tickFill }} />
-                  <Bar dataKey="count" fill={chartColors.barTeal} radius={[3, 3, 0, 0]} name="Imports" />
+                  <Bar dataKey="total" fill={chartColors.barTeal} radius={[3, 3, 0, 0]} name="Imports" />
                 </BarChart>
               </ResponsiveContainer>
             </section>
@@ -287,9 +283,9 @@ export default function PlatformHealthPage() {
                 </h2>
                 <ol className={styles.searchList}>
                   {data.top_search_terms.slice(0, 10).map((t, i) => (
-                    <li key={`search-${i}-${t.term}`} className={styles.searchItem}>
+                    <li key={`search-${i}-${t.query}`} className={styles.searchItem}>
                       <span className={styles.searchRank}>{i + 1}</span>
-                      <span className={styles.searchTerm}>{t.term}</span>
+                      <span className={styles.searchTerm}>{t.query}</span>
                       <span className={styles.searchCount}>{t.count.toLocaleString()}</span>
                       <div
                         className={styles.searchBar}
@@ -311,20 +307,15 @@ export default function PlatformHealthPage() {
                 </h2>
                 <ul className={styles.alertList}>
                   {data.system_alerts.map((alert, i) => (
-                    <li key={alert.id ?? `alert-${i}`} className={[styles.alertItem, styles[`alertItem--${alert.severity.toLowerCase()}`]].join(' ')}>
+                    <li key={`alert-${i}`} className={[styles.alertItem, styles[`alertItem--${alert.level === 'error' ? 'high' : alert.level === 'warning' ? 'med' : 'low'}`]].join(' ')}>
                       <div className={styles.alertTop}>
                         <Badge
-                          variant={ALERT_VARIANT[alert.severity] ?? 'neutral'}
-                          label={formatLabel(alert.severity)}
+                          variant={ALERT_VARIANT[alert.level] ?? 'neutral'}
+                          label={formatLabel(alert.level)}
                           size="sm"
                         />
                         <p className={styles.alertMessage}>{alert.message}</p>
                       </div>
-                      {alert.action_url && alert.action_label && (
-                        <Link to={alert.action_url} className={styles.alertAction}>
-                          {alert.action_label} →
-                        </Link>
-                      )}
                     </li>
                   ))}
                 </ul>
@@ -340,12 +331,12 @@ export default function PlatformHealthPage() {
                 </h2>
                 <ul className={styles.activityList}>
                   {data.recent_activity.slice(0, 10).map((entry, i) => (
-                    <li key={entry.id ?? `activity-${i}`} className={styles.activityItem}>
+                    <li key={`activity-${i}`} className={styles.activityItem}>
                       <div className={styles.activityDot} aria-hidden="true" />
                       <div className={styles.activityContent}>
                         <span className={styles.activityAction}>{formatLabel(entry.action)}</span>
                         <span className={styles.activityMeta}>
-                          {entry.actor_label} · {entry.target_type} · {formatDateTime(entry.timestamp)}
+                          {entry.actor} · {entry.target_type} · {formatDateTime(entry.created_at)}
                         </span>
                       </div>
                     </li>

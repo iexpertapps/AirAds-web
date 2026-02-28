@@ -68,6 +68,13 @@ interface GovernanceSuspensionFilters {
   page_size?: number | undefined;
 }
 
+interface ClaimFilters {
+  status?: string | undefined;
+  search?: string | undefined;
+  page?: number | undefined;
+  page_size?: number | undefined;
+}
+
 export const queryKeys = {
   auth: {
     profile: () => ['auth', 'profile'] as const,
@@ -127,5 +134,24 @@ export const queryKeys = {
     fraudScores: (filters?: GovernanceFraudFilters) => ['governance', 'fraudScores', filters] as const,
     blacklist: (filters?: GovernanceBlacklistFilters) => ['governance', 'blacklist', filters] as const,
     suspensions: (filters?: GovernanceSuspensionFilters) => ['governance', 'suspensions', filters] as const,
+  },
+  claims: {
+    list: (filters?: ClaimFilters) => ['claims', 'list', filters] as const,
+  },
+  moderation: {
+    queue: () => ['moderation', 'queue'] as const,
+  },
+  subscriptions: {
+    overview: () => ['subscriptions', 'overview'] as const,
+  },
+  notifications: {
+    templates: () => ['notifications', 'templates'] as const,
+    history: () => ['notifications', 'history'] as const,
+  },
+  adminKpis: {
+    acquisition: () => ['adminKpis', 'acquisition'] as const,
+    engagement: () => ['adminKpis', 'engagement'] as const,
+    monetization: () => ['adminKpis', 'monetization'] as const,
+    platformHealth: () => ['adminKpis', 'platformHealth'] as const,
   },
 };

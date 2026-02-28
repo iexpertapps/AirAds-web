@@ -183,3 +183,29 @@ src/
 | String literal query keys | ❌ Crime |
 | Theme logic inside components | ❌ Crime |
 | Barrel file abuse | ❌ Crime |
+
+---
+
+## Security Governance — @security-architect
+
+This skill operates under the **@security-architect** governance layer. All frontend code must comply with the security policies defined in `/skills/security-architect/SKILL.md` (§1–§10).
+
+### Mandatory Client-Side Security Rules
+
+These rules are inherited from @security-architect and are **non-negotiable**:
+
+1. **Token Storage (§1, §3)** — Never store access tokens in `localStorage`. Use `sessionStorage` (current AirAd pattern) with XSS mitigations, or in-memory only. Clear all tokens on logout.
+2. **No PII in Browser Storage (§2, §9)** — Never store RESTRICTED data (phone numbers, PII) in `localStorage` or `sessionStorage`. Fetch on demand, display masked, discard after use.
+3. **XSS Prevention (§4)** — Never use `dangerouslySetInnerHTML` without explicit sanitization. React's JSX escaping handles most cases — do not bypass it.
+4. **CSRF Protection (§4)** — Ensure CSRF tokens are included in all state-changing requests to the backend.
+5. **PII Display (§9)** — Display personal data masked by default (`*********4567`). Decrypt/unmask only on explicit user action with audit trail.
+6. **Content Security Policy (§4)** — Enforce CSP headers. No inline scripts. No `eval()`.
+7. **Error Handling (§4)** — Never display raw API error details, stack traces, or internal paths to users. Show user-friendly messages.
+
+### Enforcement
+
+If generated frontend code violates any @security-architect policy:
+- **CRITICAL violations** (§1, §2, §3): Block — must fix before merge.
+- **HIGH violations** (§4, §9): Warn — should fix before merge.
+
+Refer to `/skills/security-architect/AGENTS.md` for detailed rules and examples.

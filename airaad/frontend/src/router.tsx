@@ -19,6 +19,11 @@ const AuditLogPage = lazy(() => import('@/features/audit/components/AuditLogPage
 const UsersPage = lazy(() => import('@/features/system/components/UsersPage'));
 const GovernancePage = lazy(() => import('@/features/governance/components/GovernancePage'));
 const NotFoundPage = lazy(() => import('@/features/auth/components/NotFoundPage'));
+const ClaimReviewPage = lazy(() => import('@/features/claims/components/ClaimReviewPage'));
+const ModerationPage = lazy(() => import('@/features/moderation/components/ModerationPage'));
+const SubscriptionOverviewPage = lazy(() => import('@/features/subscriptions/components/SubscriptionOverviewPage'));
+const NotificationManagementPage = lazy(() => import('@/features/notifications/components/NotificationManagementPage'));
+const KpiDashboardPage = lazy(() => import('@/features/admin-kpis/components/KpiDashboardPage'));
 
 function RequireRole({ allowedRoles }: { allowedRoles: Role[] }) {
   const user = useUser();
@@ -119,6 +124,26 @@ export const router = createBrowserRouter([
         element: <RequireRole allowedRoles={['SUPER_ADMIN']} />,
         children: [{ path: '/system/users', element: <UsersPage /> }],
       },
+      {
+        element: <RequireRole allowedRoles={['SUPER_ADMIN', 'CITY_MANAGER']} />,
+        children: [{ path: '/admin/claims', element: <ClaimReviewPage /> }],
+      },
+      {
+        element: <RequireRole allowedRoles={['SUPER_ADMIN', 'CONTENT_MODERATOR', 'CITY_MANAGER']} />,
+        children: [{ path: '/admin/moderation', element: <ModerationPage /> }],
+      },
+      {
+        element: <RequireRole allowedRoles={['SUPER_ADMIN', 'ANALYST', 'OPERATIONS_MANAGER']} />,
+        children: [{ path: '/admin/subscriptions', element: <SubscriptionOverviewPage /> }],
+      },
+      {
+        element: <RequireRole allowedRoles={['SUPER_ADMIN', 'OPERATIONS_MANAGER']} />,
+        children: [{ path: '/admin/notifications', element: <NotificationManagementPage /> }],
+      },
+      {
+        element: <RequireRole allowedRoles={['SUPER_ADMIN', 'ANALYST']} />,
+        children: [{ path: '/admin/kpis', element: <KpiDashboardPage /> }],
+      },
     ],
   },
   {
@@ -129,4 +154,12 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
   },
-]);
+], {
+  future: {
+    v7_fetcherPersist: true,
+    v7_normalizeFormMethod: true,
+    v7_partialHydration: true,
+    v7_relativeSplatPath: true,
+    v7_skipActionErrorRevalidation: true,
+  },
+});

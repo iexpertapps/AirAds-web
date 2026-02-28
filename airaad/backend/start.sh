@@ -9,7 +9,7 @@
 #   4. Start gunicorn bound to 0.0.0.0:$PORT
 #
 # This script is the container entrypoint for production.
-# Railway injects $PORT at runtime.
+# DigitalOcean App Platform injects $PORT at runtime.
 # =============================================================================
 
 set -e

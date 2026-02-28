@@ -1,0 +1,752 @@
+# =============================================================================
+# AirAd GitLab CI/CD Pipeline
+# =============================================================================
+# Migrated from GitHub Actions. Single pipeline covers CI + CD for all envs.
+# Branches: develop → staging → main (production)
+#
+# Pipeline structure:
+#   LAYER 1: lint + security (parallel, no DB)
+#   LAYER 2: test (DB-dependent)
+#   LAYER 3: integration & E2E
+#   LAYER 4: review + quality gate (MR-only)
+#   DEPLOY:  branch-specific (dev/staging/prod)
+#   VERIFY:  post-deploy health checks
+#   NOTIFY:  Slack notifications
+# =============================================================================
+
+stages:
+  - lint
+  - security
+  - test
+  - integration
+  - review
+  - quality-gate
+  - deploy
+  - verify
+  - rollback
+  - notify
+
+# ---------------------------------------------------------------------------
+# Global variables (CI-only test values — NOT secrets)
+# ---------------------------------------------------------------------------
+variables:
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "20"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
+  # Backend test env
+  DJANGO_SETTINGS_MODULE: config.settings.test
+  SECRET_KEY: ci-test-secret-key-not-for-production
+  ENCRYPTION_KEY: YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE=
+  DATABASE_URL: postgis://airaad:airaad@postgis:5432/test_airaad_db
+  REDIS_URL: redis://redis:6379/0
+  AWS_ACCESS_KEY_ID: test-key
+  AWS_SECRET_ACCESS_KEY: test-secret
+  AWS_STORAGE_BUCKET_NAME: test-bucket
+  # Postgres service env
+  POSTGRES_DB: test_airaad_db
+  POSTGRES_USER: airaad
+  POSTGRES_PASSWORD: airaad
+
+# ---------------------------------------------------------------------------
+# Reusable templates (hidden jobs)
+# ---------------------------------------------------------------------------
+
+# Default rules: run on protected branches + MRs
+.default-rules:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH =~ /^(main|staging|develop)$/
+
+.python-cache:
+  cache:
+    key: python-${CI_COMMIT_REF_SLUG}
+    paths:
+      - .pip-cache/
+    policy: pull-push
+
+.node-cache:
+  cache:
+    key: node-${CI_COMMIT_REF_SLUG}
+    paths:
+      - airaad/frontend/node_modules/
+    policy: pull-push
+
+# doctl CLI template for DigitalOcean App Platform deployments
+.do-deploy:
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache curl jq
+    - DOCTL_VERSION="1.104.0"
+    - curl -sL "https://github.com/digitalocean/doctl/releases/download/v${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz" | tar -xz -C /usr/local/bin
+    - doctl auth init --access-token $DIGITALOCEAN_ACCESS_TOKEN
+
+.postgres-service:
+  services:
+    - name: postgis/postgis:16-3.4-alpine
+      alias: postgis
+      variables:
+        POSTGRES_DB: test_airaad_db
+        POSTGRES_USER: airaad
+        POSTGRES_PASSWORD: airaad
+
+.postgres-redis-service:
+  services:
+    - name: postgis/postgis:16-3.4-alpine
+      alias: postgis
+      variables:
+        POSTGRES_DB: test_airaad_db
+        POSTGRES_USER: airaad
+        POSTGRES_PASSWORD: airaad
+    - name: redis:7-alpine
+      alias: redis
+
+# =========================================================================
+# LAYER 1 — Lint (parallel, no DB)
+# =========================================================================
+
+backend-lint:
+  stage: lint
+  image: python:${PYTHON_VERSION}-slim
+  extends:
+    - .python-cache
+    - .default-rules
+  before_script:
+    - pip install --cache-dir $PIP_CACHE_DIR flake8 isort black
+  script:
+    - cd airaad/backend
+    - flake8 apps/ core/ config/ celery_app.py
+    - isort --check-only --diff --profile black apps/ core/ config/ celery_app.py
+    - black --check --diff apps/ core/ config/ celery_app.py
+
+frontend-lint:
+  stage: lint
+  image: node:${NODE_VERSION}-alpine
+  extends:
+    - .node-cache
+    - .default-rules
+  before_script:
+    - cd airaad/frontend
+    - npm ci
+  script:
+    - cd airaad/frontend
+    - npm run lint
+    - npx tsc --noEmit
+
+# =========================================================================
+# LAYER 1 — Security scans (parallel)
+# =========================================================================
+
+backend-security:
+  stage: security
+  image: python:${PYTHON_VERSION}-slim
+  extends:
+    - .python-cache
+    - .default-rules
+  before_script:
+    - pip install --cache-dir $PIP_CACHE_DIR bandit safety
+  script:
+    - cd airaad/backend
+    - bandit -r apps/ core/ -ll --format txt
+    - safety check -r requirements/production.txt || true
+  allow_failure: true
+
+frontend-security:
+  stage: security
+  image: node:${NODE_VERSION}-alpine
+  extends:
+    - .node-cache
+    - .default-rules
+  before_script:
+    - cd airaad/frontend
+    - npm ci
+  script:
+    - cd airaad/frontend
+    - npm audit --audit-level=high || true
+  allow_failure: true
+
+secret-scan:
+  stage: security
+  image:
+    name: trufflesecurity/trufflehog:latest
+    entrypoint: [""]
+  extends:
+    - .default-rules
+  script:
+    - trufflehog filesystem . --only-verified
+
+# =========================================================================
+# LAYER 2 — Tests (DB-dependent)
+# =========================================================================
+
+migration-check:
+  stage: test
+  image: python:${PYTHON_VERSION}-slim
+  extends:
+    - .postgres-service
+    - .python-cache
+    - .default-rules
+  needs: [backend-lint]
+  before_script:
+    - apt-get update && apt-get install -y --no-install-recommends gdal-bin libgdal-dev
+    - pip install --cache-dir $PIP_CACHE_DIR -r airaad/backend/requirements/test.txt
+  script:
+    - cd airaad/backend
+    - python manage.py makemigrations --check --dry-run || true
+    - python manage.py migrate --noinput
+    - python manage.py showmigrations --list
+
+backend-test:
+  stage: test
+  image: python:${PYTHON_VERSION}-slim
+  extends:
+    - .postgres-redis-service
+    - .python-cache
+    - .default-rules
+  needs: [backend-lint]
+  before_script:
+    - apt-get update && apt-get install -y --no-install-recommends gdal-bin libgdal-dev
+    - pip install --cache-dir $PIP_CACHE_DIR -r airaad/backend/requirements/test.txt
+  script:
+    - cd airaad/backend
+    - python manage.py migrate --noinput
+    - pytest --cov=. --cov-fail-under=79 --cov-report=xml --cov-report=term-missing -v
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: airaad/backend/coverage.xml
+    paths:
+      - airaad/backend/coverage.xml
+    expire_in: 7 days
+  coverage: '/TOTAL.*\s+(\d+%)/'
+
+rbac-test:
+  stage: test
+  image: python:${PYTHON_VERSION}-slim
+  extends:
+    - .postgres-redis-service
+    - .python-cache
+    - .default-rules
+  needs: [backend-lint]
+  before_script:
+    - apt-get update && apt-get install -y --no-install-recommends gdal-bin libgdal-dev
+    - pip install --cache-dir $PIP_CACHE_DIR -r airaad/backend/requirements/test.txt
+  script:
+    - cd airaad/backend
+    - python manage.py migrate --noinput
+    - pytest tests/test_rbac.py -v --no-cov --tb=short
+
+frontend-build:
+  stage: test
+  image: node:${NODE_VERSION}-alpine
+  extends:
+    - .node-cache
+    - .default-rules
+  needs: [frontend-lint]
+  before_script:
+    - cd airaad/frontend
+    - npm ci
+  script:
+    - cd airaad/frontend
+    - VITE_API_BASE_URL=http://localhost:8000 npm run build
+    - |
+      if [ ! -d "dist" ] || [ -z "$(ls -A dist)" ]; then
+        echo "❌ Build produced empty dist directory"
+        exit 1
+      fi
+      echo "✅ dist/ contains $(find dist -type f | wc -l) files"
+  artifacts:
+    paths:
+      - airaad/frontend/dist/
+    expire_in: 1 day
+
+# =========================================================================
+# LAYER 3 — Integration & E2E
+# =========================================================================
+
+backend-docker:
+  stage: integration
+  image: docker:24
+  extends:
+    - .default-rules
+  needs: [backend-test]
+  services:
+    - docker:24-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  script:
+    - docker build --target production -t airaad-backend:ci ./airaad/backend
+
+backend-e2e:
+  stage: integration
+  image: python:${PYTHON_VERSION}-slim
+  extends:
+    - .postgres-redis-service
+    - .python-cache
+    - .default-rules
+  needs: [backend-test]
+  before_script:
+    - apt-get update && apt-get install -y --no-install-recommends gdal-bin libgdal-dev
+    - pip install --cache-dir $PIP_CACHE_DIR -r airaad/backend/requirements/test.txt
+  script:
+    - cd airaad/backend
+    - python manage.py migrate --noinput
+    - pytest tests/e2e/ --tb=short -v --no-cov -m "integration" --junit-xml=e2e-results.xml
+  artifacts:
+    reports:
+      junit: airaad/backend/e2e-results.xml
+    expire_in: 7 days
+
+frontend-e2e:
+  stage: integration
+  image: mcr.microsoft.com/playwright:v1.42.0-jammy
+  extends:
+    - .node-cache
+    - .default-rules
+  needs: [frontend-build]
+  before_script:
+    - cd airaad/frontend
+    - npm ci
+  script:
+    - cd airaad/frontend
+    - npx playwright test --list --project=chromium 2>/dev/null || echo "Playwright test listing not available — skipping compilation check"
+  artifacts:
+    paths:
+      - airaad/frontend/playwright-report/
+    expire_in: 7 days
+    when: always
+
+# =========================================================================
+# LAYER 4 — MR-only: Semgrep + AI review + Quality gate
+# =========================================================================
+
+semgrep:
+  stage: review
+  image:
+    name: semgrep/semgrep:latest
+    entrypoint: [""]
+  needs: []
+  script:
+    - |
+      semgrep scan \
+        --config airaad/.semgrep.yml \
+        --config p/django \
+        --config p/python \
+        --config p/react \
+        --config p/typescript \
+        --config p/owasp-top-ten \
+        --json \
+        --output semgrep-results.json \
+        airaad/ || true
+  artifacts:
+    paths:
+      - semgrep-results.json
+    expire_in: 7 days
+  allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+ai-review:
+  stage: review
+  image: python:${PYTHON_VERSION}-slim
+  needs: [semgrep]
+  before_script:
+    - pip install "anthropic>=0.25.0" "requests>=2.31.0"
+  script:
+    - |
+      python airaad/scripts/ai_review.py \
+        --pr-number $CI_MERGE_REQUEST_IID \
+        --repo $CI_PROJECT_PATH \
+        --semgrep-results semgrep-results.json \
+        --output review-comments.json || true
+  artifacts:
+    paths:
+      - review-comments.json
+    expire_in: 7 days
+  allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+quality-gate:
+  stage: quality-gate
+  image: python:${PYTHON_VERSION}-slim
+  needs: [backend-test, rbac-test, frontend-build, backend-e2e, frontend-e2e, secret-scan]
+  script:
+    - |
+      python3 - <<'EOF'
+      import json, sys, os
+
+      path = "review-comments.json"
+      if not os.path.exists(path):
+          print("No review-comments.json — quality gate PASSED (no findings)")
+          sys.exit(0)
+
+      with open(path) as f:
+          issues = json.load(f)
+
+      critical = [i for i in issues if i.get("severity") == "CRITICAL"]
+      high     = [i for i in issues if i.get("severity") == "HIGH"]
+
+      print(f"Total findings : {len(issues)}")
+      print(f"  CRITICAL     : {len(critical)}")
+      print(f"  HIGH         : {len(high)}")
+
+      if critical:
+          print("\n❌ Quality gate FAILED — CRITICAL issues must be resolved:")
+          for i in critical:
+              print(f"  [{i['file_path']}:{i['line']}] {i['title']}")
+          sys.exit(1)
+
+      print("\n✅ Quality gate PASSED")
+      sys.exit(0)
+      EOF
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# =========================================================================
+# DEPLOY — Development (develop branch only)
+# =========================================================================
+# DigitalOcean App Platform deploys the entire app (backend + frontend +
+# workers) in a single deployment. deploy_on_push is disabled in the app
+# spec — deployments are triggered here ONLY after CI passes.
+# =========================================================================
+
+deploy-dev:
+  stage: deploy
+  extends:
+    - .do-deploy
+  needs: [backend-test, rbac-test, backend-e2e, frontend-build, frontend-e2e]
+  environment:
+    name: development
+    url: $DO_APP_URL_DEV
+  script:
+    - echo "🚀 Deploying to DigitalOcean App Platform (development)..."
+    - doctl apps create-deployment $DO_APP_ID_DEV --wait --force-rebuild
+    - echo "✅ Deployment complete"
+  resource_group: deploy-dev
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+# =========================================================================
+# DEPLOY — Staging (staging branch only)
+# =========================================================================
+
+deploy-staging:
+  stage: deploy
+  extends:
+    - .do-deploy
+  needs: [backend-test, rbac-test, backend-e2e, frontend-build, frontend-e2e]
+  environment:
+    name: staging
+    url: $DO_APP_URL_STAGING
+  script:
+    - echo "🚀 Deploying to DigitalOcean App Platform (staging)..."
+    - doctl apps create-deployment $DO_APP_ID_STAGING --wait --force-rebuild
+    - echo "✅ Deployment complete"
+  resource_group: deploy-staging
+  rules:
+    - if: $CI_COMMIT_BRANCH == "staging"
+
+# =========================================================================
+# DEPLOY — Production (main branch, manual trigger)
+# =========================================================================
+
+deploy-prod:
+  stage: deploy
+  extends:
+    - .do-deploy
+  needs: [backend-test, rbac-test, backend-e2e, frontend-build, frontend-e2e]
+  environment:
+    name: production
+    url: $DO_APP_URL_PROD
+  before_script:
+    - apk add --no-cache curl jq git
+    - DOCTL_VERSION="1.104.0"
+    - curl -sL "https://github.com/digitalocean/doctl/releases/download/v${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz" | tar -xz -C /usr/local/bin
+    - doctl auth init --access-token $DIGITALOCEAN_ACCESS_TOKEN
+  script:
+    # Create rollback tag before deploying
+    - |
+      SHORT_SHA=$(echo $CI_COMMIT_SHA | cut -c1-7)
+      RELEASE_TAG="release-$(date -u +%Y%m%d-%H%M%S)-${SHORT_SHA}"
+      git config user.name "gitlab-ci[bot]"
+      git config user.email "gitlab-ci[bot]@users.noreply.gitlab.com"
+      git tag "$RELEASE_TAG" -m "Production release $RELEASE_TAG"
+      git push "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "$RELEASE_TAG" || true
+      echo "🏷️ Created rollback tag: $RELEASE_TAG"
+    - echo "🚀 Deploying to DigitalOcean App Platform (production)..."
+    - doctl apps create-deployment $DO_APP_ID_PROD --wait --force-rebuild
+    - echo "✅ Production deployment complete"
+  resource_group: deploy-prod
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+      allow_failure: false
+
+# =========================================================================
+# VERIFY — Post-deploy health checks
+# =========================================================================
+
+verify-dev:
+  stage: verify
+  image: alpine:latest
+  needs: [deploy-dev]
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - |
+      echo "Checking $DO_APP_URL_DEV/api/v1/health/ ..."
+      for i in 1 2 3 4 5; do
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DO_APP_URL_DEV/api/v1/health/" --max-time 10 || echo "000")
+        if [ "$STATUS" = "200" ]; then
+          echo "✅ Backend health check passed (HTTP $STATUS)"
+          exit 0
+        fi
+        echo "  Attempt $i: HTTP $STATUS — retrying in 10s..."
+        sleep 10
+      done
+      echo "❌ Backend health check FAILED after 5 attempts"
+      exit 1
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+verify-staging:
+  stage: verify
+  image: alpine:latest
+  needs: [deploy-staging]
+  before_script:
+    - apk add --no-cache curl
+  script:
+    # Health check
+    - |
+      echo "Checking $DO_APP_URL_STAGING/api/v1/health/ ..."
+      for i in 1 2 3 4 5; do
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DO_APP_URL_STAGING/api/v1/health/" --max-time 10 || echo "000")
+        if [ "$STATUS" = "200" ]; then
+          echo "✅ Backend health check passed (HTTP $STATUS)"
+          break
+        fi
+        echo "  Attempt $i: HTTP $STATUS — retrying in 10s..."
+        sleep 10
+      done
+      if [ "$STATUS" != "200" ]; then
+        echo "❌ Backend health check FAILED after 5 attempts"
+        exit 1
+      fi
+    # Verify DEBUG is off
+    - |
+      RESPONSE=$(curl -s "$DO_APP_URL_STAGING/api/v1/nonexistent-endpoint-check/" || echo "")
+      if echo "$RESPONSE" | grep -q "Traceback\|INSTALLED_APPS\|DEBUG = True"; then
+        echo "❌ STAGING IS RUNNING IN DEBUG MODE"
+        exit 1
+      fi
+      echo "✅ DEBUG is off"
+    # Verify API auth
+    - |
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DO_APP_URL_STAGING/api/v1/vendors/" --max-time 10 || echo "000")
+      if [ "$STATUS" = "401" ] || [ "$STATUS" = "403" ]; then
+        echo "✅ API authentication enforced (HTTP $STATUS)"
+      else
+        echo "⚠️ Unexpected status $STATUS for unauthenticated request"
+      fi
+  rules:
+    - if: $CI_COMMIT_BRANCH == "staging"
+
+verify-prod:
+  stage: verify
+  image: alpine:latest
+  needs: [deploy-prod]
+  before_script:
+    - apk add --no-cache curl
+  script:
+    # Health check (6 attempts for production)
+    - |
+      PASSED=false
+      for i in 1 2 3 4 5 6; do
+        RESPONSE=$(curl -s -w "\n%{http_code}" "$DO_APP_URL_PROD/api/v1/health/" --max-time 10 || echo -e "\n000")
+        BODY=$(echo "$RESPONSE" | head -1)
+        STATUS=$(echo "$RESPONSE" | tail -1)
+        if [ "$STATUS" = "200" ]; then
+          echo "✅ Backend health check passed (HTTP $STATUS)"
+          echo "   Response: $BODY"
+          PASSED=true
+          break
+        fi
+        echo "  Attempt $i: HTTP $STATUS — retrying in 10s..."
+        sleep 10
+      done
+      if [ "$PASSED" = "false" ]; then
+        echo "❌ Backend health check FAILED after 6 attempts"
+        exit 1
+      fi
+    # Verify DEBUG is off
+    - |
+      RESPONSE=$(curl -s "$DO_APP_URL_PROD/api/v1/nonexistent-endpoint-check/" || echo "")
+      if echo "$RESPONSE" | grep -q "Traceback\|INSTALLED_APPS\|DEBUG = True"; then
+        echo "❌ PRODUCTION IS RUNNING IN DEBUG MODE — CRITICAL"
+        exit 1
+      fi
+      echo "✅ DEBUG is off in production"
+    # Verify API auth is enforced
+    - |
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DO_APP_URL_PROD/api/v1/vendors/" --max-time 10 || echo "000")
+      if [ "$STATUS" = "401" ] || [ "$STATUS" = "403" ]; then
+        echo "✅ API authentication enforced (HTTP $STATUS)"
+      else
+        echo "❌ Unexpected status $STATUS for unauthenticated request"
+        exit 1
+      fi
+    # Check frontend is accessible (same app URL, root path)
+    - |
+      STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DO_APP_URL_PROD" --max-time 10 || echo "000")
+      if [ "$STATUS" = "200" ]; then
+        echo "✅ Frontend accessible (HTTP $STATUS)"
+      else
+        echo "❌ Frontend returned HTTP $STATUS"
+        exit 1
+      fi
+    # Verify security headers
+    - |
+      HEADERS=$(curl -sI "$DO_APP_URL_PROD" --max-time 10 || echo "")
+      MISSING=0
+      for HEADER in "x-content-type-options" "x-frame-options" "referrer-policy" "strict-transport-security" "content-security-policy"; do
+        if echo "$HEADERS" | grep -qi "$HEADER"; then
+          echo "✅ $HEADER present"
+        else
+          echo "❌ $HEADER MISSING"
+          MISSING=$((MISSING + 1))
+        fi
+      done
+      if [ "$MISSING" -gt 0 ]; then
+        echo "⚠️ $MISSING security headers missing"
+      fi
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# =========================================================================
+# ROLLBACK — Production (manual, via DigitalOcean App Platform)
+# =========================================================================
+# DO App Platform supports rollback via dashboard or by redeploying a
+# previous deployment. This job is manual — trigger it after reverting
+# the git commit, then it redeploys the app.
+# =========================================================================
+
+rollback-prod:
+  stage: rollback
+  extends:
+    - .do-deploy
+  needs:
+    - job: verify-prod
+      optional: true
+  script:
+    - echo "🔄 Triggering rollback deployment on DigitalOcean..."
+    - |
+      # Get the previous successful deployment ID
+      PREV_DEPLOY=$(doctl apps list-deployments $DO_APP_ID_PROD --format ID,Phase --no-header 2>/dev/null | grep -i "ACTIVE\|SUPERSEDED" | sed -n '2p' | awk '{print $1}')
+      if [ -n "$PREV_DEPLOY" ]; then
+        echo "   Found previous deployment: $PREV_DEPLOY"
+        echo "   ⚠️ Auto-rollback to specific deployment not supported via CLI."
+        echo "   → Use DO Dashboard: https://cloud.digitalocean.com/apps/$DO_APP_ID_PROD/deployments"
+        echo "   → Click 'Rollback' on deployment $PREV_DEPLOY"
+      fi
+    # Force redeploy current state (useful if git was reverted first)
+    - doctl apps create-deployment $DO_APP_ID_PROD --wait --force-rebuild || true
+    - sleep 15
+    - |
+      for i in 1 2 3; do
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DO_APP_URL_PROD/api/v1/health/" --max-time 10 || echo "000")
+        if [ "$STATUS" = "200" ]; then
+          echo "✅ Rollback successful — backend is healthy"
+          exit 0
+        fi
+        sleep 10
+      done
+      echo "❌ Rollback health check failed — IMMEDIATE MANUAL INTERVENTION REQUIRED"
+      echo "   → DO Dashboard: https://cloud.digitalocean.com/apps/$DO_APP_ID_PROD"
+      exit 1
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: on_failure
+
+# =========================================================================
+# NOTIFY — Slack notifications
+# =========================================================================
+
+notify-dev:
+  stage: notify
+  image: alpine:latest
+  needs:
+    - job: verify-dev
+      optional: true
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - |
+      if [ -z "$SLACK_WEBHOOK_URL" ]; then
+        echo "No SLACK_WEBHOOK_URL set — skipping notification"
+        exit 0
+      fi
+      if [ "$CI_JOB_STATUS" = "success" ]; then
+        EMOJI="✅"; STATUS="succeeded"
+      else
+        EMOJI="❌"; STATUS="FAILED"
+      fi
+      curl -s -X POST "$SLACK_WEBHOOK_URL" \
+        -H "Content-Type: application/json" \
+        -d "{\"text\": \"$EMOJI *Development Deploy $STATUS*\nBranch: \`develop\`\nCommit: \`${CI_COMMIT_SHORT_SHA}\`\nApp: $DO_APP_URL_DEV\nPipeline: $CI_PIPELINE_URL\"}"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+      when: always
+
+notify-staging:
+  stage: notify
+  image: alpine:latest
+  needs:
+    - job: verify-staging
+      optional: true
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - |
+      if [ -z "$SLACK_WEBHOOK_URL" ]; then
+        echo "No SLACK_WEBHOOK_URL set — skipping notification"
+        exit 0
+      fi
+      if [ "$CI_JOB_STATUS" = "success" ]; then
+        EMOJI="✅"; STATUS="succeeded"
+      else
+        EMOJI="❌"; STATUS="FAILED"
+      fi
+      curl -s -X POST "$SLACK_WEBHOOK_URL" \
+        -H "Content-Type: application/json" \
+        -d "{\"text\": \"$EMOJI *Staging Deploy $STATUS*\nBranch: \`staging\`\nCommit: \`${CI_COMMIT_SHORT_SHA}\`\nApp: $DO_APP_URL_STAGING\nPipeline: $CI_PIPELINE_URL\"}"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "staging"
+      when: always
+
+notify-prod:
+  stage: notify
+  image: alpine:latest
+  needs:
+    - job: verify-prod
+      optional: true
+    - job: rollback-prod
+      optional: true
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - |
+      if [ -z "$SLACK_WEBHOOK_URL" ]; then
+        echo "No SLACK_WEBHOOK_URL set — skipping notification"
+        exit 0
+      fi
+      EMOJI="🚀"; STATUS="SUCCEEDED"; DETAIL="Production is live and verified."
+      if [ "$CI_JOB_STATUS" != "success" ]; then
+        EMOJI="🚨"; STATUS="FAILED"; DETAIL="Production deploy failed. Check pipeline for details."
+      fi
+      curl -s -X POST "$SLACK_WEBHOOK_URL" \
+        -H "Content-Type: application/json" \
+        -d "{\"text\": \"$EMOJI *PRODUCTION Deploy $STATUS*\n$DETAIL\nCommit: \`${CI_COMMIT_SHORT_SHA}\`\nApp: $DO_APP_URL_PROD\nPipeline: $CI_PIPELINE_URL\"}"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: always

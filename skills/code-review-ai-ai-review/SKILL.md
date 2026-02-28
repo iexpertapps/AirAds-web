@@ -450,3 +450,55 @@ Comprehensive AI code review combining:
 8. Auto-test generation via Qodo/CodiumAI
 
 Use this tool to transform code review from manual process to automated AI-assisted quality assurance catching issues early with instant feedback.
+
+---
+
+## Security Governance — @security-architect
+
+This skill operates under the **@security-architect** governance layer. Every code review must validate security compliance against the policies defined in `/skills/security-architect/SKILL.md` (§1–§10).
+
+### Mandatory Security Review Checklist
+
+The following checks must be performed during **every** code review, in addition to existing quality checks:
+
+| Check | Policy | Severity |
+|-------|--------|----------|
+| No hardcoded secrets or credentials | §6 Secret Management | CRITICAL |
+| No weak password hashing or custom crypto | §1 Auth, §3 Encryption | CRITICAL |
+| RESTRICTED data encrypted at rest and masked in display/logs | §2 Classification, §3 Encryption | CRITICAL |
+| No raw string-formatted SQL (use ORM/parameterized queries) | §4 API Security | CRITICAL |
+| No PII in logs or error responses | §5 Logging, §9 Privacy | CRITICAL |
+| Input validation present on all user-facing inputs | §4 API Security | HIGH |
+| Explicit permission checks on new/modified endpoints | §1 Auth, §7 Least Privilege | HIGH |
+| Audit logging present for data mutations | §5 Logging | HIGH |
+| Rate limiting configured for public/auth endpoints | §4 API Security | HIGH |
+| Error responses do not leak internal details (stack traces, paths, SQL) | §4 API Security | HIGH |
+| CORS uses explicit origin allowlist (no wildcards) | §4 API Security | HIGH |
+| Dependencies free of known critical CVEs | §8 Secure SDLC | HIGH |
+| Security headers present (`X-Content-Type-Options`, `X-Frame-Options`) | §4 API Security | MEDIUM |
+
+### Enforcement Behavior
+
+When a security violation is detected during review:
+
+1. **CRITICAL** — Flag as blocking. Request revision before approval. Do not approve.
+2. **HIGH** — Flag with warning. Recommend fix before merge. May approve with documented justification.
+3. **MEDIUM** — Flag as suggestion. Fix or accept with documented justification.
+
+If 3+ HIGH violations are found in a single PR, escalate to architectural review.
+
+Always reference the specific @security-architect policy number (§1–§10) when flagging violations.
+
+### Security-Sensitive Change Triggers
+
+The following changes require **elevated security scrutiny**:
+- Authentication or authorization logic changes
+- Encryption, hashing, or key management changes
+- New API endpoints accepting user input
+- CORS, CSP, or security header changes
+- New data models storing PII or RESTRICTED data
+- Deployment configuration or secret management changes
+- New third-party service integrations
+- User role or permission matrix changes
+
+Refer to `/skills/security-architect/AGENTS.md` for detailed enforcement rules and examples.

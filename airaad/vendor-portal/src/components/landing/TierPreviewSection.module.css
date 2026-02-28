@@ -1,0 +1,202 @@
+.section {
+  padding: var(--space-24) var(--space-8);
+  background: var(--surface-page);
+}
+
+.inner {
+  max-width: var(--landing-max-width);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.heading {
+  font: var(--text-heading-xl);
+  color: var(--text-primary);
+  margin-bottom: var(--space-3);
+}
+
+.subheading {
+  font: var(--text-body-lg);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-16);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-5);
+  align-items: stretch;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-8) var(--space-5);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--duration-normal) var(--ease-standard),
+              box-shadow var(--duration-normal) var(--ease-standard);
+  text-align: left;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.card--popular {
+  border-color: var(--brand-orange);
+  border-width: 2px;
+  transform: scale(1.03);
+  z-index: 1;
+}
+
+.card--popular:hover {
+  transform: scale(1.03) translateY(-4px);
+}
+
+.popularBadge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--brand-orange);
+  color: var(--color-white);
+  font: var(--text-micro);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.tierName {
+  font: var(--text-label);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-2);
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  margin-bottom: var(--space-6);
+}
+
+.currency {
+  font: var(--text-heading-sm);
+  color: var(--text-primary);
+}
+
+.priceValue {
+  font: var(--text-heading-xl);
+  color: var(--text-primary);
+}
+
+.priceUnit {
+  font: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+.freeLabel {
+  font: var(--text-heading-xl);
+  color: var(--brand-teal);
+}
+
+.features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  flex: 1;
+  margin-bottom: var(--space-6);
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font: var(--text-body-sm);
+  color: var(--text-primary);
+}
+
+.featureIcon--check {
+  color: var(--brand-teal);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.featureIcon--x {
+  color: var(--color-grey-400);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  font: var(--text-label);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard),
+              transform var(--duration-fast) var(--ease-standard);
+  text-decoration: none;
+  text-align: center;
+}
+
+.ctaButton--primary {
+  background: var(--gradient-primary-btn);
+  color: var(--color-white);
+  border: none;
+}
+
+.ctaButton--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3);
+}
+
+.ctaButton--secondary {
+  background: transparent;
+  color: var(--brand-orange);
+  border: 1px solid var(--brand-orange);
+}
+
+.ctaButton--secondary:hover {
+  background: var(--color-warning-bg);
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .card--popular {
+    transform: none;
+  }
+
+  .card--popular:hover {
+    transform: translateY(-4px);
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section {
+    padding: var(--space-16) var(--space-5);
+  }
+}

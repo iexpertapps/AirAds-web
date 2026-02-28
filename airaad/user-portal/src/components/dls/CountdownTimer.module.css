@@ -1,0 +1,26 @@
+.timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-family-mono);
+  font-weight: 600;
+  color: var(--brand-crimson);
+}
+
+.md {
+  font-size: 14px;
+}
+
+.sm {
+  font-size: 12px;
+}
+
+.segment {
+  display: inline;
+}
+
+.expired {
+  font: var(--text-caption);
+  font-weight: 600;
+  color: var(--color-grey-400);
+}

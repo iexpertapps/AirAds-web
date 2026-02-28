@@ -1,0 +1,126 @@
+.page {
+  min-height: 100vh;
+  padding: calc(var(--topbar-height) + var(--space-10)) var(--space-8) var(--space-10);
+  background: var(--surface-page);
+}
+
+.inner {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font: var(--text-body-sm);
+  color: var(--brand-orange);
+  text-decoration: none;
+  margin-bottom: var(--space-6);
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.heading {
+  font: var(--text-heading-xl);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.subtext {
+  font: var(--text-body-md);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-8);
+}
+
+.vendorCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-6);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  margin-bottom: var(--space-8);
+}
+
+.vendorName {
+  font: var(--text-heading-sm);
+  color: var(--text-primary);
+}
+
+.vendorAddress {
+  font: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+.confirmSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.confirmText {
+  font: var(--text-body);
+  color: var(--text-primary);
+}
+
+.submitBtn {
+  width: 100%;
+  height: 48px;
+  font: var(--text-label);
+  font-size: 16px;
+  color: var(--color-white);
+  background: var(--gradient-primary-btn);
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.submitBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  font: var(--text-body-sm);
+  color: var(--color-error-text);
+}
+
+.successMsg {
+  text-align: center;
+  padding: var(--space-8);
+}
+
+.successIcon {
+  color: var(--brand-teal);
+  margin-bottom: var(--space-4);
+}
+
+.successHeading {
+  font: var(--text-heading-md);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.successText {
+  font: var(--text-body-md);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: calc(var(--topbar-height) + var(--space-6)) var(--space-4) var(--space-6);
+  }
+}

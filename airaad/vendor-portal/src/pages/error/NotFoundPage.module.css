@@ -1,0 +1,70 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  background: var(--surface-page);
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.logoIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+}
+
+.code {
+  font: var(--text-display);
+  color: var(--brand-orange);
+  line-height: 1;
+}
+
+.heading {
+  font: var(--text-heading-lg);
+  color: var(--text-primary);
+}
+
+.subtext {
+  font: var(--text-body-md);
+  color: var(--text-secondary);
+  max-width: 320px;
+}
+
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 var(--space-8);
+  font: var(--text-label);
+  font-size: 16px;
+  color: var(--color-white);
+  background: var(--gradient-primary-btn);
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.ctaButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3);
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: var(--space-5);
+  }
+}

@@ -64,7 +64,7 @@ export const useUIStore = create<UIState>()(
         state.theme = theme;
       });
       try {
-        localStorage.setItem('airaad-theme', theme);
+        localStorage.setItem('airad-theme', theme);
       } catch {
         // ignore storage errors
       }

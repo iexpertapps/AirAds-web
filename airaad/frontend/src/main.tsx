@@ -23,7 +23,7 @@ const app = (
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} future={{ v7_startTransition: true }} />
       <ToastProvider />
     </ThemeProvider>
     {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}

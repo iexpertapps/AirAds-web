@@ -2,7 +2,7 @@
 AirAd Backend — General Utilities
 
 get_client_ip: Extracts real client IP from X-Forwarded-For or REMOTE_ADDR.
-vendor_has_feature: Stub returning False — Phase B implements full feature gating.
+vendor_has_feature: Feature gating based on SubscriptionPackage (§3.5).
 """
 
 import logging
@@ -62,27 +62,89 @@ def vendor_has_feature(vendor: "Vendor", feature: str) -> bool:
     This is the ONLY subscription feature gate in the entire codebase.
     No ``if vendor.subscription_level ==`` checks are permitted anywhere else.
 
-    Phase A stub — always returns False. Phase B (TASK-B08) implements
-    the full feature matrix based on SubscriptionPackage.
+    Reads the vendor's subscription_level and looks up the corresponding
+    SubscriptionPackage to determine feature availability.
 
-    Feature names (Phase B):
-        - ``HAPPY_HOUR``
-        - ``VOICE_BOT``
-        - ``SPONSORED_WINDOW``
-        - ``TIME_HEATMAP``
-        - ``PREDICTIVE_RECOMMENDATIONS``
-        - ``EXTRA_REELS``
+    Feature names:
+        - ``HAPPY_HOUR`` — Gold+ (daily_happy_hours_allowed > 0)
+        - ``VOICE_BOT`` — Gold+ (has_voice_bot=True)
+        - ``SPONSORED_WINDOW`` — Gold+ (sponsored_placement_level != NONE)
+        - ``TIME_HEATMAP`` — Gold+ (hourly analytics)
+        - ``PREDICTIVE_RECOMMENDATIONS`` — Platinum only (has_predictive_reports=True)
+        - ``EXTRA_REELS`` — Gold+ (max_videos > 1)
+        - ``CAMPAIGN_SCHEDULING`` — Gold+ (campaign_scheduling_level != NONE)
 
     Args:
         vendor: The Vendor instance to check.
         feature: Feature name string (case-sensitive).
 
     Returns:
-        False in Phase A. Phase B returns True if the vendor's subscription
-        tier includes the requested feature.
+        True if the vendor's subscription tier includes the requested feature.
 
     Example:
         >>> vendor_has_feature(vendor, "HAPPY_HOUR")
-        False
+        False  # if vendor is SILVER
     """
-    return False
+    try:
+        from apps.subscriptions.models import SubscriptionPackage
+
+        package = SubscriptionPackage.objects.filter(
+            level=vendor.subscription_level,
+            is_active=True,
+        ).first()
+
+        if package is None:
+            return False
+
+        feature_map: dict[str, bool] = {
+            # Happy Hour — Gold+ (daily_happy_hours_allowed > 0)
+            "HAPPY_HOUR": package.daily_happy_hours_allowed > 0,
+            # Voice Bot tiers
+            "VOICE_BOT": package.has_voice_bot,
+            "VOICE_BOT_DYNAMIC": package.voice_bot_type in ("DYNAMIC", "ADVANCED"),
+            "VOICE_BOT_ADVANCED": package.voice_bot_type == "ADVANCED",
+            # Sponsored Placement tiers
+            "SPONSORED_WINDOW": package.sponsored_placement_level != "NONE",
+            "SPONSORED_LIMITED_TIME": package.sponsored_placement_level in (
+                "LIMITED_TIME", "AREA_BOOST", "AREA_EXCLUSIVE",
+            ),
+            "SPONSORED_AREA_BOOST": package.sponsored_placement_level in (
+                "AREA_BOOST", "AREA_EXCLUSIVE",
+            ),
+            "SPONSORED_AREA_EXCLUSIVE": package.sponsored_placement_level == "AREA_EXCLUSIVE",
+            # Analytics
+            "TIME_HEATMAP": package.analytics_level in ("STANDARD", "ADVANCED", "PREDICTIVE"),
+            "PREDICTIVE_RECOMMENDATIONS": package.has_predictive_reports,
+            "COMPETITOR_BENCHMARKING": package.analytics_level == "PREDICTIVE",
+            # Reels
+            "EXTRA_REELS": package.max_videos > 1,
+            # Campaign Scheduling tiers
+            "CAMPAIGN_SCHEDULING": package.campaign_scheduling_level != "NONE",
+            "CAMPAIGN_BASIC": package.campaign_scheduling_level in (
+                "BASIC", "ADVANCED", "SMART_AUTOMATION",
+            ),
+            "CAMPAIGN_ADVANCED": package.campaign_scheduling_level in (
+                "ADVANCED", "SMART_AUTOMATION",
+            ),
+            "CAMPAIGN_SMART_AUTOMATION": package.campaign_scheduling_level == "SMART_AUTOMATION",
+            # Discount types — Gold+ can create item-specific, Diamond+ flash, Gold+ BOGO
+            "ITEM_SPECIFIC_DISCOUNT": package.level in ("GOLD", "DIAMOND", "PLATINUM"),
+            "FLASH_DISCOUNT": package.level in ("DIAMOND", "PLATINUM"),
+            "BOGO_DEAL": package.level in ("GOLD", "DIAMOND", "PLATINUM"),
+            # Delivery — Diamond+
+            "FREE_DELIVERY": package.max_delivery_configs != 0,
+            # Voice search priority
+            "VOICE_SEARCH_PRIORITY": package.voice_search_priority != "NONE",
+        }
+
+        return feature_map.get(feature, False)
+    except Exception as exc:
+        logger.error(
+            "vendor_has_feature lookup failed — defaulting to False",
+            extra={
+                "vendor_id": str(getattr(vendor, "id", "?")),
+                "feature": feature,
+                "error": str(exc),
+            },
+        )
+        return False

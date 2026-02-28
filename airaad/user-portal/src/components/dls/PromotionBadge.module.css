@@ -1,0 +1,22 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  background: var(--brand-orange);
+  color: var(--text-on-brand);
+  font: var(--text-micro);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.flash {
+  background: var(--brand-crimson);
+  animation: pulse-flash 2s ease-in-out infinite;
+}
+
+@keyframes pulse-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}

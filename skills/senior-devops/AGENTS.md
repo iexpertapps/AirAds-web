@@ -401,6 +401,7 @@ When acting as a senior DevOps engineer on this project:
 2. **Never suggest Kubernetes or Terraform** — Railway handles orchestration at this scale
 3. **Always use `psycopg` (v3)**, never `psycopg2-binary` in production requirements
 4. **Always validate** that `DEBUG=False` before any production deployment advice
+
 5. **Always include rollback plan** when suggesting schema migrations
 6. **Flag immediately** if any secret appears hardcoded anywhere in the codebase
 7. **Prefer Railway CLI** for one-off commands, GitHub Actions for automated deploys
@@ -436,9 +437,37 @@ When acting as a senior DevOps engineer on this project:
 
 ---
 
+## Security Governance — @security-architect
+
+This skill operates under the **@security-architect** governance layer. All infrastructure and deployment decisions must comply with the security policies defined in `/skills/security-architect/SKILL.md` (§1–§10).
+
+### Mandatory Infrastructure Security Rules
+
+These rules are inherited from @security-architect and are **non-negotiable**:
+
+1. **TLS Enforcement (§3)** — TLS 1.2+ on all endpoints. HSTS enabled with `max-age=31536000` and `includeSubDomains`. No mixed content.
+2. **Secret Management (§6)** — All secrets in environment variables only (Railway, Vercel, GitHub Secrets). Never in images, configs, Dockerfiles, or VCS. TruffleHog in CI on every push.
+3. **Production Hardening (§1, §4)** — `DEBUG=False`, `ALLOWED_HOSTS` set to exact domain, `SESSION_COOKIE_SECURE=True`, `CSRF_COOKIE_SECURE=True`, `X_FRAME_OPTIONS=DENY`. CORS explicit origin allowlist only.
+4. **Database Security (§7)** — Encrypted connections. Least-privilege DB user for application connections. No superuser for app access.
+5. **Container Security (§6)** — Slim base images. No secrets in Docker layers. No `.env` files in images. `--no-install-recommends` for apt packages.
+6. **CI/CD Security Gates (§8, §10)** — Pipeline must include secret scanning (TruffleHog), dependency audit (Safety, npm audit), and SAST (Semgrep, Bandit). Critical findings block deploy.
+7. **Access Scoping (§7)** — CI/CD tokens scoped to minimum required actions. Deploy tokens do not have admin access. Different secrets per environment.
+
+### Enforcement
+
+If deployment configuration violates any @security-architect policy:
+- **CRITICAL violations** (§3, §6): Block — must fix before deploy.
+- **HIGH violations** (§1, §4, §7, §8): Warn — should fix before deploy.
+
+Refer to `/skills/security-architect/AGENTS.md` for detailed rules and examples.
+
+---
+
 ## References
 
 - [SKILL.md](SKILL.md) — Full DevOps toolkit overview
 - [references/cicd_pipeline_guide.md](references/cicd_pipeline_guide.md) — Complete GitHub Actions workflows
 - [references/deployment_strategies.md](references/deployment_strategies.md) — Vercel + Railway deployment details
 - [references/infrastructure_as_code.md](references/infrastructure_as_code.md) — Docker + env management
+- [@security-architect Governance](/skills/security-architect/SKILL.md) — Security policies (§1–§10)
+- [@security-architect Enforcement](/skills/security-architect/AGENTS.md) — Enforced security rules

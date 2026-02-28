@@ -166,16 +166,9 @@ class LogoutView(APIView):
                 refresh_token=serializer.validated_data["refresh"],
                 user=request.user,
             )
-        except ValueError as e:
-            return Response(
-                {
-                    "success": False,
-                    "data": None,
-                    "message": str(e),
-                    "errors": {},
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        except ValueError:
+            # Token already blacklisted or invalid — session is effectively cleared
+            pass
 
         return success_response(message="Logged out successfully")
 

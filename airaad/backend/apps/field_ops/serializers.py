@@ -22,6 +22,9 @@ class FieldVisitSerializer(serializers.ModelSerializer):
     vendor_name = serializers.CharField(source="vendor.business_name", read_only=True)
     vendor_id = serializers.UUIDField(source="vendor.id", read_only=True)
     gps_confirmed_point = serializers.SerializerMethodField(read_only=True)
+    gps_confirmed = serializers.SerializerMethodField(read_only=True)
+    photos_count = serializers.SerializerMethodField(read_only=True)
+    drift_meters = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = FieldVisit
@@ -34,7 +37,10 @@ class FieldVisitSerializer(serializers.ModelSerializer):
             "agent_email",
             "visited_at",
             "visit_notes",
+            "gps_confirmed",
             "gps_confirmed_point",
+            "photos_count",
+            "drift_meters",
             "created_at",
         ]
         read_only_fields = [
@@ -43,9 +49,46 @@ class FieldVisitSerializer(serializers.ModelSerializer):
             "agent_email",
             "vendor_id",
             "vendor_name",
+            "gps_confirmed",
             "gps_confirmed_point",
+            "photos_count",
+            "drift_meters",
             "created_at",
         ]
+
+    def get_gps_confirmed(self, obj: FieldVisit) -> bool:
+        """Return True if a GPS point was confirmed on-site."""
+        return obj.gps_confirmed_point is not None
+
+    def get_photos_count(self, obj: FieldVisit) -> int:
+        """Return count of active photos for this visit."""
+        try:
+            return obj.photos.filter(is_active=True).count()
+        except Exception:
+            return 0
+
+    def get_drift_meters(self, obj: FieldVisit) -> float | None:
+        """Return GPS drift distance in metres if both vendor and confirmed points exist."""
+        try:
+            if obj.gps_confirmed_point is None:
+                return None
+            vendor = obj.vendor
+            gps_lat = getattr(vendor, "gps_lat", None)
+            gps_lon = getattr(vendor, "gps_lon", None)
+            if not (gps_lat and gps_lon):
+                return None
+            from math import atan2, cos, radians, sin, sqrt
+
+            R = 6_371_000
+            lat1 = radians(float(gps_lat))
+            lon1 = radians(float(gps_lon))
+            lat2 = radians(obj.gps_confirmed_point.y)
+            lon2 = radians(obj.gps_confirmed_point.x)
+            dlat, dlon = lat2 - lat1, lon2 - lon1
+            a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+            return round(R * 2 * atan2(sqrt(a), sqrt(1 - a)), 1)
+        except Exception:
+            return None
 
     def get_gps_confirmed_point(self, obj: FieldVisit) -> dict | None:
         """Return confirmed GPS point as {longitude, latitude} dict.

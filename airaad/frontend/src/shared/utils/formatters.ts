@@ -76,9 +76,10 @@ export function formatLabel(key: string): string {
       .replace(/\b\w/g, l => l.toUpperCase());
   }
   
-  // Handle camelCase
+  // Handle camelCase — keep consecutive uppercase runs (acronyms) together
   return key
-    .replace(/([A-Z])/g, ' $1')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replace(/^./, str => str.toUpperCase())
     .trim();
 }

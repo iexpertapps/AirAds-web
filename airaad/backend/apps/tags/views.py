@@ -198,3 +198,37 @@ class TagDetailView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TagDiscoveryView(APIView):
+    """GET /api/v1/tags/discovery/ — public tags for browsing UI (§B-8).
+
+    Returns active tags grouped by tag_type for the customer discovery screen.
+    No authentication required.
+    """
+
+    from rest_framework.permissions import AllowAny
+
+    authentication_classes: list = []
+    permission_classes = [AllowAny]
+
+    def get(self, request: Request) -> Response:
+        """Return active tags for browsing, optionally filtered by tag_type."""
+        qs = Tag.objects.filter(is_active=True).order_by("display_order", "name")
+        tag_type = request.query_params.get("tag_type")
+        if tag_type:
+            qs = qs.filter(tag_type=tag_type)
+
+        results = [
+            {
+                "id": str(t.id),
+                "name": t.name,
+                "slug": t.slug,
+                "tag_type": t.tag_type,
+                "display_label": t.display_label,
+                "display_order": t.display_order,
+                "icon_name": t.icon_name,
+            }
+            for t in qs
+        ]
+        return success_response(data=results)

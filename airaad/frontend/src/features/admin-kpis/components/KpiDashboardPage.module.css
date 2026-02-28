@@ -1,0 +1,74 @@
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.sectionCard {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-6);
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--text-heading-sm);
+  color: var(--text-primary);
+  margin-bottom: var(--space-5);
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.metricCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface-hover);
+  border-radius: var(--radius-md);
+}
+
+.metricValue {
+  font: var(--text-heading-lg);
+  color: var(--text-primary);
+}
+
+.metricValue--highlight {
+  color: var(--brand-orange);
+}
+
+.metricLabel {
+  font: var(--text-caption);
+  color: var(--text-secondary);
+}
+
+.chartWrap {
+  margin-top: var(--space-4);
+}
+
+.loadingSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  color: var(--text-secondary);
+  font: var(--text-body-sm);
+}
+
+.errorSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  color: var(--color-error-text);
+  font: var(--text-body-sm);
+}

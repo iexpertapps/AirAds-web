@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GPS Search Test</title>
+</head>
+<body>
+    <h1>GPS Search Test</h1>
+    <button onclick="testGPS()">Test GPS Search</button>
+    <div id="result"></div>
+
+    <script>
+    async function testGPS() {
+        const url = 'http://localhost:8000/api/v1/vendor-portal/claim/search/?lat=31.373384470042097&lng=73.06685637991406';
+        
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            document.getElementById('result').innerHTML = `
+                <h3>Results:</h3>
+                <p>Status: ${response.status}</p>
+                <p>Success: ${data.success}</p>
+                <p>Message: ${data.message}</p>
+                <p>Vendors found: ${data.data ? data.data.length : 0}</p>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+        } catch (error) {
+            document.getElementById('result').innerHTML = `
+                <h3>Error:</h3>
+                <p>${error.message}</p>
+            `;
+        }
+    }
+    </script>
+</body>
+</html>

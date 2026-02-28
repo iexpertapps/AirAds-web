@@ -30,8 +30,10 @@ from .services import (
     create_city,
     create_country,
     create_landmark,
+    delete_country,
     update_area,
     update_city,
+    update_country,
     update_landmark,
 )
 
@@ -85,6 +87,82 @@ class CountryListCreateView(APIView):
             message="Country created",
             status_code=status.HTTP_201_CREATED,
         )
+
+
+class CountryDetailView(APIView):
+    """Retrieve, update, or delete a single country."""
+
+    _read_roles = RolePermission.for_roles(*AdminRole.values)
+    _write_roles = RolePermission.for_roles(
+        AdminRole.SUPER_ADMIN, AdminRole.CITY_MANAGER
+    )
+
+    def get_permissions(self) -> list:
+        if self.request.method in ("GET", "HEAD", "OPTIONS"):
+            return [self._read_roles()]
+        return [self._write_roles()]
+
+    @extend_schema(
+        tags=["Geo"], summary="Get country detail", responses={200: CountrySerializer}
+    )
+    def get(self, request: Request, pk: str) -> Response:
+        """Return a single country by ID."""
+        try:
+            country = Country.objects.get(id=pk, is_active=True)
+        except Country.DoesNotExist:
+            return Response(
+                {"success": False, "data": None, "message": "Country not found", "errors": {}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        return success_response(data=CountrySerializer(country).data)
+
+    @extend_schema(
+        tags=["Geo"],
+        summary="Update country (SUPER_ADMIN, CITY_MANAGER)",
+        responses={200: CountrySerializer},
+    )
+    def patch(self, request: Request, pk: str) -> Response:
+        """Partially update a country."""
+        try:
+            country = Country.objects.get(id=pk)
+            country = update_country(
+                country=country,
+                updates=dict(request.data),
+                actor=request.user,
+                request=request._request,
+            )
+        except Country.DoesNotExist:
+            return Response(
+                {"success": False, "data": None, "message": "Country not found", "errors": {}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except ValueError as e:
+            return Response(
+                {"success": False, "data": None, "message": str(e), "errors": {}},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return success_response(data=CountrySerializer(country).data)
+
+    @extend_schema(
+        tags=["Geo"],
+        summary="Delete country (SUPER_ADMIN, CITY_MANAGER)",
+        responses={200: None},
+    )
+    def delete(self, request: Request, pk: str) -> Response:
+        """Soft-delete a country."""
+        try:
+            country = Country.objects.get(id=pk)
+            delete_country(
+                country=country,
+                actor=request.user,
+                request=request._request,
+            )
+        except Country.DoesNotExist:
+            return Response(
+                {"success": False, "data": None, "message": "Country not found", "errors": {}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        return success_response(message="Country deleted")
 
 
 class CityListCreateView(APIView):

@@ -62,6 +62,7 @@ class Command(BaseCommand):
 
                 if not options["no_vendors"]:
                     self._seed_vendors(city, area, landmark, admin_user)
+                    self._seed_field_visits(admin_user)
 
         except Exception as exc:
             raise CommandError(f"seed_data failed: {exc}") from exc
@@ -915,3 +916,186 @@ class Command(BaseCommand):
                 data_source=vd["data_source"],
             )
             self.stdout.write(f"  Created Vendor: {vendor.business_name}")
+
+        # =================================================================
+        # Step 7 — Seed SubscriptionPackage tiers (Phase B §3.1)
+        # =================================================================
+        self.stdout.write(self.style.MIGRATE_HEADING("\n— Seeding Subscription Packages —"))
+        self._seed_subscription_packages()
+
+    def _seed_field_visits(self, actor: Any) -> None:
+        """Create sample FieldVisit records for the Field Ops page.
+
+        Uses the existing FIELD_AGENT seed user and first 5 vendors.
+        Idempotent — skips if any FieldVisit already exists.
+
+        Args:
+            actor: AdminUser used to look up or create the FIELD_AGENT user.
+        """
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        from apps.accounts.models import AdminRole, AdminUser
+        from apps.field_ops.models import FieldVisit
+        from apps.vendors.models import Vendor
+
+        self.stdout.write(self.style.MIGRATE_HEADING("\n— Seeding Field Visits —"))
+
+        if FieldVisit.objects.exists():
+            self.stdout.write("  Field visits exist — skipping")
+            return
+
+        agent, _ = AdminUser.objects.get_or_create(
+            email="fieldagent@airads.test",
+            defaults={
+                "full_name": "Field Agent",
+                "role": AdminRole.FIELD_AGENT,
+                "is_active": True,
+            },
+        )
+
+        vendors = list(Vendor.objects.filter(is_deleted=False).order_by("created_at")[:5])
+        if not vendors:
+            self.stdout.write("  No vendors found — skipping field visits")
+            return
+
+        now = timezone.now()
+        visits_data = [
+            {
+                "vendor": vendors[0],
+                "visited_at": now - timedelta(days=7),
+                "visit_notes": "Verified location and business signage. GPS confirmed on-site.",
+                "gps_lon": 67.0601,
+                "gps_lat": 24.8271,
+            },
+            {
+                "vendor": vendors[1] if len(vendors) > 1 else vendors[0],
+                "visited_at": now - timedelta(days=5),
+                "visit_notes": "Confirmed operating hours match records. Minor discrepancy in phone number noted.",
+                "gps_lon": 67.0610,
+                "gps_lat": 24.8265,
+            },
+            {
+                "vendor": vendors[2] if len(vendors) > 2 else vendors[0],
+                "visited_at": now - timedelta(days=3),
+                "visit_notes": "Vendor closed during visit — returned next day. Business confirmed active.",
+                "gps_lon": 67.0595,
+                "gps_lat": 24.8280,
+            },
+            {
+                "vendor": vendors[3] if len(vendors) > 3 else vendors[0],
+                "visited_at": now - timedelta(days=1),
+                "visit_notes": "New signage installed. Updated photos collected.",
+                "gps_lon": 67.0598,
+                "gps_lat": 24.8269,
+            },
+            {
+                "vendor": vendors[4] if len(vendors) > 4 else vendors[0],
+                "visited_at": now - timedelta(hours=6),
+                "visit_notes": "Routine verification visit. All details match database records.",
+                "gps_lon": 67.0605,
+                "gps_lat": 24.8275,
+            },
+        ]
+
+        from django.contrib.gis.geos import Point
+
+        from apps.audit.utils import log_action
+
+        for vd in visits_data:
+            visit = FieldVisit.objects.create(
+                vendor=vd["vendor"],
+                agent=agent,
+                visited_at=vd["visited_at"],
+                visit_notes=vd["visit_notes"],
+                gps_confirmed_point=Point(vd["gps_lon"], vd["gps_lat"], srid=4326),
+            )
+            log_action(
+                action="FIELD_VISIT_CREATED",
+                actor=actor,
+                target_obj=visit,
+                request=None,
+                before={},
+                after={"vendor_id": str(vd["vendor"].id), "agent_id": str(agent.id)},
+            )
+            self.stdout.write(f"  Created FieldVisit: {vd['vendor'].business_name}")
+
+    def _seed_subscription_packages(self) -> None:
+        """Seed the 4 subscription tiers: SILVER, GOLD, DIAMOND, PLATINUM.
+
+        Idempotent — uses get_or_create on level.
+        Values match the Tiered Vendor Subscription Architecture doc.
+        """
+        from decimal import Decimal
+
+        from apps.subscriptions.models import SubscriptionLevel, SubscriptionPackage
+
+        packages = [
+            {
+                "level": SubscriptionLevel.SILVER,
+                "name": "Silver — Visibility",
+                "price_monthly": Decimal("0.00"),
+                "max_videos": 1,
+                "daily_happy_hours_allowed": 0,
+                "has_voice_bot": False,
+                "has_predictive_reports": False,
+                "sponsored_placement_level": "NONE",
+                "campaign_scheduling_level": "NONE",
+                "voice_search_priority": "NONE",
+                "visibility_boost_weight": 1.0,
+            },
+            {
+                "level": SubscriptionLevel.GOLD,
+                "name": "Gold — Control",
+                "price_monthly": Decimal("2999.00"),
+                "max_videos": 3,
+                "daily_happy_hours_allowed": 1,
+                "has_voice_bot": True,
+                "has_predictive_reports": False,
+                "sponsored_placement_level": "LIMITED_TIME",
+                "campaign_scheduling_level": "BASIC",
+                "voice_search_priority": "LOW",
+                "visibility_boost_weight": 1.2,
+            },
+            {
+                "level": SubscriptionLevel.DIAMOND,
+                "name": "Diamond — Automation",
+                "price_monthly": Decimal("7999.00"),
+                "max_videos": 6,
+                "daily_happy_hours_allowed": 3,
+                "has_voice_bot": True,
+                "has_predictive_reports": False,
+                "sponsored_placement_level": "AREA_BOOST",
+                "campaign_scheduling_level": "ADVANCED",
+                "voice_search_priority": "MEDIUM",
+                "visibility_boost_weight": 1.5,
+            },
+            {
+                "level": SubscriptionLevel.PLATINUM,
+                "name": "Platinum — Dominance",
+                "price_monthly": Decimal("14999.00"),
+                "max_videos": 999,
+                "daily_happy_hours_allowed": 99,
+                "has_voice_bot": True,
+                "has_predictive_reports": True,
+                "sponsored_placement_level": "AREA_EXCLUSIVE",
+                "campaign_scheduling_level": "SMART_AUTOMATION",
+                "voice_search_priority": "HIGHEST",
+                "visibility_boost_weight": 2.0,
+            },
+        ]
+
+        for pkg_data in packages:
+            level = pkg_data.pop("level")
+            obj, created = SubscriptionPackage.objects.get_or_create(
+                level=level,
+                defaults=pkg_data,
+            )
+            if created:
+                self.stdout.write(f"  Created: {obj}")
+            else:
+                for field, value in pkg_data.items():
+                    setattr(obj, field, value)
+                obj.save()
+                self.stdout.write(f"  Updated: {obj}")

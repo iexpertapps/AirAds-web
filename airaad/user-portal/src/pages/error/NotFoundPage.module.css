@@ -1,0 +1,52 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-6);
+  background: var(--surface-page);
+}
+
+.content {
+  text-align: center;
+  max-width: 400px;
+}
+
+.code {
+  font: var(--text-display);
+  background: var(--gradient-brand-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-2);
+}
+
+.title {
+  font: var(--text-heading-lg);
+  color: var(--text-primary);
+  margin-bottom: var(--space-3);
+}
+
+.description {
+  font: var(--text-body);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-8);
+}
+
+.homeLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  background: var(--gradient-primary-btn);
+  color: var(--text-on-brand);
+  font: var(--text-body-strong);
+  border-radius: var(--radius-pill);
+  transition: transform var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.homeLink:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-fab);
+}

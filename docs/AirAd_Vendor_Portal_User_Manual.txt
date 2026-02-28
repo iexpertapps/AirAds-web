@@ -1,0 +1,2976 @@
+
+AIRAD VENDOR PORTAL - USER MANUAL
+=====================================
+Version 1.0 | February 2026
+
+AirAd Vendor Portal - User Manual
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --airad-primary: #FF6B35;
+            --airad-secondary: #004E89;
+            --airad-accent: #00A8E8;
+            --airad-dark: #1A1A1A;
+            --airad-light: #F8F9FA;
+            --airad-gray: #6C757D;
+            --airad-success: #28A745;
+            --airad-warning: #FFC107;
+            --airad-danger: #DC3545;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--airad-dark);
+            background: white;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 20mm;
+            position: relative;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--airad-primary);
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+        }
+
+        .title {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--airad-primary);
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: var(--airad-secondary);
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        .meta {
+            font-size: 14px;
+            color: var(--airad-gray);
+            margin-bottom: 10px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--airad-secondary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--airad-accent);
+        }
+
+        .subsection-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--airad-primary);
+            margin-bottom: 15px;
+            margin-top: 30px;
+        }
+
+        .text-content {
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .step-list {
+            counter-reset: step-counter;
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .step-list li {
+            counter-increment: step-counter;
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 40px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .step-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 28px;
+            background: var(--airad-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: var(--airad-light);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--airad-primary);
+        }
+
+        .feature-title {
+            font-weight: 600;
+            color: var(--airad-secondary);
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .feature-desc {
+            font-size: 13px;
+            color: var(--airad-gray);
+        }
+
+        .tier-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 13px;
+        }
+
+        .tier-table th {
+            background: var(--airad-secondary);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .tier-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .tier-table tr:nth-child(even) {
+            background: var(--airad-light);
+        }
+
+        .check-mark {
+            color: var(--airad-success);
+            font-weight: bold;
+        }
+
+        .cross-mark {
+            color: var(--airad-danger);
+            font-weight: bold;
+        }
+
+        .tip-box {
+            background: #E7F3FF;
+            border: 1px solid var(--airad-accent);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .tip-box::before {
+            content: "💡";
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 20px;
+        }
+
+        .tip-content {
+            margin-left: 35px;
+            font-size: 13px;
+        }
+
+        .warning-box {
+            background: #FFF3E0;
+            border: 1px solid var(--airad-warning);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .warning-box::before {
+            content: "⚠️";
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 20px;
+        }
+
+        .warning-content {
+            margin-left: 35px;
+            font-size: 13px;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--airad-gray);
+            border-top: 1px solid #e0e0e0;
+            padding-top: 10px;
+        }
+
+        .toc-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .toc-list li {
+            margin-bottom: 10px;
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .toc-list a {
+            color: var(--airad-secondary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc-list a:hover {
+            color: var(--airad-primary);
+        }
+
+        .toc-page {
+            float: right;
+            color: var(--airad-gray);
+            font-weight: 400;
+        }
+
+        .faq-item {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--airad-light);
+            border-radius: 8px;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            color: var(--airad-secondary);
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .faq-answer {
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        @media print {
+            .page {
+                box-shadow: none;
+                margin: 0;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+        }
+
+AirAd Vendor Portal
+
+User Manual
+
+Version 1.0
+
+February 2026
+
+                    Your complete guide to managing your business on AirAd
+
+                    Transform your local visibility with AR-powered advertising
+
+© 2026 AirAd. All rights reserved.
+
+Table of Contents
+
+Section 1 — Welcome to AirAd
+3
+
+Section 2 — Getting Started
+4
+
+Section 3 — Claiming Your Business
+6
+
+Section 4 — Subscription Plans
+8
+
+Section 5 — Managing Your Profile
+10
+
+Section 6 — Campaigns & Promotions
+12
+
+Section 7 — Voice Bot Configuration
+14
+
+Section 8 — Analytics Dashboard
+16
+
+Section 9 — AR Visibility
+18
+
+Section 10 — Account Management
+20
+
+Section 11 — Compliance & Policies
+22
+
+Section 12 — FAQs
+24
+
+Section 13 — Support
+26
+
+Page 2
+
+Section 1 — Welcome to AirAd
+
+What is AirAd?
+
+AirAd is a revolutionary local advertising platform that uses Augmented Reality (AR) technology to connect customers with businesses like yours. When customers use the AirAd mobile app, they can see your business floating in the real world through their phone camera - making you impossible to miss!
+
+Think of AirAd as your digital billboard in the sky. Instead of being lost in traditional search results, your business becomes a visible, interactive destination that customers can discover naturally as they explore their surroundings.
+
+Why Use the Vendor Portal?
+
+The AirAd Vendor Portal is your command center for managing your business presence on our platform. Through this portal, you can:
+
+🎯 Claim Your Business
+
+Verify ownership and take control of your business listing
+
+📊 Track Performance
+
+Monitor customer engagement and visibility metrics
+
+🎉 Run Promotions
+
+Create discounts, happy hours, and special offers
+
+🤖 Voice Bot Setup
+
+Configure automated customer service for your business
+
+What This Manual Covers
+
+This user manual will guide you through every aspect of using the AirAd Vendor Portal, from initial setup to advanced features. We'll cover:
+
+Creating and accessing your account
+
+Claiming and verifying your business
+
+Understanding subscription tiers and benefits
+
+Managing your business profile and information
+
+Creating promotional campaigns and discounts
+
+Setting up voice bot automation
+
+Understanding your analytics and performance data
+
+Managing your account and subscription
+
+New to AirAd?
+ Don't worry! We've designed this portal to be intuitive and user-friendly. Each section includes step-by-step instructions with helpful tips along the way.
+
+Page 3
+
+Section 2 — Getting Started
+
+Accessing the Vendor Portal
+
+The AirAd Vendor Portal is accessible through any modern web browser. Simply navigate to:
+
+                    portal.airad.com
+
+Bookmark this page for quick access to your business dashboard.
+
+Creating Your Account
+
+Getting started with AirAd is simple and takes just a few minutes:
+
+Visit portal.airad.com and click "Sign Up" in the top right corner
+
+Enter your mobile phone number - this will be your primary login method
+
+Verify your phone number with the 6-digit OTP code sent via SMS
+
+Create a secure password for your account
+
+Accept the terms of service and privacy policy
+
+Click "Create Account" to complete registration
+
+Important:
+ Use a phone number that you can access regularly. This number will be used for account verification and important notifications about your business.
+
+Logging In
+
+Once your account is created, logging in is quick and secure:
+
+Visit portal.airad.com
+
+Enter your registered phone number
+
+Request and enter the 6-digit OTP code
+
+You'll be automatically logged into your dashboard
+
+Pro Tip:
+ The OTP code expires after 10 minutes for security reasons. If you don't receive it, check your SMS folder and request a new code.
+
+Dashboard Overview
+
+After logging in, you'll see your personalized dashboard. Here's what each section does:
+
+📈 Quick Stats
+
+Your visibility score, customer views, and recent activity at a glance
+
+🎯 Claim Status
+
+Shows whether you've claimed your business or need to complete verification
+
+💳 Subscription
+
+Your current plan and quick access to upgrade options
+
+🔔 Notifications
+
+Important updates about your account and business performance
+
+Navigation Menu
+
+The left sidebar provides quick access to all portal features:
+
+Dashboard:
+ Your main overview page
+
+Profile:
+ Manage your business information
+
+Campaigns:
+ Create and manage promotions
+
+Reels:
+ Upload business video content
+
+Analytics:
+ View detailed performance metrics
+
+Voice Bot:
+ Configure automated customer service
+
+Subscription:
+ Manage your plan and billing
+
+Page 4
+
+Section 3 — Claiming Your Business
+
+Why Claim Your Business?
+
+Claiming your business verifies you as the legitimate owner and unlocks powerful features to manage your presence on AirAd. Only verified businesses can:
+
+Edit business information and photos
+
+Create promotional campaigns
+
+Access customer analytics
+
+Configure voice bot automation
+
+Upgrade to premium subscription tiers
+
+Step-by-Step Claim Process
+
+Step 1: Start the Claim Process
+
+From your dashboard, click the "Claim Your Business" button or navigate to the Profile section and select "Claim Business."
+
+Step 2: Enable Location Detection
+
+The portal will request access to your location to show nearby businesses. Click "Allow" when prompted by your browser. This helps us find businesses close to your current location.
+
+Location Accuracy:
+ For best results, enable location services while physically at your business location. This ensures the most accurate nearby listings.
+
+Step 3: Find Your Business
+
+You'll see a map and list view of businesses in your area. Use these tools to locate your business:
+
+Map View:
+ Browse businesses visually on the interactive map
+
+List View:
+ See all nearby businesses in a scrollable list
+
+Search Bar:
+ Type your business name or address for quick results
+
+Filter Options:
+ Filter by business category or distance
+
+Step 4: Initiate the Claim
+
+Once you find your business, click the "Claim This Business" button. You'll be asked to confirm this is the correct business before proceeding.
+
+Step 5: OTP Verification
+
+For security, we'll send a verification code to the business phone number on file. This ensures only legitimate business owners can claim listings.
+
+Enter the 6-digit OTP code when you receive it
+
+The code expires after 10 minutes
+
+If you don't have access to the business phone, proceed to manual verification
+
+Step 6: Manual Verification (Alternative)
+
+If you can't receive OTP verification, you can verify manually by uploading documentation:
+
+Click "Verify Manually" when OTP fails
+
+Upload one of the following documents:
+
+Business registration certificate
+
+Utility bill with business address
+
+Business license or permit
+
+Tax registration document
+
+Ensure documents are clear and show your business name and address
+
+Submit for review by our verification team
+
+Processing Time:
+ Manual verification typically takes 1-2 business days. You'll receive an email notification once your claim is approved.
+
+After Claim Approval
+
+Once your claim is verified, you'll have full control over your business listing. You can immediately:
+
+Edit business information, hours, and photos
+
+Create your first promotional campaign
+
+Access basic analytics and customer insights
+
+Upgrade to premium subscription tiers
+
+Congratulations!
+ You're now ready to maximize your business visibility on AirAd. Start by completing your business profile to attract more customers.
+
+Page 5
+
+Section 4 — Subscription Plans
+
+Understanding Subscription Tiers
+
+AirAd offers four subscription tiers designed to match your business needs and growth goals. Each tier builds upon the previous one, providing increasing visibility, control, and automation capabilities.
+
+Feature
+
+Silver
+
+Gold
+
+Diamond
+
+Platinum
+
+Monthly Price
+
+Free
+
+$29
+
+$79
+
+$199
+
+AR Visibility
+
+Base visibility
+
+20% boost
+
+50% boost
+
+100% boost
+
+Business Profile
+
+✓
+
+✓
+
+✓
+
+✓
+
+Basic Analytics
+
+✓
+
+✓
+
+✓
+
+✓
+
+Discount Campaigns
+
+✗
+
+✓
+
+✓
+
+✓
+
+Happy Hour Promotions
+
+✗
+
+✓
+
+✓
+
+✓
+
+Free Delivery Setup
+
+✗
+
+✓
+
+✓
+
+✓
+
+Hourly Analytics
+
+✗
+
+✓
+
+✓
+
+✓
+
+Voice Bot Basic
+
+✗
+
+✗
+
+✓
+
+✓
+
+Voice Bot Advanced
+
+✗
+
+✗
+
+✗
+
+✓
+
+Competitor Analytics
+
+✗
+
+✗
+
+✓
+
+✓
+
+Campaign Scheduling
+
+✗
+
+✗
+
+✓
+
+✓
+
+Priority Support
+
+✗
+
+✗
+
+✗
+
+✓
+
+Smart Automation
+
+✗
+
+✗
+
+✗
+
+✓
+
+Silver Tier (Free)
+
+Perfect for businesses new to digital advertising. Get started with basic visibility and profile management at no cost.
+
+✅ What You Get
+
+Base AR visibility, complete business profile, basic analytics dashboard
+
+🎯 Best For
+
+Small businesses testing digital advertising, startups with limited budgets
+
+Gold Tier ($29/month)
+
+Unlock promotional tools and enhanced analytics to actively grow your customer base.
+
+✅ What You Get
+
+20% visibility boost, discount campaigns, happy hours, hourly analytics
+
+🎯 Best For
+
+Growing businesses wanting to attract more customers with promotions
+
+Diamond Tier ($79/month)
+
+Advanced automation and competitor insights to establish market dominance in your area.
+
+✅ What You Get
+
+50% visibility boost, voice bot, competitor analytics, campaign scheduling
+
+🎯 Best For
+
+Established businesses wanting to optimize operations and competitive positioning
+
+Platinum Tier ($199/month)
+
+The ultimate package with maximum visibility, advanced automation, and priority support for market leaders.
+
+✅ What You Get
+
+100% visibility boost, advanced voice bot, smart automation, priority support
+
+🎯 Best For
+
+Market leaders wanting maximum visibility and complete automation
+
+How to Upgrade
+
+Upgrading your subscription is simple and secure through our Stripe integration:
+
+Navigate to the Subscription section from the sidebar
+
+Click "Upgrade Plan" on your desired tier
+
+Review the features and pricing confirmation
+
+Enter your payment details securely through Stripe
+
+Confirm your subscription - immediate activation
+
+Enjoy your new features and enhanced visibility!
+
+Flexible Billing:
+ You can upgrade, downgrade, or cancel your subscription at any time. Changes take effect at the next billing cycle.
+
+Page 6
+
+Section 5 — Managing Your Profile
+
+Your Business Profile is Your Digital Storefront
+
+Your business profile is what customers see when they discover your business on AirAd. A complete, accurate profile builds trust and attracts more customers. This section covers everything you need to know about managing your business information.
+
+Accessing Profile Management
+
+To manage your business profile:
+
+Log into your Vendor Portal dashboard
+
+Click "Profile" in the left sidebar menu
+
+You'll see all editable sections of your business profile
+
+Basic Business Information
+
+Keep your core business details accurate and up-to-date:
+
+Business Name:
+ Your official business name as customers know it
+
+Category:
+ Select the primary category that best describes your business
+
+Address:
+ Complete physical address for accurate location mapping
+
+Phone Number:
+ Main business contact number
+
+Website:
+ Your business website URL (optional)
+
+Email:
+ Customer service email address
+
+Accuracy Matters:
+ Ensure your address is precise. Customers use GPS navigation to find your business, and incorrect addresses can lead to lost customers.
+
+Business Hours
+
+Set your operating hours to let customers know when you're available:
+
+Click "Edit Business Hours" in your profile section
+
+Set opening and closing times for each day of the week
+
+Mark days when you're closed (holidays, maintenance, etc.)
+
+Add special notes for irregular hours or seasonal changes
+
+Click "Save" to update your hours immediately
+
+Customer Experience:
+ Outdated business hours frustrate customers. Update your hours promptly when they change, especially for holidays or special events.
+
+Logo and Photos
+
+Visual content helps customers recognize and trust your business:
+
+Business Logo:
+ Upload your official logo in high resolution
+
+Recommended size: 400x400 pixels
+
+Format: PNG or JPG
+
+File size: Maximum 5MB
+
+Business Photos:
+ Upload multiple photos to showcase your business
+
+Storefront/entrance photos
+
+Interior shots showing ambiance
+
+Product or service photos
+
+Team photos (optional)
+
+Drag to reorder photos - the first photo becomes your primary image
+
+Click "Save Changes" to update your visual content
+
+Photo Quality:
+ Use bright, clear photos taken during business hours. Natural lighting works best. Avoid blurry images or photos with visible watermarks.
+
+Business Description
+
+Tell customers what makes your business special:
+
+Write a compelling business description (maximum 500 characters)
+
+Highlight what makes you unique
+
+Mention your specialties or signature offerings
+
+Include any awards or recognition
+
+Use keywords customers might search for
+
+Category Tags
+
+Category tags help customers discover your business when browsing or searching:
+
+Select up to 5 relevant category tags from the predefined list
+
+Choose tags that accurately describe your products/services
+
+Consider what customers might search for when looking for businesses like yours
+
+Popular tags include: "family-friendly," "outdoor seating," "wifi," "delivery," etc.
+
+Profile Completion Tips
+
+A complete profile performs better in customer searches and builds more trust:
+
+✅ Must-Have Elements
+
+Accurate address, current hours, working phone number, business description
+
+🌟 Trust Builders
+
+Professional logo, quality photos, website link, customer reviews
+
+🎯 Discovery Boosters
+
+Relevant category tags, detailed description, special features highlighted
+
+📱 Mobile Optimization
+
+Ensure all information displays well on mobile devices
+
+Profile Score:
+ Your dashboard shows a profile completion percentage. Aim for 100% to maximize your visibility and customer trust.
+
+Saving and Publishing Changes
+
+When you make changes to your profile:
+
+Click "Save Changes" after editing any section
+
+Changes are published immediately to the AirAd platform
+
+Customers will see updated information right away
+
+You can edit your profile as often as needed
+
+Review Before Publishing:
+ Double-check all information for accuracy before saving, especially your address and phone number. Incorrect information can negatively impact customer experience.
+
+Page 7
+
+Section 6 — Campaigns & Promotions
+
+Drive Customer Engagement with Promotions
+
+Promotional campaigns are powerful tools to attract new customers and increase repeat business. Available to Gold tier and above, these features help you stand out from competitors and drive immediate action from customers.
+
+Accessing Campaign Management
+
+To create and manage your promotional campaigns:
+
+Log into your Vendor Portal dashboard
+
+Click "Campaigns" in the left sidebar menu
+
+View your active campaigns and create new ones
+
+Tier Requirement:
+ Campaign features require Gold tier subscription or higher. Upgrade your plan to unlock these powerful marketing tools.
+
+Discount Campaigns
+
+Create compelling discounts that encourage customers to choose your business:
+
+Creating a Discount Campaign
+
+Click "Create New Campaign" and select "Discount"
+
+Campaign Name:
+ Give your discount a memorable title
+
+Discount Type:
+ Choose percentage or fixed amount
+
+Percentage: "20% off entire order"
+
+Fixed amount: "$5 off minimum purchase of $25"
+
+Discount Value:
+ Set the discount amount or percentage
+
+Minimum Purchase:
+ Set a minimum order value (optional)
+
+Duration:
+ Choose campaign start and end dates
+
+Description:
+ Explain what the discount covers
+
+Click "Create Campaign" to publish
+
+Best Practices for Discounts
+
+💡 Effective Offers
+
+10-25% off or $5-10 off works best for most businesses
+
+⏰ Limited Time
+
+Create urgency with 3-7 day campaign durations
+
+📱 Clear Terms
+
+Specify exactly what the discount applies to
+
+🎯 Target Audience
+
+Consider what appeals to your ideal customers
+
+Happy Hour Promotions
+
+Set up recurring happy hour promotions to drive traffic during slower periods:
+
+Click "Create New Campaign" and select "Happy Hour"
+
+Promotion Name:
+ "Afternoon Special," "Evening Happy Hour," etc.
+
+Days of Week:
+ Select which days the happy hour applies to
+
+Time Range:
+ Set start and end times (e.g., 3:00 PM - 6:00 PM)
+
+Offer Details:
+ Describe the special (e.g., "Buy one get one free drinks")
+
+Recurring Schedule:
+ Set to repeat weekly or monthly
+
+Click "Create Happy Hour" to activate
+
+Timing Strategy:
+ Schedule happy hours during your typically slow periods to maximize their effectiveness and boost overall daily revenue.
+
+Free Delivery Configuration
+
+Attract more customers by offering free delivery within a specified area:
+
+Click "Create New Campaign" and select "Free Delivery"
+
+Delivery Radius:
+ Set the distance for free delivery (e.g., 3 miles)
+
+Minimum Order:
+ Set minimum purchase amount for free delivery
+
+Available Hours:
+ Specify when free delivery is available
+
+Delivery Instructions:
+ Add any special delivery notes for customers
+
+Click "Create Free Delivery Offer" to activate
+
+Campaign Scheduling (Diamond+)
+
+Diamond and Platinum tiers can schedule campaigns in advance:
+
+Create campaigns up to 30 days in advance
+
+Set exact start and end times down to the minute
+
+Configure recurring campaigns for regular promotions
+
+Batch create multiple campaigns at once
+
+Monitoring Active Campaigns
+
+Track the performance of your promotional campaigns:
+
+Campaign Dashboard:
+ View all active campaigns at a glance
+
+Performance Metrics:
+ Track views, taps, and conversion rates
+
+Customer Engagement:
+ See how many customers redeem offers
+
+Revenue Impact:
+ Monitor campaign ROI and revenue lift
+
+A/B Testing:
+ Compare different offers to see what works best
+
+📊 Key Metrics
+
+Views, taps, redemptions, revenue generated
+
+🎯 Optimization
+
+Use data to refine future campaign strategies
+
+Managing Campaigns
+
+Full control over your promotional campaigns:
+
+Edit Campaigns:
+ Modify details, extend duration, or update offers
+
+Pause Campaigns:
+ Temporarily halt campaigns without deleting them
+
+End Campaigns:
+ Stop campaigns before their scheduled end time
+
+Duplicate Campaigns:
+ Copy successful campaigns for quick setup
+
+Delete Campaigns:
+ Remove inactive campaigns from your dashboard
+
+Campaign Compliance Guidelines
+
+Ensure your promotions comply with platform policies:
+
+All discounts must be authentic and redeemable
+
+Clear terms and conditions for all offers
+
+No misleading or false advertising
+
+Honor all valid customer redemptions
+
+Comply with local business regulations and laws
+
+Policy Violations:
+ Misleading promotions can result in campaign removal and account suspension. Always be transparent about your offers.
+
+Success Strategy:
+ Start with simple, attractive offers and track performance. Use the data to create increasingly effective campaigns that drive real business results.
+
+Page 8
+
+Section 7 — Voice Bot Configuration
+
+Automated Customer Service 24/7
+
+Voice Bot is an intelligent automated assistant that handles customer inquiries about your business. Available to Diamond tier and above, this feature provides instant responses to common questions, improving customer satisfaction and reducing your workload.
+
+Voice Bot Benefits
+
+🕐 24/7 Availability
+
+Customers get instant answers anytime, day or night
+
+💬 Consistent Responses
+
+Every customer gets accurate, professional information
+
+⏰ Time Savings
+
+Reduce repetitive phone calls and inquiries
+
+📈 Better Service
+
+Handle more customer inquiries efficiently
+
+Accessing Voice Bot Settings
+
+To configure your voice bot:
+
+Log into your Vendor Portal dashboard
+
+Click "Voice Bot" in the left sidebar menu
+
+Configure your bot settings and responses
+
+Tier Requirement:
+ Voice Bot is available to Diamond tier and above. Upgrade your plan to unlock automated customer service.
+
+Basic Voice Bot Setup (Diamond Tier)
+
+Configure your voice bot to handle essential customer inquiries:
+
+Step 1: Basic Information
+
+Bot Name:
+ Choose a friendly name (e.g., "Business Assistant")
+
+Greeting Message:
+ Welcome message customers hear first
+
+Business Hours:
+ Set when live transfer is available
+
+Fallback Message:
+ What to say when the bot can't help
+
+Step 2: Menu Configuration
+
+Set up your voice bot menu with common customer questions:
+
+Business Hours:
+ "What are your business hours?"
+
+Location & Directions:
+ "Where are you located?"
+
+Phone Number:
+ "What's your phone number?"
+
+Services Offered:
+ "What services do you provide?"
+
+Pricing:
+ "How much do your services cost?"
+
+Current Promotions:
+ "Do you have any special offers?"
+
+Step 3: Response Writing
+
+Write clear, helpful responses for each menu item:
+
+Keep responses concise and easy to understand
+
+Use natural, conversational language
+
+Include the most important information first
+
+Provide options for customers who need more help
+
+Test responses by reading them aloud
+
+Advanced Voice Bot Features (Platinum Tier)
+
+Platinum tier unlocks advanced automation capabilities:
+
+Order Taking:
+ Accept basic orders and reservations
+
+Appointment Booking:
+ Schedule customer appointments
+
+Payment Processing:
+ Handle basic payment inquiries
+
+Inventory Updates:
+ Provide real-time product availability
+
+Multi-language Support:
+ Serve customers in multiple languages
+
+CRM Integration:
+ Connect with your customer database
+
+FAQ Configuration
+
+Set up frequently asked questions that your bot can answer automatically:
+
+Click "FAQ Configuration" in Voice Bot settings
+
+Add common questions customers ask
+
+Write clear, helpful answers for each question
+
+Organize FAQs by category (Services, Pricing, Location, etc.)
+
+Enable/disable individual FAQs as needed
+
+FAQ Best Practices:
+ Start with 10-15 most common questions. Monitor customer inquiries and add new FAQs based on what customers actually ask.
+
+Voice Bot Testing
+
+Test your voice bot before activating it for customers:
+
+Click "Test Voice Bot" in the configuration panel
+
+Use the test interface to ask questions
+
+Verify all responses are accurate and helpful
+
+Test edge cases and unclear questions
+
+Make adjustments based on test results
+
+Click "Activate" when ready to go live
+
+Monitoring Voice Bot Performance
+
+Track how well your voice bot is serving customers:
+
+Conversation Volume:
+ Number of customer interactions
+
+Success Rate:
+ Percentage of questions answered successfully
+
+Customer Satisfaction:
+ Feedback ratings from interactions
+
+Common Questions:
+ Most frequently asked topics
+
+Transfer Rate:
+ How often customers need human assistance
+
+Voice Bot Best Practices
+
+🗣️ Natural Language
+
+Write responses that sound like a helpful human
+
+📊 Regular Updates
+
+Keep information current and accurate
+
+🎯 Clear Escalation
+
+Always provide a path to human help
+
+📱 Mobile Optimization
+
+Ensure responses work well on voice interfaces
+
+Managing Your Voice Bot
+
+Keep your voice bot performing optimally:
+
+Regular Updates:
+ Update responses when business information changes
+
+Performance Review:
+ Check analytics weekly for optimization opportunities
+
+Customer Feedback:
+ Use customer input to improve responses
+
+Seasonal Adjustments:
+ Update for holidays, special events, or promotions
+
+Backup Configuration:
+ Save successful configurations for future use
+
+Customer Experience:
+ Your voice bot represents your business. Ensure all responses are professional, accurate, and helpful. Poor bot performance can damage customer trust.
+
+Page 9
+
+Section 8 — Analytics Dashboard
+
+Data-Driven Business Decisions
+
+The Analytics Dashboard provides valuable insights into how customers discover and interact with your business on AirAd. Understanding these metrics helps you make informed decisions to improve your marketing strategy and grow your customer base.
+
+Accessing Analytics
+
+To view your business analytics:
+
+Log into your Vendor Portal dashboard
+
+Click "Analytics" in the left sidebar menu
+
+View your performance data and insights
+
+Analytics by Subscription Tier
+
+Different analytics features are available based on your subscription tier:
+
+Analytics Feature
+
+Silver
+
+Gold
+
+Diamond
+
+Platinum
+
+Basic Visibility Metrics
+
+✓
+
+✓
+
+✓
+
+✓
+
+Customer Views & Taps
+
+✓
+
+✓
+
+✓
+
+✓
+
+Hourly Analytics
+
+✗
+
+✓
+
+✓
+
+✓
+
+Campaign Performance
+
+✗
+
+✓
+
+✓
+
+✓
+
+Competitor Analytics
+
+✗
+
+✗
+
+✓
+
+✓
+
+Customer Demographics
+
+✗
+
+✗
+
+✗
+
+✓
+
+Advanced Insights
+
+✗
+
+✗
+
+✗
+
+✓
+
+Basic Analytics (All Tiers)
+
+Essential metrics available to all subscribers:
+
+Visibility Score:
+ How often your business appears in customer searches
+
+Score: 0-100 (higher = more visible)
+
+Factors: profile completion, tier level, activity
+
+Goal: Maintain 80+ for optimal visibility
+
+Customer Views:
+ How many customers viewed your business profile
+
+Daily, weekly, and monthly totals
+
+Trend lines showing growth over time
+
+Comparison to previous periods
+
+Profile Taps:
+ Customer interactions with your business listing
+
+Phone calls initiated
+
+Website clicks
+
+Direction requests
+
+Discovery Sources:
+ How customers find your business
+
+AR discovery (camera view)
+
+Map browsing
+
+Search results
+
+Category browsing
+
+Hourly Analytics (Gold+)
+
+Detailed time-based insights to optimize your business operations:
+
+Peak Hours:
+ When customers are most active
+
+Hour-by-hour customer activity
+
+Best times for promotions
+
+Staffing optimization insights
+
+Daily Patterns:
+ Customer behavior by day of week
+
+Busiest vs. slowest days
+
+Weekend vs. weekday patterns
+
+Seasonal trends
+
+Time to Conversion:
+ How long from discovery to action
+
+Immediate actions vs. delayed
+
+Optimal follow-up timing
+
+Customer journey insights
+
+Campaign Analytics (Gold+)
+
+Measure the effectiveness of your promotional campaigns:
+
+Campaign Reach:
+ How many customers saw your promotions
+
+Engagement Rate:
+ Percentage of viewers who took action
+
+Conversion Rate:
+ Customers who redeemed offers
+
+Revenue Impact:
+ Additional revenue generated
+
+ROI Calculation:
+ Return on investment for each campaign
+
+A/B Testing:
+ Compare different campaign approaches
+
+Competitor Analytics (Diamond+)
+
+Understand your competitive position in the local market:
+
+Market Share:
+ Your visibility compared to competitors
+
+Competitor Ranking:
+ How you rank against similar businesses
+
+Competitor Activity:
+ What promotions competitors are running
+
+Customer Preferences:
+ What customers choose in your area
+
+Opportunity Gaps:
+ Underserved customer needs you can address
+
+Competitive Intelligence:
+ Use competitor data to identify opportunities and differentiate your business from others in your area.
+
+Advanced Insights (Platinum)
+
+Deep analytics for strategic business planning:
+
+Customer Demographics:
+ Age, gender, and location data
+
+Behavioral Patterns:
+ How customers interact with your business
+
+Predictive Analytics:
+ Forecast future customer trends
+
+Market Analysis:
+ Local market trends and opportunities
+
+Custom Reports:
+ Tailored analytics for your specific needs
+
+Using Analytics to Grow Your Business
+
+Turn data into actionable insights:
+
+📈 Visibility Optimization
+
+Improve your profile based on visibility score factors
+
+⏰ Timing Strategy
+
+Schedule promotions during peak customer hours
+
+🎯 Campaign Refinement
+
+Use performance data to create better offers
+
+🏆 Competitive Positioning
+
+Differentiate based on competitor weaknesses
+
+Analytics Best Practices
+
+Get the most value from your analytics data:
+
+Regular Review:
+ Check analytics weekly for trends and insights
+
+Set Goals:
+ Establish targets for key metrics
+
+Track Changes:
+ Monitor impact of business decisions on performance
+
+Compare Periods:
+ Look at month-over-month and year-over-year trends
+
+Act on Insights:
+ Use data to inform business strategy and decisions
+
+Data Privacy:
+ All analytics data is anonymized and aggregated. No individual customer information is shared, complying with privacy regulations.
+
+Pro Tip:
+ Download analytics reports for your records and share with your team. Use historical data to identify seasonal patterns and plan accordingly.
+
+Page 10
+
+Section 9 — AR Visibility
+
+How Your Business Appears in Augmented Reality
+
+Augmented Reality (AR) is AirAd's signature feature that makes your business visible to customers through their smartphone cameras. When customers use the AirAd app, they see your business floating in the real world - making you impossible to miss and creating a memorable discovery experience.
+
+How AR Visibility Works
+
+Understanding the technology behind your AR presence:
+
+Location Detection:
+ Customer's phone GPS determines their position
+
+Camera View:
+ Phone camera shows the real world through the screen
+
+Business Overlay:
+ Your business appears as a floating bubble/label
+
+Distance-Based:
+ Businesses appear based on proximity to customer
+
+Interactive Elements:
+ Customers can tap to learn more about your business
+
+Navigation Integration:
+ Direct path to your business location
+
+AR Visibility Tiers
+
+Your subscription tier determines how prominently your business appears in AR:
+
+Visibility Feature
+
+Silver
+
+Gold
+
+Diamond
+
+Platinum
+
+Base Visibility Range
+
+500 meters
+
+600 meters
+
+750 meters
+
+1,000 meters
+
+AR Ranking Multiplier
+
+1.0x
+
+1.2x
+
+1.5x
+
+2.0x
+
+Bubble Size
+
+Standard
+
+Large
+
+Extra Large
+
+Premium
+
+Priority Display
+
+✗
+
+✗
+
+✓
+
+✓
+
+Custom Branding
+
+✗
+
+✗
+
+✗
+
+✓
+
+Animated Effects
+
+✗
+
+✗
+
+✗
+
+✓
+
+Visibility Ranking Factors
+
+Multiple factors determine how prominently your business appears in AR:
+
+Subscription Tier:
+ Higher tiers get priority placement
+
+Platinum businesses appear first
+
+Diamond businesses appear second
+
+Gold businesses appear third
+
+Silver businesses appear last
+
+Profile Completion:
+ Complete profiles rank higher
+
+100% completion gets maximum boost
+
+Missing information reduces visibility
+
+Regular updates maintain ranking
+
+Customer Engagement:
+ Popular businesses get boosted
+
+High view/tap rates improve ranking
+
+Positive customer feedback helps
+
+Active campaigns increase visibility
+
+Business Activity:
+ Active businesses rank higher
+
+Regular profile updates
+
+Active promotional campaigns
+
+Recent customer interactions
+
+Location Relevance:
+ Proximity to searching customers
+
+Distance from customer
+
+Customer's search preferences
+
+Time of day and business hours
+
+Improving Your AR Visibility
+
+Strategies to increase your business prominence in AR:
+
+📊 Complete Your Profile
+
+Fill in all business information for maximum ranking boost
+
+🎯 Run Promotions
+
+Active campaigns increase your visibility score
+
+📈 Upgrade Tier
+
+Higher tiers get significant visibility advantages
+
+⏰ Stay Active
+
+Regular updates keep your business relevant
+
+AR Bubble Customization
+
+How your business appears to customers in AR:
+
+Business Name:
+ Your primary business identifier
+
+Category Icon:
+ Visual representation of your business type
+
+Distance Indicator:
+ How far you are from the customer
+
+Status Badge:
+ Open/closed status and current promotions
+
+Rating Display:
+ Customer ratings and reviews (if available)
+
+Call-to-Action:
+ Quick actions like "Call" or "Get Directions"
+
+Premium AR Features (Platinum)
+
+Platinum tier unlocks exclusive AR enhancements:
+
+Custom Branding:
+ Your logo and brand colors in AR bubbles
+
+Animated Effects:
+ Eye-catching animations to attract attention
+
+Extended Range:
+ Visible from up to 1km away
+
+Priority Placement:
+ Always appear before lower-tier businesses
+
+Special Badges:
+ "Premium Partner" and other exclusive indicators
+
+Enhanced Interactions:
+ Rich media and interactive elements
+
+Customer AR Experience
+
+What customers see and how they interact with your business:
+
+Customer opens AirAd app and enables AR mode
+
+Your business appears as a floating bubble in their camera view
+
+Customer can see your distance and basic information
+
+Tapping your bubble reveals detailed business information
+
+Customer can call, get directions, or view promotions
+
+Navigation guides them directly to your location
+
+AR Visibility Best Practices
+
+Maximize your AR presence with these strategies:
+
+Accurate Location:
+ Ensure your business address is precise for proper AR placement
+
+Visual Identity:
+ Use a clear, recognizable logo for instant recognition
+
+Compelling Offers:
+ Promotions visible in AR attract more customer attention
+
+Regular Updates:
+ Keep information fresh to maintain high visibility rankings
+
+Customer Engagement:
+ Encourage customers to interact with your AR presence
+
+AR Advantage:
+ AR visibility gives you a significant competitive advantage. Businesses that appear in AR get 3-5x more customer engagement than those that don't.
+
+Measuring AR Performance
+
+Track how customers discover you through AR:
+
+AR Views:
+ How many customers see your business in AR
+
+AR Interactions:
+ Taps and engagements from AR discovery
+
+AR Conversions:
+ Customers who visit after AR discovery
+
+AR ROI:
+ Return on investment from AR visibility
+
+Location Accuracy:
+ Incorrect GPS coordinates can make your business appear in the wrong AR location. Double-check your address and location settings regularly.
+
+Page 11
+
+Section 10 — Account Management
+
+Managing Your AirAd Account
+
+Your account settings give you control over your security, notifications, and subscription management. This section covers everything you need to know about maintaining your account and optimizing your AirAd experience.
+
+Accessing Account Settings
+
+To manage your account settings:
+
+Log into your Vendor Portal dashboard
+
+Click your profile name in the top right corner
+
+Select "Account Settings" from the dropdown menu
+
+View and modify your account preferences
+
+Security Settings
+
+Keep your account secure with these essential security features:
+
+Password Management
+
+Click "Security" in the account settings menu
+
+Select "Change Password"
+
+Enter your current password for verification
+
+Create a new strong password (8+ characters, mixed case, numbers)
+
+Confirm the new password
+
+Click "Update Password" to save changes
+
+Password Security:
+ Use a unique password for AirAd that you don't use for other services. Consider using a password manager for maximum security.
+
+Two-Factor Authentication
+
+Add an extra layer of security to your account:
+
+Click "Enable 2FA" in security settings
+
+Download an authenticator app (Google Authenticator, Authy, etc.)
+
+Scan the QR code with your authenticator app
+
+Enter the 6-digit code to verify setup
+
+Save backup codes in a secure location
+
+Login History
+
+Monitor who has access to your account:
+
+View recent login attempts with timestamps
+
+See IP addresses and device types
+
+Identify any suspicious activity
+
+Log out of all sessions if needed
+
+Notification Preferences
+
+Control how and when you receive notifications:
+
+Email Notifications
+
+Customer Interactions:
+ New views, taps, and messages
+
+Campaign Updates:
+ Performance alerts and milestones
+
+Account Changes:
+ Security alerts and important updates
+
+Subscription Billing:
+ Payment confirmations and renewals
+
+Platform News:
+ New features and service updates
+
+SMS Notifications
+
+Urgent Alerts:
+ Security issues and account problems
+
+Campaign Milestones:
+ Major performance achievements
+
+Customer Urgent:
+ Time-sensitive customer inquiries
+
+In-App Notifications
+
+Real-time Updates:
+ Live customer activity
+
+System Messages:
+ Platform updates and maintenance
+
+Performance Insights:
+ Analytics highlights and trends
+
+Subscription Management
+
+Full control over your subscription plan and billing:
+
+Current Plan Overview
+
+Plan Name:
+ Your current subscription tier
+
+Monthly Cost:
+ Current billing amount
+
+Billing Date:
+ Next payment due date
+
+Features Used:
+ Active features and benefits
+
+Usage Statistics:
+ How you're utilizing your plan
+
+Upgrading Your Plan
+
+Click "Upgrade Plan" in subscription settings
+
+Select your desired tier from available options
+
+Review new features and pricing
+
+Enter payment information through secure Stripe checkout
+
+Confirm upgrade - immediate activation
+
+Receive confirmation and enjoy new features
+
+Downgrading Your Plan
+
+Click "Change Plan" in subscription settings
+
+Select a lower tier if available
+
+Review features you'll lose after downgrade
+
+Confirm downgrade - takes effect next billing cycle
+
+Download any data you'll lose access to
+
+Downgrade Impact:
+ Downgrading will remove access to premium features at your next billing date. Download important data before the downgrade takes effect.
+
+Canceling Your Subscription
+
+Click "Cancel Subscription" in billing settings
+
+Review cancellation terms and data retention policy
+
+Provide cancellation reason (optional but helpful)
+
+Confirm cancellation - continues until end of billing period
+
+Export your business data before access ends
+
+Billing Management
+
+Manage your payment methods and billing history:
+
+Payment Methods:
+ Add, remove, or update credit cards
+
+Billing History:
+ View all past invoices and payments
+
+Download Invoices:
+ Get PDF copies for your records
+
+Tax Information:
+ Update business tax details
+
+Billing Address:
+ Keep contact information current
+
+Data Management
+
+Control your business data and privacy:
+
+Export Data:
+ Download all your business information
+
+Delete Account:
+ Permanently remove your account and data
+
+Privacy Settings:
+ Control data sharing preferences
+
+GDPR Rights:
+ Exercise data protection rights
+
+Account Best Practices
+
+🔐 Regular Security
+
+Update passwords and enable 2FA
+
+📧 Monitor Emails
+
+Watch for important account notifications
+
+💳 Billing Awareness
+
+Track subscription costs and renewal dates
+
+📊 Data Backup
+
+Regularly export important business data
+
+Getting Help with Account Issues
+
+If you encounter account-related problems:
+
+Password Reset:
+ Use "Forgot Password" on login page
+
+2FA Issues:
+ Use backup codes or contact support
+
+Billing Questions:
+ Check billing history or contact billing support
+
+Technical Problems:
+ Clear browser cache and try again
+
+Account Lock:
+ Contact support for assistance
+
+Account Security:
+ Never share your login credentials with anyone. AirAd staff will never ask for your password.
+
+Page 12
+
+Section 11 — Compliance & Policies
+
+Maintaining a Trusted Platform
+
+AirAd is committed to maintaining a safe, trustworthy platform for both businesses and customers. These policies ensure fair competition, authentic business practices, and a positive experience for everyone. Your compliance helps build trust and benefits the entire AirAd community.
+
+Business Listing Requirements
+
+All business listings must meet these standards:
+
+Legitimate Business:
+ Must be a legally registered business
+
+Valid business registration or license
+
+Physical business location (no PO boxes)
+
+Active business operations
+
+Accurate Information:
+ All business details must be truthful
+
+Correct business name and address
+
+Accurate business hours
+
+Real phone number and contact information
+
+Actual services and products offered
+
+Appropriate Category:
+ Must select correct business category
+
+Category must match primary business activity
+
+No category spamming or misrepresentation
+
+Services listed must be actually offered
+
+Quality Visuals:
+ Photos and logos must be professional
+
+Clear, high-quality images
+
+Actual business photos (no stock images)
+
+Appropriate content for all audiences
+
+Promotional Campaign Guidelines
+
+All promotional campaigns must follow these rules:
+
+Authentic Offers:
+ All discounts must be genuine and redeemable
+
+No fake or misleading discounts
+
+Honor all valid customer redemptions
+
+Clear terms and conditions
+
+No hidden restrictions or fees
+
+Truthful Advertising:
+ All claims must be accurate
+
+No false statements about products/services
+
+Accurate pricing and availability
+
+No bait-and-switch tactics
+
+Honest descriptions of offerings
+
+Fair Competition:
+ Campaigns must be ethical
+
+No false claims about competitors
+
+No misleading comparisons
+
+Respect trademark and copyright laws
+
+No deceptive marketing practices
+
+Legal Compliance:
+ Follow all applicable laws
+
+Consumer protection laws
+
+Advertising regulations
+
+Industry-specific requirements
+
+Local business ordinances
+
+Prohibited Business Types
+
+The following business types are not permitted on AirAd:
+
+Illegal Activities:
+ Any business operating illegally
+
+Unlicensed operations
+
+Prohibited goods or services
+
+Businesses violating local laws
+
+Harmful Content:
+ Businesses promoting harmful activities
+
+Hate speech or discrimination
+
+Violence or illegal content
+
+Adult entertainment (where restricted)
+
+Scams and Fraud:
+ Deceptive or fraudulent businesses
+
+Pyramid schemes
+
+Advance fee fraud
+
+Fake investment opportunities
+
+Regulated Industries:
+ Businesses requiring special licensing
+
+Medical services (without proper licensing)
+
+Financial services (without regulatory approval)
+
+Legal services (without bar admission)
+
+Content Standards
+
+All content on your business listing must meet these standards:
+
+Professional Language:
+ Business-appropriate communication
+
+No Offensive Content:
+ Respectful and inclusive language
+
+Accurate Representations:
+ Truthful descriptions and images
+
+Copyright Compliance:
+ Use only content you have rights to
+
+Privacy Respect:
+ No sharing of private customer information
+
+Customer Interaction Policies
+
+How you interact with customers through AirAd:
+
+Timely Responses:
+ Respond to customer inquiries promptly
+
+Professional Communication:
+ Maintain courteous business communication
+
+No Spam:
+ Don't send unsolicited marketing messages
+
+Privacy Protection:
+ Safeguard customer contact information
+
+Service Quality:
+ Deliver promised products and services
+
+Violation Consequences
+
+Failure to comply with policies may result in:
+
+Warning Notices:
+ Formal notification of policy violations
+
+Content Removal:
+ Removal of non-compliant content
+
+Campaign Suspension:
+ Temporary suspension of promotional features
+
+Listing Suspension:
+ Temporary removal from the platform
+
+Account Termination:
+ Permanent removal from AirAd
+
+Legal Action:
+ Referral to authorities for serious violations
+
+Zero Tolerance:
+ AirAd has zero tolerance for fraud, illegal activities, or deliberate deception. Such violations result in immediate and permanent account termination.
+
+Reporting Violations
+
+Help maintain platform integrity by reporting violations:
+
+Customer Reports:
+ Customers can report suspicious businesses
+
+Business Reports:
+ Businesses can report competitor violations
+
+Automated Detection:
+ AI systems detect potential violations
+
+Manual Review:
+ Human review team investigates reports
+
+Confidential Reporting:
+ Anonymous reporting options available
+
+Appeals Process
+
+If you believe a violation determination is incorrect:
+
+Review the specific violation details provided
+
+Gather evidence supporting your case
+
+Submit an appeal through the account dashboard
+
+Include all relevant documentation and explanations
+
+Wait for review by the appeals team (typically 3-5 business days)
+
+Receive final decision and next steps
+
+Compliance Best Practices
+
+📋 Regular Reviews
+
+Periodically review your listing for compliance
+
+📚 Stay Informed
+
+Keep up with policy updates and changes
+
+🎯 Honest Marketing
+
+Always be truthful in your promotions
+
+🤝 Customer Focus
+
+Prioritize customer satisfaction and trust
+
+Legal and Regulatory Compliance
+
+Beyond AirAd policies, ensure compliance with:
+
+Local Business Laws:
+ Municipal and state regulations
+
+Industry Regulations:
+ Specific requirements for your business type
+
+Consumer Protection:
+ Laws protecting customer rights
+
+Advertising Standards:
+ Truth in advertising requirements
+
+Data Protection:
+ Privacy laws and data handling requirements
+
+Compliance is Everyone's Responsibility:
+ Following these policies not only keeps your account in good standing but also helps create a trustworthy platform that benefits all businesses and customers.
+
+Page 13
+
+Section 12 — FAQs
+
+Frequently Asked Questions
+
+Find quick answers to the most common questions about using the AirAd Vendor Portal. These FAQs cover everything from getting started to advanced features.
+
+1. How do I get started with AirAd?
+
+                    Getting started is easy! Visit portal.airad.com, create an account with your phone number, and follow the step-by-step process to claim your business. The entire setup takes about 10-15 minutes.
+
+2. Is AirAd really free to use?
+
+                    Yes! AirAd offers a free Silver tier that includes basic business listing, profile management, and fundamental analytics. Premium features like promotional campaigns and voice bot automation require paid subscriptions starting at $29/month.
+
+3. How does the AR visibility work?
+
+                    When customers use the AirAd mobile app, they can see your business through their phone camera as a floating bubble in the real world. This makes your business impossible to miss and creates an engaging discovery experience.
+
+4. What if I can't receive OTP verification for my business claim?
+
+                    If you can't access the business phone number, you can use manual verification. Upload business documents like registration certificates, utility bills, or business licenses. Our team typically reviews these within 1-2 business days.
+
+5. Can I change my subscription tier anytime?
+
+                    Absolutely! You can upgrade, downgrade, or cancel your subscription at any time. Upgrades take effect immediately, while downgrades and cancellations take effect at your next billing cycle.
+
+6. How do promotional campaigns work?
+
+                    Create discounts, happy hours, or free delivery offers through the Campaigns section. Set your offer details, duration, and terms. Customers see these promotions when they discover your business and can redeem them directly.
+
+7. What is Voice Bot and how does it help my business?
+
+                    Voice Bot is an automated assistant that handles customer inquiries 24/7. It answers common questions about your business hours, location, services, and current promotions, reducing your workload while improving customer service.
+
+8. How accurate are the analytics?
+
+                    Our analytics provide real-time insights into customer behavior, including views, interactions, and campaign performance. Data is anonymized and aggregated to protect customer privacy while giving you actionable business intelligence.
+
+9. Can I have multiple business locations?
+
+                    Yes, you can manage multiple business locations from a single account. Each location needs to be claimed separately, and you can choose different subscription tiers for each location based on your needs.
+
+10. How do I improve my AR visibility ranking?
+
+                    Improve your ranking by completing your business profile, running promotional campaigns, upgrading your subscription tier, and maintaining regular activity. Higher-tier businesses get priority placement in AR views.
+
+11. What happens if a customer has a bad experience with my business?
+
+                    Customers can provide feedback through the app. Address issues promptly and professionally. Consistently poor customer experiences may affect your visibility ranking and could lead to account review.
+
+12. Is my business data secure on AirAd?
+
+                    Yes, we use industry-standard security measures including encryption, secure servers, and regular security audits. Your data is protected and never shared with third parties without your explicit consent.
+
+13. Can I export my business data?
+
+                    Yes, you can export all your business data including analytics, customer interactions, and campaign performance at any time through your account settings. This ensures you always have access to your valuable business information.
+
+14. What kind of support is available?
+
+                    Silver tier gets email support, Gold tier adds priority email support, Diamond tier includes chat support, and Platinum tier provides priority phone support. Response times vary by tier from 24-48 hours for Silver to under 2 hours for Platinum.
+
+15. How do I cancel my account?
+
+                    You can cancel your subscription through account settings. Your subscription continues until the end of your billing period, after which you'll lose access to premium features. You can export your data before cancellation to keep your business information.
+
+Technical Support FAQs
+
+16. Why isn't my business appearing in AR?
+
+                    Check that your address is accurate, your business is verified, and you have an active subscription. Also ensure your profile is complete and your business hours are current. Technical issues are rare but can be reported to support.
+
+17. What browsers are supported for the Vendor Portal?
+
+                    The Vendor Portal works best on modern browsers including Chrome, Firefox, Safari, and Edge. For the best experience, keep your browser updated to the latest version and enable JavaScript.
+
+18. How do I report bugs or technical issues?
+
+                    Report technical issues through the support section of your account dashboard. Include details about your browser, device, and steps to reproduce the issue. Screenshots are helpful for faster resolution.
+
+Billing and Payment FAQs
+
+19. What payment methods do you accept?
+
+                    We accept all major credit cards through our secure Stripe payment processor. Payment information is encrypted and never stored on our servers. You can update your payment method anytime in account settings.
+
+20. Can I get a refund if I'm not satisfied?
+
+                    We offer a 30-day money-back guarantee for new subscriptions. If you're not satisfied with the service, contact support within 30 days of your first payment for a full refund.
+
+21. Are there any hidden fees?
+
+                    No hidden fees! The price you see is the price you pay. All features included in your subscription tier are available at no additional cost. Optional add-ons or custom services are clearly priced before purchase.
+
+Still Have Questions?
+
+If you don't find your answer here, our support team is ready to help! Contact us through:
+
+Email Support:
+ support@airad.com
+
+In-App Support:
+ Help section in your dashboard
+
+Knowledge Base:
+ Detailed articles and tutorials
+
+Community Forum:
+ Connect with other business owners
+
+Pro Tip:
+ Bookmark this FAQ section for quick reference. We regularly update FAQs based on common questions from our business community.
+
+Page 14
+
+Section 13 — Support
+
+We're Here to Help You Succeed
+
+AirAd provides comprehensive support to ensure you get maximum value from our platform. From technical assistance to strategic guidance, our support team is dedicated to helping your business thrive with AR-powered advertising.
+
+Support Tiers by Subscription Level
+
+Different levels of support are available based on your subscription tier:
+
+Support Feature
+
+Silver
+
+Gold
+
+Diamond
+
+Platinum
+
+Email Support
+
+✓
+
+✓
+
+✓
+
+✓
+
+Response Time
+
+24-48 hours
+
+12-24 hours
+
+4-8 hours
+
+Under 2 hours
+
+Priority Email
+
+✗
+
+✓
+
+✓
+
+✓
+
+Live Chat Support
+
+✗
+
+✗
+
+✓
+
+✓
+
+Phone Support
+
+✗
+
+✗
+
+✗
+
+✓
+
+Dedicated Account Manager
+
+✗
+
+✗
+
+✗
+
+✓
+
+Strategy Sessions
+
+✗
+
+✗
+
+✗
+
+✓
+
+Contacting Support
+
+Multiple ways to get the help you need:
+
+Email Support
+
+General Support:
+ support@airad.com
+
+Billing Questions:
+ billing@airad.com
+
+Technical Issues:
+ tech@airad.com
+
+Policy Violations:
+ compliance@airad.com
+
+Partnership Inquiries:
+ partners@airad.com
+
+Email Tips:
+ Include your business name, account email, and detailed description of your issue. Screenshots help us resolve problems faster.
+
+In-App Support
+
+Quick access to help directly from your dashboard:
+
+Click the "Help" button in the bottom right corner
+
+Choose your issue type from the categories
+
+Browse relevant help articles or contact support
+
+Track your support tickets and responses
+
+Access frequently asked questions and guides
+
+Live Chat Support (Diamond+)
+
+Real-time assistance for urgent issues:
+
+Available Monday-Friday, 9 AM - 6 PM local time
+
+Instant responses from trained support specialists
+
+Screen sharing for technical troubleshooting
+
+Follow-up email summaries of chat conversations
+
+Phone Support (Platinum)
+
+Direct phone access for priority assistance:
+
+Priority Hotline:
+ Available 24/7 for Platinum members
+
+Direct Line:
+ Skip the queue with dedicated support number
+
+Expert Assistance:
+ Senior support specialists for complex issues
+
+Callback Service:
+ Schedule calls at your convenience
+
+Self-Service Resources
+
+Find answers quickly with our comprehensive resources:
+
+Knowledge Base:
+ 200+ detailed articles and tutorials
+
+Video Library:
+ Step-by-step video guides for all features
+
+Best Practices:
+ Industry-specific tips and strategies
+
+API Documentation:
+ Technical documentation for developers
+
+Community Forum:
+ Connect with other business owners
+
+Premium Support Services (Platinum)
+
+Exclusive support benefits for Platinum members:
+
+Dedicated Account Manager:
+ Single point of contact for all needs
+
+Monthly Strategy Sessions:
+ Business growth consulting
+
+Performance Reviews:
+ Detailed analytics and optimization
+
+Early Feature Access:
+ Beta testing new features
+
+Custom Training:
+ Team training sessions
+
+Priority Bug Fixes:
+ Expedited resolution of technical issues
+
+Support Response Times
+
+When to expect responses based on tier and issue type:
+
+Issue Type
+
+Silver
+
+Gold
+
+Diamond
+
+Platinum
+
+General Questions
+
+48 hours
+
+24 hours
+
+8 hours
+
+2 hours
+
+Technical Issues
+
+72 hours
+
+48 hours
+
+24 hours
+
+4 hours
+
+Billing Inquiries
+
+24 hours
+
+12 hours
+
+6 hours
+
+1 hour
+
+Urgent Issues
+
+72 hours
+
+48 hours
+
+12 hours
+
+Immediate
+
+Emergency Support
+
+For critical issues affecting your business operations:
+
+Account Compromise:
+ emergency@airad.com
+
+Service Outage:
+ status@airad.com
+
+Legal Issues:
+ legal@airad.com
+
+Security Concerns:
+ security@airad.com
+
+Emergency Contacts:
+ Use emergency channels only for true emergencies affecting business operations or security. Regular inquiries should use standard support channels.
+
+Support Best Practices
+
+📋 Be Specific
+
+Provide detailed information about your issue
+
+🖼️ Include Screenshots
+
+Visual context helps resolve issues faster
+
+⏰ Plan Ahead
+
+Contact support before urgent deadlines
+
+📚 Check Resources
+
+Review knowledge base before contacting support
+
+Feedback and Suggestions
+
+Help us improve AirAd with your feedback:
+
+Feature Requests:
+ feedback@airad.com
+
+Bug Reports:
+ bugs@airad.com
+
+User Experience:
+ ux@airad.com
+
+General Feedback:
+ hello@airad.com
+
+Community and Networking
+
+Connect with other AirAd business owners:
+
+Community Forum:
+ Share experiences and tips
+
+Local Meetups:
+ Network with nearby businesses
+
+Webinars:
+ Educational sessions and training
+
+Success Stories:
+ Learn from other businesses' strategies
+
+Community Power:
+ The AirAd community is one of your most valuable resources. Engage with other business owners to share insights and learn from their experiences.
+
+Support Commitment
+
+Our support team is committed to your success. We promise:
+
+Professional, courteous assistance
+
+Accurate, helpful information
+
+Timely responses based on your tier
+
+Follow-up until issues are resolved
+
+Continuous improvement based on your feedback
+
+Page 15
+
+Thank You!
+
+You're now equipped to maximize your business visibility with AirAd!
+
+Transform how customers discover your business through the power of Augmented Reality.
+
+🚀 Get Started
+
+Complete your profile and claim your business today
+
+📈 Grow Your Business
+
+Use analytics and campaigns to drive customer engagement
+
+🤖 Automate Success
+
+Let voice bot handle customer inquiries 24/7
+
+🌟 Stand Out
+
+Leverage AR visibility to dominate your local market
+
+Questions? Need Help?
+
+Email us at: 
+support@airad.com
+
+Visit our knowledge base: 
+help.airad.com
+
+Connect With Us
+
+Website: portal.airad.com
+
+Email: hello@airad.com
+
+Phone: 1-800-AIRAD-01
+
+Social: @AirAdPlatform
+
+© 2026 AirAd. All rights reserved. | Version 1.0 | February 2026

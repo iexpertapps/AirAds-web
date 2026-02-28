@@ -1,0 +1,259 @@
+# =============================================================================
+# AirAd — DigitalOcean App Platform Spec
+# =============================================================================
+# Template for creating DO apps. Create 3 apps from this template:
+#   1. airaad-dev      (branch: develop,  instance: basic-xxs)
+#   2. airaad-staging   (branch: staging,  instance: basic-xs)
+#   3. airaad-prod      (branch: main,     instance: professional-xs)
+#
+# Usage:
+#   doctl apps create --spec .do/app.yaml
+#   doctl apps update <app-id> --spec .do/app.yaml
+#
+# IMPORTANT: deploy_on_push is FALSE — deployments are triggered by GitLab CI
+# only after all tests pass.
+#
+# PostGIS Note: Dev databases may not support PostGIS. For all environments,
+# use a Managed Database cluster with PostGIS enabled, then set DATABASE_URL
+# as an app-level environment variable instead of using ${db.DATABASE_URL}.
+# =============================================================================
+
+name: airaad-dev
+# Change per environment: airaad-dev | airaad-staging | airaad-prod
+region: nyc
+# Available: nyc, sfo, ams, lon, fra, sgp, blr, tor, syd
+
+# ---------------------------------------------------------------------------
+# Backend — Django + Gunicorn (Dockerfile-based)
+# ---------------------------------------------------------------------------
+services:
+  - name: backend
+    gitlab:
+      repo: iexpertapps-group/AirAds-web
+      branch: develop
+      # Change per env: develop | staging | main
+      deploy_on_push: false
+    dockerfile_path: airaad/backend/Dockerfile
+    source_dir: airaad/backend
+    http_port: 8000
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    # Dev: basic-xxs ($5/mo) | Staging: basic-xs ($10/mo) | Prod: professional-xs ($12/mo)
+    routes:
+      - path: /api
+    health_check:
+      http_path: /api/v1/health/
+      initial_delay_seconds: 30
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+    envs:
+      # --- Core Django ---
+      - key: DJANGO_SETTINGS_MODULE
+        scope: RUN_TIME
+        value: config.settings.production
+      - key: ALLOWED_HOSTS
+        scope: RUN_TIME
+        value: .ondigitalocean.app
+        # Prod: add your custom domain e.g. ".airaad.com,.ondigitalocean.app"
+      - key: SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+        # Set via DO Dashboard or: doctl apps update <id> --spec ...
+      - key: ENCRYPTION_KEY
+        scope: RUN_TIME
+        type: SECRET
+      # --- Database (set manually if using Managed DB for PostGIS) ---
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        type: SECRET
+        # Format: postgis://user:pass@host:25060/dbname?sslmode=require
+      # --- Redis ---
+      - key: REDIS_URL
+        scope: RUN_TIME
+        type: SECRET
+        # Format: rediss://default:pass@host:25061/0
+      - key: CELERY_BROKER_URL
+        scope: RUN_TIME
+        type: SECRET
+      - key: CELERY_RESULT_BACKEND
+        scope: RUN_TIME
+        type: SECRET
+      # --- AWS S3 ---
+      - key: AWS_ACCESS_KEY_ID
+        scope: RUN_TIME
+        type: SECRET
+      - key: AWS_SECRET_ACCESS_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: AWS_STORAGE_BUCKET_NAME
+        scope: RUN_TIME
+        value: airaad-media-dev
+      - key: AWS_S3_REGION_NAME
+        scope: RUN_TIME
+        value: us-east-1
+      # --- Stripe ---
+      - key: STRIPE_SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: STRIPE_PUBLISHABLE_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: STRIPE_WEBHOOK_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: STRIPE_PRICE_GOLD
+        scope: RUN_TIME
+        value: ""
+      - key: STRIPE_PRICE_DIAMOND
+        scope: RUN_TIME
+        value: ""
+      - key: STRIPE_PRICE_PLATINUM
+        scope: RUN_TIME
+        value: ""
+      # --- Twilio SMS ---
+      - key: TWILIO_ACCOUNT_SID
+        scope: RUN_TIME
+        type: SECRET
+      - key: TWILIO_AUTH_TOKEN
+        scope: RUN_TIME
+        type: SECRET
+      - key: TWILIO_PHONE_NUMBER
+        scope: RUN_TIME
+        value: ""
+      # --- CORS ---
+      - key: CORS_ALLOWED_ORIGINS
+        scope: RUN_TIME
+        value: ""
+        # Prod: https://airaad.com,https://www.airaad.com
+      - key: FRONTEND_URL
+        scope: RUN_TIME
+        value: ${APP_URL}
+      # --- Misc ---
+      - key: NUM_PROXIES
+        scope: RUN_TIME
+        value: "1"
+      - key: MANUAL_OTP_CODE
+        scope: RUN_TIME
+        value: "005261"
+        # Clear this in production when Twilio is configured
+      - key: DEBUG
+        scope: RUN_TIME
+        value: "False"
+
+# ---------------------------------------------------------------------------
+# Celery Worker — background task processing
+# ---------------------------------------------------------------------------
+workers:
+  - name: celery-worker
+    gitlab:
+      repo: iexpertapps-group/AirAds-web
+      branch: develop
+      deploy_on_push: false
+    dockerfile_path: airaad/backend/Dockerfile
+    source_dir: airaad/backend
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    run_command: celery -A celery_app worker --loglevel=info --concurrency=2
+    envs:
+      - key: DJANGO_SETTINGS_MODULE
+        scope: RUN_TIME
+        value: config.settings.production
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        type: SECRET
+      - key: REDIS_URL
+        scope: RUN_TIME
+        type: SECRET
+      - key: CELERY_BROKER_URL
+        scope: RUN_TIME
+        type: SECRET
+      - key: CELERY_RESULT_BACKEND
+        scope: RUN_TIME
+        type: SECRET
+      - key: SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: ENCRYPTION_KEY
+        scope: RUN_TIME
+        type: SECRET
+
+  # ---------------------------------------------------------------------------
+  # Celery Beat — scheduled task scheduler (exactly 1 instance)
+  # ---------------------------------------------------------------------------
+  - name: celery-beat
+    gitlab:
+      repo: iexpertapps-group/AirAds-web
+      branch: develop
+      deploy_on_push: false
+    dockerfile_path: airaad/backend/Dockerfile
+    source_dir: airaad/backend
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    run_command: celery -A celery_app beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    envs:
+      - key: DJANGO_SETTINGS_MODULE
+        scope: RUN_TIME
+        value: config.settings.production
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        type: SECRET
+      - key: REDIS_URL
+        scope: RUN_TIME
+        type: SECRET
+      - key: CELERY_BROKER_URL
+        scope: RUN_TIME
+        type: SECRET
+      - key: CELERY_RESULT_BACKEND
+        scope: RUN_TIME
+        type: SECRET
+      - key: SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: ENCRYPTION_KEY
+        scope: RUN_TIME
+        type: SECRET
+
+# ---------------------------------------------------------------------------
+# Frontend — React SPA (static site served by DO CDN)
+# ---------------------------------------------------------------------------
+static_sites:
+  - name: frontend
+    gitlab:
+      repo: iexpertapps-group/AirAds-web
+      branch: develop
+      deploy_on_push: false
+    source_dir: airaad/frontend
+    build_command: npm ci && npm run build
+    output_dir: dist
+    catchall_document: index.html
+    routes:
+      - path: /
+    envs:
+      - key: VITE_API_BASE_URL
+        scope: BUILD_TIME
+        value: ${APP_URL}
+      - key: VITE_APP_ENV
+        scope: BUILD_TIME
+        value: development
+        # Change per env: development | staging | production
+
+# ---------------------------------------------------------------------------
+# Databases (Optional — use if NOT using external Managed Database)
+# ---------------------------------------------------------------------------
+# NOTE: Dev databases do NOT support PostGIS. For AirAd, use a Managed
+# Database cluster instead and set DATABASE_URL / REDIS_URL as app secrets.
+#
+# Uncomment below ONLY for non-PostGIS testing:
+#
+# databases:
+#   - name: db
+#     engine: PG
+#     version: "16"
+#     production: false
+#     # Set production: true for prod environment
+#   - name: redis
+#     engine: REDIS
+#     version: "7"
+#     production: false

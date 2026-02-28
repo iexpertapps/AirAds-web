@@ -1,0 +1,59 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: var(--surface-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-standard);
+  white-space: nowrap;
+  font-family: var(--font-family);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--brand-orange);
+  outline-offset: 2px;
+}
+
+.md {
+  padding: var(--space-2) var(--space-4);
+  font-size: 14px;
+  min-height: var(--touch-target-min);
+}
+
+.sm {
+  padding: var(--space-1) var(--space-3);
+  font-size: 12px;
+  min-height: 32px;
+}
+
+.selected {
+  background: var(--brand-orange);
+  color: var(--text-on-brand);
+  border-color: var(--brand-orange);
+}
+
+.chip:hover:not(.selected) {
+  border-color: var(--brand-orange);
+  background: var(--surface-hover);
+}
+
+.icon {
+  font-size: 1.1em;
+}
+
+.label {
+  font-weight: 500;
+}
+
+.count {
+  font-size: 0.85em;
+  opacity: 0.8;
+  font-weight: 400;
+}
+
+.selected .count {
+  opacity: 0.9;
+}

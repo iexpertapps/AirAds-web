@@ -12,6 +12,11 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
+  ClipboardCheck,
+  ShieldAlert,
+  CreditCard,
+  Bell,
+  BarChart3,
 } from 'lucide-react';
 import { useUIStore } from '@/shared/store/uiStore';
 import { useUserRole } from '@/features/auth/store/authStore';
@@ -79,6 +84,36 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Audit Log',
     icon: <BookOpen size={18} strokeWidth={1.5} />,
     allowedRoles: ['SUPER_ADMIN', 'ANALYST', 'OPERATIONS_MANAGER'],
+  },
+  {
+    to: '/admin/claims',
+    label: 'Claims',
+    icon: <ClipboardCheck size={18} strokeWidth={1.5} />,
+    allowedRoles: ['SUPER_ADMIN', 'CITY_MANAGER'],
+  },
+  {
+    to: '/admin/moderation',
+    label: 'Moderation',
+    icon: <ShieldAlert size={18} strokeWidth={1.5} />,
+    allowedRoles: ['SUPER_ADMIN', 'CONTENT_MODERATOR', 'CITY_MANAGER'],
+  },
+  {
+    to: '/admin/subscriptions',
+    label: 'Subscriptions',
+    icon: <CreditCard size={18} strokeWidth={1.5} />,
+    allowedRoles: ['SUPER_ADMIN', 'ANALYST', 'OPERATIONS_MANAGER'],
+  },
+  {
+    to: '/admin/notifications',
+    label: 'Notifications',
+    icon: <Bell size={18} strokeWidth={1.5} />,
+    allowedRoles: ['SUPER_ADMIN', 'OPERATIONS_MANAGER'],
+  },
+  {
+    to: '/admin/kpis',
+    label: 'KPI Dashboard',
+    icon: <BarChart3 size={18} strokeWidth={1.5} />,
+    allowedRoles: ['SUPER_ADMIN', 'ANALYST'],
   },
   {
     to: '/system/users',

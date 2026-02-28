@@ -310,9 +310,63 @@ When reviewing requirements or PRDs, structure output as:
 
 ---
 
+## Security Governance — @security-architect
+
+This skill operates under the **@security-architect** governance layer. All product decisions must consider security and privacy implications as defined in `/skills/security-architect/SKILL.md` (§1–§10).
+
+### Mandatory Security Considerations in Feature Planning
+
+These requirements are inherited from @security-architect and apply to every PRD and feature design:
+
+1. **Privacy Impact Assessment (§9)** — Any feature handling PII (phone numbers, email, user profiles) must include a privacy impact section in the PRD: what data is collected, why, how long it's retained, and how it's protected.
+2. **Data Classification (§2)** — Every new data entity introduced must specify its classification (RESTRICTED / CONFIDENTIAL / INTERNAL / PUBLIC) and the corresponding controls.
+3. **Threat Modeling (§10)** — Features touching authentication, authorization, external APIs, or data storage require a threat model before development begins. Request one from @security-architect.
+4. **Security Requirements in PRD (§8)** — PRDs must include a "Security Requirements" section listing authentication needs, access control rules, encryption requirements, and audit logging expectations.
+5. **Consent & Retention (§9)** — Features collecting personal data must specify consent mechanism and data retention period. Default retention: 2 years for business data.
+6. **Security as Acceptance Criteria (§10)** — Include security-related acceptance criteria: e.g., "API validates all input server-side", "Phone numbers displayed masked", "Admin actions audit-logged".
+
+### PRD Security Section Template
+
+Add this section to every PRD for features involving data or access:
+
+```markdown
+## Security & Privacy Requirements
+
+**Data Classification:**
+- [Field name]: [RESTRICTED / CONFIDENTIAL / INTERNAL / PUBLIC]
+
+**Access Control:**
+- Who can access this feature? [Roles]
+- Object-level permissions needed? [Yes/No]
+
+**Privacy:**
+- PII collected: [List]
+- Purpose: [Why]
+- Retention: [Duration]
+- Consent required: [Yes/No]
+
+**Threat Model:**
+- Required: [Yes/No — Yes if touching auth, external APIs, or PII]
+- Requested from: @security-architect
+
+**Security Acceptance Criteria:**
+- [ ] [Specific testable security requirement]
+```
+
+### Enforcement
+
+When planning features:
+- If a feature handles PII without privacy impact assessment → **flag and request one before development**.
+- If a feature touches auth/authorization without threat model → **request threat model from @security-architect**.
+- If a PRD lacks security requirements section → **add it before signoff**.
+
+---
+
 ## References
 
 - [SKILL.md](SKILL.md) — Full toolkit with scripts and templates
 - [references/prd_templates.md](references/prd_templates.md) — PRD template library
 - [scripts/rice_prioritizer.py](scripts/rice_prioritizer.py) — RICE scoring tool
 - [scripts/customer_interview_analyzer.py](scripts/customer_interview_analyzer.py) — Interview analysis tool
+- [@security-architect Governance](/skills/security-architect/SKILL.md) — Security policies (§1–§10)
+- [@security-architect Enforcement](/skills/security-architect/AGENTS.md) — Enforced security rules

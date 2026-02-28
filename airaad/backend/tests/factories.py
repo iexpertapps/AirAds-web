@@ -123,7 +123,7 @@ class VendorFactory(factory.django.DjangoModelFactory):
     phone_number_encrypted = factory.LazyFunction(lambda: encrypt("+923001234567"))
     qc_status = QCStatus.PENDING
     is_deleted = False
-    claimed_status = False
+    claimed_status = "UNCLAIMED"
     storefront_photo_key = ""
     business_hours = factory.LazyFunction(
         lambda: {

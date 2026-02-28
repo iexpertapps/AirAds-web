@@ -1,6 +1,5 @@
 import { LogOut, User, Sun, Moon } from 'lucide-react';
-import { useUser } from '@/features/auth/store/authStore';
-import { AuthStateManager } from '@/features/auth/store/authStore';
+import { useUser, AuthStateManager } from '@/features/auth/store/authStore';
 import { useUIStore } from '@/shared/store/uiStore';
 import { queryClient } from '@/lib/queryClient';
 import { apiClient } from '@/lib/axios';
@@ -19,8 +18,9 @@ export function TopBar({ title }: TopBarProps) {
   const toggleTheme = useUIStore((s) => s.toggleTheme);
 
   async function handleLogout() {
+    const refreshToken = AuthStateManager.getCurrentRefreshToken();
     try {
-      await apiClient.post('/api/v1/auth/logout/');
+      await apiClient.post('/api/v1/auth/logout/', { refresh: refreshToken });
     } catch {
       // best-effort — proceed even if server call fails
     } finally {

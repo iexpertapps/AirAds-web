@@ -1,0 +1,134 @@
+.filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 200px;
+  max-width: 360px;
+}
+
+.statusFilter {
+  min-width: 180px;
+}
+
+.resultCount {
+  font: var(--text-body-sm);
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.tableWrap {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead {
+  background: var(--surface-hover);
+}
+
+.table th {
+  font: var(--text-heading-sm);
+  color: var(--text-primary);
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+  white-space: nowrap;
+}
+
+.table td {
+  font: var(--text-body-md);
+  color: var(--text-primary);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+  height: var(--table-row-height);
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.vendorName {
+  font: var(--text-body-strong);
+  color: var(--text-primary);
+}
+
+.areaText {
+  font: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+.daysWaiting {
+  font: var(--text-label);
+}
+
+.daysWaiting--urgent {
+  color: var(--color-error-text);
+}
+
+.daysWaiting--normal {
+  color: var(--color-warning-text);
+}
+
+.daysWaiting--recent {
+  color: var(--text-secondary);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.rejectModal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.rejectModalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border-default);
+}
+
+.paginationInfo {
+  font: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+.paginationButtons {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.maskedPhone {
+  font: var(--text-body-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-family-mono);
+}

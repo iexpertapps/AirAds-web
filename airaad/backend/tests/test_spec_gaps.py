@@ -7,7 +7,7 @@ against 01_AirAd_Data_Collection_and_Seed_Data.docx.
 Gap #1  — Area.boundary_polygon field exists
 Gap #2  — Landmark.ar_anchor_points field exists
 Gap #3  — Alias uniqueness within city enforced in geo/services.py
-Gap #4  — Vendor.claimed_status field exists, defaults False
+Gap #4  — Vendor.claimed_status field exists, defaults UNCLAIMED
 Gap #5  — Vendor.storefront_photo_key field exists
 Gap #7  — GPS coordinate range validation in CSV import
 Gap #8  — Tag.expires_at field + expire_promotion_tags task deactivates expired tags
@@ -136,16 +136,16 @@ class TestVendorClaimedStatus:
         from apps.vendors.models import Vendor
         assert hasattr(Vendor, "claimed_status"), "Vendor must have claimed_status field"
 
-    def test_claimed_status_defaults_false(self):
+    def test_claimed_status_defaults_unclaimed(self):
         from tests.factories import VendorFactory
         vendor = VendorFactory()
-        assert vendor.claimed_status is False
+        assert vendor.claimed_status == "UNCLAIMED"
 
-    def test_claimed_status_can_be_set_true(self):
+    def test_claimed_status_can_be_set_claimed(self):
         from tests.factories import VendorFactory
-        vendor = VendorFactory(claimed_status=True)
+        vendor = VendorFactory(claimed_status="CLAIMED")
         vendor.refresh_from_db()
-        assert vendor.claimed_status is True
+        assert vendor.claimed_status == "CLAIMED"
 
     def test_claimed_status_exposed_in_serializer(self):
         from apps.vendors.serializers import VendorSerializer
@@ -153,7 +153,7 @@ class TestVendorClaimedStatus:
         vendor = VendorFactory()
         data = VendorSerializer(vendor).data
         assert "claimed_status" in data
-        assert data["claimed_status"] is False
+        assert data["claimed_status"] == "UNCLAIMED"
 
 
 # ---------------------------------------------------------------------------

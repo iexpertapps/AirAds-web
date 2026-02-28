@@ -1,0 +1,418 @@
+.heading {
+  font: var(--text-heading-xl);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.subtext {
+  font: var(--text-body-md);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-8);
+}
+
+/* Success banner */
+.successBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-6);
+  color: var(--color-success-text);
+}
+
+.successBanner strong {
+  font: var(--text-body-strong);
+  color: var(--color-success-text);
+}
+
+.successBanner p {
+  font: var(--text-body-sm);
+  color: var(--color-success-text);
+  margin-top: var(--space-1);
+}
+
+.dismissBtn {
+  margin-left: auto;
+  font-size: 20px;
+  color: var(--color-success-text);
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* Current plan card */
+.currentPlan {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-8);
+  margin-bottom: var(--space-8);
+  position: relative;
+  overflow: hidden;
+}
+
+.currentPlan::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary-btn);
+}
+
+.planHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.planName {
+  font: var(--text-heading-lg);
+  color: var(--text-primary);
+}
+
+.planStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font: var(--text-micro);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.planStatusBadge--ACTIVE {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.planStatusBadge--PAST_DUE {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.planStatusBadge--CANCELED {
+  background: var(--color-error-bg);
+  color: var(--color-error-text);
+}
+
+.planStatusBadge--NONE {
+  background: var(--color-grey-200);
+  color: var(--color-grey-500);
+}
+
+/* Dark mode plan status badge adjustments */
+[data-theme="dark"] .planStatusBadge--NONE {
+  background: rgba(168, 162, 158, 0.2);
+  color: var(--color-grey-400);
+}
+
+.planMeta {
+  font: var(--text-body-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-5);
+}
+
+.planActions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.manageBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 36px;
+  padding: 0 var(--space-4);
+  font: var(--text-label);
+  color: var(--brand-orange);
+  background: var(--color-warning-bg);
+  border: 1px solid var(--brand-orange);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.manageBtn:hover {
+  background: var(--brand-orange);
+  color: var(--color-white);
+}
+
+.manageBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 36px;
+  padding: 0 var(--space-4);
+  font: var(--text-label);
+  color: var(--color-error-text);
+  background: transparent;
+  border: 1px solid var(--color-error-text);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: var(--color-error-bg);
+}
+
+.cancelBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.resumeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 36px;
+  padding: 0 var(--space-4);
+  font: var(--text-label);
+  color: var(--color-white);
+  background: var(--brand-teal);
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.resumeBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancelWarning {
+  font: var(--text-caption);
+  color: var(--color-warning-text);
+  background: var(--color-warning-bg);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-4);
+}
+
+/* Plan comparison */
+.comparisonHeading {
+  font: var(--text-heading-md);
+  color: var(--text-primary);
+  margin-bottom: var(--space-6);
+}
+
+.tiersGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-10);
+}
+
+.tierCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6) var(--space-4);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  text-align: center;
+}
+
+.tierCard--current {
+  border-color: var(--brand-orange);
+  border-width: 2px;
+}
+
+.popularLabel {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--brand-teal);
+  color: var(--color-white);
+  font: var(--text-micro);
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.currentLabel {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--brand-orange);
+  color: var(--color-white);
+  font: var(--text-micro);
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.tierName {
+  font: var(--text-label);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-3);
+}
+
+.tierPrice {
+  font: var(--text-heading-lg);
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.tierUnit {
+  font: var(--text-caption);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-5);
+}
+
+.tierFeatures {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-align: left;
+  margin-bottom: var(--space-5);
+  flex: 1;
+}
+
+.tierFeature {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--text-body-sm);
+  color: var(--text-primary);
+}
+
+.featureCheck {
+  color: var(--brand-teal);
+  flex-shrink: 0;
+}
+
+.upgradeBtn {
+  width: 100%;
+  height: 40px;
+  font: var(--text-label);
+  color: var(--color-white);
+  background: var(--gradient-primary-btn);
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.upgradeBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3);
+}
+
+.upgradeBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.downgradeBtn {
+  width: 100%;
+  height: 40px;
+  font: var(--text-label);
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+/* Invoices */
+.invoiceHeading {
+  font: var(--text-heading-md);
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.invoiceTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.invoiceTable th {
+  font: var(--text-label);
+  color: var(--text-primary);
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-hover);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.invoiceTable td {
+  font: var(--text-body-sm);
+  color: var(--text-primary);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.invoiceTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.downloadLink {
+  font: var(--text-body-sm);
+  color: var(--brand-orange);
+  text-decoration: none;
+}
+
+.downloadLink:hover {
+  text-decoration: underline;
+}
+
+.emptyInvoices {
+  text-align: center;
+  padding: var(--space-6);
+  color: var(--text-secondary);
+  font: var(--text-body-sm);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: var(--text-secondary);
+  font: var(--text-body);
+}
+
+.error {
+  font: var(--text-body-sm);
+  color: var(--color-error-text);
+  margin-top: var(--space-2);
+}
+
+@media (max-width: 1024px) {
+  .tiersGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .tiersGrid {
+    grid-template-columns: 1fr;
+  }
+}

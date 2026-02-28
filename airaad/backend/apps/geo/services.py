@@ -63,6 +63,67 @@ def create_country(
     return country
 
 
+@transaction.atomic
+def update_country(
+    country: Country,
+    updates: dict[str, Any],
+    actor: Any,
+    request: HttpRequest,
+) -> Country:
+    """Update a Country record.
+
+    Args:
+        country: Country instance to update.
+        updates: Dict of field names to new values.
+        actor: AdminUser performing the action.
+        request: HTTP request for audit tracing.
+
+    Returns:
+        Updated Country instance.
+    """
+    before = {"name": country.name, "code": country.code}
+    allowed_fields = {"name", "is_active"}
+    for field, value in updates.items():
+        if field in allowed_fields:
+            setattr(country, field, value)
+    country.save()
+    log_action(
+        action="COUNTRY_UPDATED",
+        actor=actor,
+        target_obj=country,
+        request=request,
+        before=before,
+        after={"name": country.name, "is_active": country.is_active},
+    )
+    return country
+
+
+@transaction.atomic
+def delete_country(
+    country: Country,
+    actor: Any,
+    request: HttpRequest,
+) -> None:
+    """Soft-delete a Country by setting is_active=False.
+
+    Args:
+        country: Country instance to delete.
+        actor: AdminUser performing the action.
+        request: HTTP request for audit tracing.
+    """
+    before = {"name": country.name, "is_active": country.is_active}
+    country.is_active = False
+    country.save(update_fields=["is_active"])
+    log_action(
+        action="COUNTRY_DELETED",
+        actor=actor,
+        target_obj=country,
+        request=request,
+        before=before,
+        after={"is_active": False},
+    )
+
+
 # ---------------------------------------------------------------------------
 # City
 # ---------------------------------------------------------------------------

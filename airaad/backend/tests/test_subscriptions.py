@@ -1,7 +1,7 @@
 """
 AirAd — tests/test_subscriptions.py
 
-Tests for apps/subscriptions — Phase B stub tasks.
+Tests for apps/subscriptions — Phase B tasks.
 """
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ class TestSubscriptionExpiryCheckTask:
         assert callable(subscription_expiry_check)
 
     def test_task_runs_without_error(self) -> None:
-        """subscription_expiry_check (Phase B stub) runs without raising."""
+        """subscription_expiry_check runs without raising."""
         from apps.subscriptions.tasks import subscription_expiry_check
         subscription_expiry_check()  # Must not raise
 

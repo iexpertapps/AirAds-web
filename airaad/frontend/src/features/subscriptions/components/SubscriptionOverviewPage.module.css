@@ -1,0 +1,97 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.tierCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-6);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+}
+
+.tierCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.tierCard--SILVER::before { background: var(--color-grey-400); }
+.tierCard--GOLD::before { background: var(--brand-orange); }
+.tierCard--DIAMOND::before { background: var(--brand-teal); }
+.tierCard--PLATINUM::before { background: var(--brand-crimson); }
+
+.tierName {
+  font: var(--text-label);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tierCount {
+  font: var(--text-heading-xl);
+  color: var(--text-primary);
+}
+
+.tierPercent {
+  font: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+.chartSection {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.sectionHeading {
+  font: var(--text-heading-sm);
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.summaryRow {
+  display: flex;
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.summaryCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  flex: 1;
+}
+
+.summaryValue {
+  font: var(--text-heading-lg);
+  color: var(--text-primary);
+}
+
+.summaryLabel {
+  font: var(--text-caption);
+  color: var(--text-secondary);
+}
+
+.conversionHighlight {
+  color: var(--brand-orange);
+}

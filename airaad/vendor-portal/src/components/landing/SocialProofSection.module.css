@@ -1,0 +1,124 @@
+.section {
+  padding: var(--space-24) var(--space-8);
+  background: var(--brand-black);
+  color: var(--color-white);
+}
+
+.inner {
+  max-width: var(--landing-max-width);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.heading {
+  font: var(--text-heading-xl);
+  color: var(--color-white);
+  margin-bottom: var(--space-12);
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-8);
+  margin-bottom: var(--space-16);
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.statValue {
+  font: var(--text-display-sm);
+  color: var(--brand-orange);
+}
+
+.statLabel {
+  font: var(--text-body-md);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.testimonials {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-6);
+  text-align: left;
+}
+
+.testimonialCard {
+  background: var(--brand-black-card);
+  border: 1px solid var(--brand-black-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.quoteText {
+  font: var(--text-body);
+  color: rgba(255, 255, 255, 0.85);
+  font-style: italic;
+  line-height: 1.7;
+}
+
+.quoteText::before {
+  content: '\201C';
+  font-size: 24px;
+  color: var(--brand-orange);
+  margin-right: 2px;
+}
+
+.quoteText::after {
+  content: '\201D';
+  font-size: 24px;
+  color: var(--brand-orange);
+  margin-left: 2px;
+}
+
+.authorRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.authorAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--brand-orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  font: var(--text-label);
+  flex-shrink: 0;
+}
+
+.authorInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.authorName {
+  font: var(--text-label);
+  color: var(--color-white);
+}
+
+.authorBiz {
+  font: var(--text-caption);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 768px) {
+  .statsRow {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  .section {
+    padding: var(--space-16) var(--space-5);
+  }
+}

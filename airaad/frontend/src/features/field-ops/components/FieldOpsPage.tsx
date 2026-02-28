@@ -30,7 +30,7 @@ interface FieldVisit {
   vendor_id: string;
   vendor_name: string;
   agent_email: string;
-  visit_date: string;
+  visited_at: string;
   gps_confirmed: boolean;
   photos_count: number;
   drift_meters?: number;
@@ -189,10 +189,10 @@ export default function FieldOpsPage() {
       render: (v) => <span>{v.agent_email}</span>,
     },
     {
-      key: 'visit_date',
+      key: 'visited_at',
       header: 'Visit Date',
       sortable: true,
-      render: (v) => <span>{new Date(v.visit_date).toLocaleDateString()}</span>,
+      render: (v) => <span>{new Date(v.visited_at).toLocaleDateString()}</span>,
     },
     {
       key: 'gps_confirmed',
@@ -218,7 +218,7 @@ export default function FieldOpsPage() {
       key: 'drift',
       header: 'Drift Alert',
       render: (v) =>
-        v.drift_meters !== undefined && v.drift_meters > DRIFT_THRESHOLD_METERS ? (
+        v.drift_meters != null && v.drift_meters > DRIFT_THRESHOLD_METERS ? (
           <Badge
             variant="warning"
             label={`${v.drift_meters.toFixed(0)}m drift`}
@@ -298,12 +298,12 @@ export default function FieldOpsPage() {
               <dt>Agent</dt>
               <dd>{selectedVisit.agent_email}</dd>
               <dt>Visit Date</dt>
-              <dd>{new Date(selectedVisit.visit_date).toLocaleString()}</dd>
+              <dd>{new Date(selectedVisit.visited_at).toLocaleString()}</dd>
               <dt>GPS Confirmed</dt>
               <dd>{selectedVisit.gps_confirmed ? 'Yes' : 'No'}</dd>
               <dt>Photos</dt>
               <dd>{selectedVisit.photos_count}</dd>
-              {selectedVisit.drift_meters !== undefined && (
+              {selectedVisit.drift_meters != null && (
                 <>
                   <dt>GPS Drift</dt>
                   <dd className={selectedVisit.drift_meters > DRIFT_THRESHOLD_METERS ? styles.driftWarning : ''}>
@@ -357,19 +357,23 @@ export default function FieldOpsPage() {
               <section className={styles.uploadSection}>
                 <h3 className={styles.sectionHeading}>Upload Photo</h3>
                 <div className={styles.uploadForm}>
-                  <label className={styles.fileLabel}>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      className={styles.fileInput}
-                      onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
-                    />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className={styles.fileInput}
+                    onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
+                  />
+                  <button
+                    type="button"
+                    className={styles.fileLabel}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
                     <span className={styles.fileLabelText}>
                       <Upload size={14} aria-hidden="true" />
                       {uploadFile ? uploadFile.name : 'Choose photo…'}
                     </span>
-                  </label>
+                  </button>
                   {uploadFile && (
                     <button
                       type="button"

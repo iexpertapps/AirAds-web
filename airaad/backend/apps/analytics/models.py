@@ -17,8 +17,9 @@ from django.db import models
 
 
 class EventType(models.TextChoices):
-    """Discovery event types per spec §7.1."""
+    """Discovery event types per spec §7.1 + Phase B extensions."""
 
+    # Phase A events
     AR_VIEW_OPENED = "AR_VIEW_OPENED", "AR View Opened"
     VENDOR_MARKER_TAPPED = "VENDOR_MARKER_TAPPED", "Vendor Marker Tapped"
     VOICE_QUERY_MADE = "VOICE_QUERY_MADE", "Voice Query Made"
@@ -26,6 +27,15 @@ class EventType(models.TextChoices):
     REEL_VIEWED = "REEL_VIEWED", "Reel Viewed"
     PROMOTION_CLICKED = "PROMOTION_CLICKED", "Promotion Clicked"
     VENDOR_VIEW = "VENDOR_VIEW", "Vendor View"
+
+    # Phase B events (§3.6 analytics)
+    VIEW = "VIEW", "View"
+    SEARCH = "SEARCH", "Search"
+    REEL_VIEW = "REEL_VIEW", "Reel View"
+    REEL_SHARE = "REEL_SHARE", "Reel Share"
+    DISCOUNT_VIEW = "DISCOUNT_VIEW", "Discount View"
+    DISCOUNT_TAP = "DISCOUNT_TAP", "Discount Tap"
+    PROFILE_TAP = "PROFILE_TAP", "Profile Tap"
 
 
 class AnalyticsEvent(models.Model):

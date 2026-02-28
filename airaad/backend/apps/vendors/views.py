@@ -135,6 +135,10 @@ class VendorListCreateView(APIView):
         if tag_id:
             qs = qs.filter(tags__id=tag_id)
 
+        claimed_status = request.query_params.get("claimed_status")
+        if claimed_status:
+            qs = qs.filter(claimed_status=claimed_status)
+
         paginator = StandardResultsPagination()
         page = paginator.paginate_queryset(qs, request)
         return paginator.get_paginated_response(

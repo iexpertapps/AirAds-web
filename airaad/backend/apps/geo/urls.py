@@ -10,6 +10,7 @@ from .views import (
     AreaListCreateView,
     CityDetailView,
     CityListCreateView,
+    CountryDetailView,
     CountryListCreateView,
     LandmarkDetailView,
     LandmarkListCreateView,
@@ -17,6 +18,7 @@ from .views import (
 
 urlpatterns = [
     path("countries/", CountryListCreateView.as_view(), name="geo-country-list"),
+    path("countries/<uuid:pk>/", CountryDetailView.as_view(), name="geo-country-detail"),
     path("cities/", CityListCreateView.as_view(), name="geo-city-list"),
     path("cities/<uuid:pk>/", CityDetailView.as_view(), name="geo-city-detail"),
     path("areas/", AreaListCreateView.as_view(), name="geo-area-list"),

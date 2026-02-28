@@ -14,28 +14,6 @@ from celery.signals import task_failure
 logger = logging.getLogger(__name__)
 
 
-def _task_exists(module: str, name: str) -> bool:
-    """Check whether a Celery task function is importable.
-
-    Used to guard Phase B Beat schedules so Beat does not log errors
-    every interval for task bodies that are not yet implemented.
-
-    Args:
-        module: Dotted module path, e.g. "apps.vendors.tasks".
-        name: Function name within the module, e.g. "discount_scheduler".
-
-    Returns:
-        True if the attribute exists in the module, False otherwise.
-    """
-    import importlib
-
-    try:
-        mod = importlib.import_module(module)
-        return callable(getattr(mod, name, None))
-    except Exception:
-        return False
-
-
 # ---------------------------------------------------------------------------
 # Celery app instance
 # ---------------------------------------------------------------------------
@@ -54,10 +32,10 @@ app.autodiscover_tasks()
 def setup_periodic_tasks(sender: Celery, **kwargs: Any) -> None:
     """Register all Celery Beat periodic schedules in code.
 
-    All 5 schedules are defined here. Beat replicas must be exactly 1 (R10).
-    Phase B tasks (discount_scheduler, subscription_expiry_check,
-    hourly_tag_assignment) are registered now so Beat is aware of them
-    when Phase B task bodies are implemented.
+    Phase A: 9 tasks (QA scans, tag expiry, governance).
+    Phase B: 8 tasks (discounts, subscriptions, tags, flash deals, happy hours,
+    voicebot freshness, vendor churn, monthly reports).
+    Beat replicas must be exactly 1 (R10).
 
     Args:
         sender: The Celery app instance.
@@ -128,40 +106,72 @@ def setup_periodic_tasks(sender: Celery, **kwargs: Any) -> None:
         name="generate_time_context_tags",
     )
 
-    # Phase B tasks — only registered when the task bodies are implemented.
-    # Guards prevent Beat from logging errors every interval for missing tasks.
-    _phase_b_tasks = [
-        ("apps.vendors.tasks", "discount_scheduler"),
-        ("apps.subscriptions.tasks", "subscription_expiry_check"),
-        ("apps.tags.tasks", "hourly_tag_assignment"),
-    ]
-    _phase_b_implemented = all(
-        _task_exists(module, name) for module, name in _phase_b_tasks
+    # -----------------------------------------------------------------------
+    # Phase B tasks — all implemented, no guards needed
+    # -----------------------------------------------------------------------
+
+    # Phase B — Discount scheduler: every 1 minute (§3.4)
+    sender.add_periodic_task(
+        60.0,
+        app.signature("apps.vendors.tasks.discount_scheduler"),
+        name="discount_scheduler",
     )
 
-    if _phase_b_implemented:
-        # Phase B — Discount scheduler: every 1 minute
-        sender.add_periodic_task(
-            60.0,
-            app.signature("apps.vendors.tasks.discount_scheduler"),
-            name="discount_scheduler",
-        )
+    # Phase B — Subscription expiry check: daily at midnight UTC (§3.4)
+    sender.add_periodic_task(
+        crontab(hour=0, minute=0),
+        app.signature("apps.subscriptions.tasks.subscription_expiry_check"),
+        name="subscription_expiry_check",
+    )
 
-        # Phase B — Subscription expiry check: daily at midnight UTC
-        sender.add_periodic_task(
-            crontab(hour=0, minute=0),
-            app.signature("apps.subscriptions.tasks.subscription_expiry_check"),
-            name="subscription_expiry_check",
-        )
+    # Phase B — Hourly tag auto-assignment: every 1 hour (§3.4)
+    sender.add_periodic_task(
+        crontab(minute=0),
+        app.signature("apps.vendors.tasks.hourly_tag_assignment"),
+        name="hourly_tag_assignment",
+    )
 
-        # Phase B — Hourly tag auto-assignment: every 1 hour
-        sender.add_periodic_task(
-            crontab(minute=0),
-            app.signature("apps.tags.tasks.hourly_tag_assignment"),
-            name="hourly_tag_assignment",
-        )
-    else:
-        logger.info("Phase B Beat tasks skipped — task bodies not yet implemented")
+    # Phase B — Flash deal trigger: every 5 minutes (§3.4)
+    sender.add_periodic_task(
+        crontab(minute="*/5"),
+        app.signature("apps.vendors.tasks.flash_deal_trigger"),
+        name="flash_deal_trigger",
+    )
+
+    # Phase B — Auto happy hour trigger: every 15 minutes (§3.4)
+    sender.add_periodic_task(
+        crontab(minute="*/15"),
+        app.signature("apps.vendors.tasks.auto_happy_hour_trigger"),
+        name="auto_happy_hour_trigger",
+    )
+
+    # Phase B — Voice bot freshness check: daily at 06:00 UTC
+    sender.add_periodic_task(
+        crontab(hour=6, minute=0),
+        app.signature("apps.subscriptions.tasks.voicebot_freshness_check"),
+        name="voicebot_freshness_check",
+    )
+
+    # Phase B — Vendor churn check: daily at 07:00 UTC
+    sender.add_periodic_task(
+        crontab(hour=7, minute=0),
+        app.signature("apps.subscriptions.tasks.vendor_churn_check"),
+        name="vendor_churn_check",
+    )
+
+    # Phase B — Vendor monthly report: 1st of month at 06:00 UTC
+    sender.add_periodic_task(
+        crontab(hour=6, minute=0, day_of_month=1),
+        app.signature("apps.subscriptions.tasks.vendor_monthly_report"),
+        name="vendor_monthly_report",
+    )
+
+    # Phase B — Vendor activation check: daily at 02:00 UTC (§3.2)
+    sender.add_periodic_task(
+        crontab(hour=2, minute=0),
+        app.signature("apps.vendors.tasks.vendor_activation_check"),
+        name="vendor_activation_check",
+    )
 
 
 # ---------------------------------------------------------------------------

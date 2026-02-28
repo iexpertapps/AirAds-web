@@ -1,0 +1,68 @@
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--space-4);
+  z-index: 9999;
+  padding: var(--space-2) var(--space-4);
+  background: var(--brand-orange);
+  color: var(--color-white);
+  font: var(--text-label);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: top var(--duration-fast) var(--ease-standard);
+}
+
+.skip-link:focus {
+  top: var(--space-4);
+}
+
+.loading-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: var(--space-4);
+  color: var(--text-secondary);
+  font: var(--text-body);
+}
+
+.loading-fallback-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  animation: pulse-logo 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-logo {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ── Visually Hidden (screen-reader only) ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ── Focus ring ── */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--brand-orange);
+  outline-offset: 2px;
+}
+
+/* ── No-scrollbar utility ── */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

@@ -1,0 +1,23 @@
+# AirAds Backup System - Crontab Configuration
+# Add these entries to your crontab with: crontab -e
+
+# Environment variables
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin
+PYTHONPATH=/Users/syedsmacbook/Developer/AirAds-web/airaad/backend
+DJANGO_SETTINGS_MODULE=config.settings.production
+
+# Daily full backup at 2:00 AM
+0 2 * * * /Users/syedsmacbook/Developer/AirAds-web/scripts/run_backup.sh full
+
+# Database backup every 6 hours
+0 */6 * * * /Users/syedsmacbook/Developer/AirAds-web/scripts/run_backup.sh database
+
+# Redis backup every 4 hours
+0 */4 * * * /Users/syedsmacbook/Developer/AirAds-web/scripts/run_backup.sh redis
+
+# Weekly cleanup of expired backups on Sundays at 3:00 AM
+0 3 * * 0 /Users/syedsmacbook/Developer/AirAds-web/scripts/backup_system.py --cleanup
+
+# Monthly backup verification on the 1st of each month at 4:00 AM
+0 4 1 * * /Users/syedsmacbook/Developer/AirAds-web/scripts/verify_backups.sh

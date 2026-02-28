@@ -451,6 +451,32 @@ When reviewing Python code, structure your output as:
 
 ---
 
+## Security Governance — @security-architect
+
+This skill operates under the **@security-architect** governance layer. All backend code must comply with the security policies defined in `/skills/security-architect/SKILL.md` (§1–§10).
+
+### Mandatory Backend Security Rules
+
+These rules are inherited from @security-architect and are **non-negotiable**:
+
+1. **Input Validation (§4)** — Validate all API inputs via DRF serializers. Never use raw string-formatted SQL. Always use Django ORM or parameterized queries.
+2. **Authentication (§1)** — Use Django's built-in password hashing (`set_password` / `make_password`). Never implement custom password hashing.
+3. **Data Protection (§2, §3)** — RESTRICTED data (phone numbers, PII) must be encrypted at rest (AES-256-GCM) and masked in API responses and logs.
+4. **Audit Logging (§5)** — Log all data mutations (create, update, delete) with actor, resource, action, and timestamp. Never log passwords, tokens, or full PII.
+5. **Error Handling (§4)** — Never expose stack traces, SQL errors, or internal paths in API responses. Use generic messages with correlation IDs.
+6. **Secret Management (§6)** — All secrets via `os.environ[]`. Never hardcode secrets. Never use default values for secret keys.
+7. **Permissions (§1, §7)** — Every view must declare explicit `permission_classes`. Default-deny for undefined routes. Least privilege access.
+
+### Enforcement
+
+If generated Python code violates any @security-architect policy:
+- **CRITICAL violations** (§1, §2, §3, §6): Block — must fix before merge.
+- **HIGH violations** (§4, §5, §7): Warn — should fix before merge.
+
+Refer to `/skills/security-architect/AGENTS.md` for detailed rules and examples.
+
+---
+
 ## References
 
 - Individual rule files in `rules/` directory
@@ -458,3 +484,5 @@ When reviewing Python code, structure your output as:
 - [PEP 257 - Docstring Conventions](https://peps.python.org/pep-0257/)
 - [PEP 484 - Type Hints](https://peps.python.org/pep-0484/)
 - [Python typing module documentation](https://docs.python.org/3/library/typing.html)
+- [@security-architect Governance](/skills/security-architect/SKILL.md) — Security policies (§1–§10)
+- [@security-architect Enforcement](/skills/security-architect/AGENTS.md) — Enforced security rules
